@@ -53,7 +53,7 @@ params:
           icon: ""
           fallback: "🗺️"
           gradient: "#f59e0b, #d97706"
-          - name: Navigation
+        - name: Navigation
           url: "http://navigation.mulecube.local"
           demo_url: "https://signalk.org/about/"
           description: "Marine Chart Plotter"
