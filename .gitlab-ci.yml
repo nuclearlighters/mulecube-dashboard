@@ -10,7 +10,6 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   HUGO_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/hugo-runner:1.5"
   BASE_IMAGE_DEMO: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-nginx-base:latest"
-  BASE_IMAGE_DEVICE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-dashboard-base:latest"
   GHCR_IMAGE: "ghcr.io/nuclearlighters/mulecube/mulecube-dashboard"
   AWX_HOST: "https://awx.nuclearlighters.net"
 
@@ -83,10 +82,12 @@ docker:device:
     DOCKER_API_VERSION: "1.41"
   before_script:
     - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
-    - docker login registry-gitlab.nuclearlighters.net -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
-    - echo "FROM ${BASE_IMAGE_DEVICE}" > Dockerfile
-    - echo "COPY public/ /usr/share/nginx/html/" >> Dockerfile
+    - |
+      cat > Dockerfile << 'DOCKERFILE'
+      FROM cgr.dev/chainguard/nginx:latest
+      COPY public/ /usr/share/nginx/html/
+      DOCKERFILE
     - docker buildx create --name armbuilder --use 2>/dev/null || docker buildx use armbuilder
     - docker buildx build --platform linux/arm64 --push -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
     - echo "✅ Device image pushed (arm64)"
