@@ -9,12 +9,12 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   HUGO_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/hugo-runner:1.4"
-  BASE_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-nginx-base:latest"
+  BASE_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-dashboard-base:latest"
   GHCR_IMAGE: "ghcr.io/nuclearlighters/mulecube/mulecube-dashboard"
   AWX_HOST: "https://awx.nuclearlighters.net"
 
 # =============================================================================
-# BUILD STAGE - Compile Hugo site (parallel builds)
+# BUILD STAGE
 # =============================================================================
 
 build:demo:
@@ -25,7 +25,6 @@ build:demo:
   script:
     - hugo version
     - hugo --minify --gc --ignoreCache -e demo
-    - echo "Built for demo environment"
   artifacts:
     paths:
       - public/
@@ -41,7 +40,6 @@ build:device:
   script:
     - hugo version
     - hugo --minify --gc --ignoreCache
-    - echo "Built for device environment"
   artifacts:
     paths:
       - public/
@@ -50,7 +48,7 @@ build:device:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # =============================================================================
-# DOCKER STAGE - Build and push images (parallel builds)
+# DOCKER STAGE
 # =============================================================================
 
 docker:demo:
@@ -96,10 +94,9 @@ docker:device:
       FROM ${BASE_IMAGE}
       COPY public/ /usr/share/nginx/html/
       DOCKERFILE
-    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
-    - docker push ${GHCR_IMAGE}:latest
-    - docker push ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA}
-    - echo "✅ Device image pushed: ${GHCR_IMAGE}:latest"
+    - docker buildx create --name armbuilder --use 2>/dev/null || docker buildx use armbuilder
+    - docker buildx build --platform linux/arm64 --build-arg BASE_IMAGE=${BASE_IMAGE} --push -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
+    - echo "✅ Device image pushed: ${GHCR_IMAGE}:latest (arm64)"
   needs:
     - job: build:device
       artifacts: true
@@ -107,7 +104,7 @@ docker:device:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # =============================================================================
-# DEPLOY STAGE - Deploy to targets (parallel deployments)
+# DEPLOY STAGE
 # =============================================================================
 
 deploy:demo:
@@ -121,24 +118,14 @@ deploy:demo:
       RESPONSE=$(curl -s -X POST \
         -H "Authorization: Bearer ${AWX_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard", "image_tag": "demo"}}' \
+        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}' \
         "${AWX_HOST}/api/v2/job_templates/${AWX_DEMO_TEMPLATE_ID}/launch/")
-
       JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-
-      if [ -z "$JOB_ID" ]; then
-        echo "Failed to launch AWX job"
-        echo "$RESPONSE" | jq .
-        exit 1
-      fi
-
+      if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
       echo "AWX Job launched: ID=$JOB_ID"
-      echo "Job URL: ${AWX_HOST}/#/jobs/playbook/${JOB_ID}/output"
-
       for i in $(seq 1 30); do
         sleep 10
-        STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" \
-          "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
+        STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
         echo "Status: $STATUS"
         case "$STATUS" in
           successful) echo "✅ Demo deployment successful"; exit 0 ;;
@@ -161,28 +148,18 @@ deploy:device:
     - docker
   script:
     - |
-      echo "📦 Deploying to Raspberry Pi device..."
+      echo "📦 Deploying to Raspberry Pi..."
       RESPONSE=$(curl -s -X POST \
         -H "Authorization: Bearer ${AWX_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-landing", "image_tag": "latest"}}' \
+        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}' \
         "${AWX_HOST}/api/v2/job_templates/${AWX_DEVICE_TEMPLATE_ID}/launch/")
-
       JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-
-      if [ -z "$JOB_ID" ]; then
-        echo "Failed to launch AWX job"
-        echo "$RESPONSE" | jq .
-        exit 1
-      fi
-
+      if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
       echo "AWX Job launched: ID=$JOB_ID"
-      echo "Job URL: ${AWX_HOST}/#/jobs/playbook/${JOB_ID}/output"
-
       for i in $(seq 1 30); do
         sleep 10
-        STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" \
-          "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
+        STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
         echo "Status: $STATUS"
         case "$STATUS" in
           successful) echo "✅ Device deployment successful"; exit 0 ;;
@@ -194,7 +171,7 @@ deploy:device:
     - job: docker:device
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-  allow_failure: true  # Pi might be offline
+  allow_failure: true
   environment:
     name: production
     url: http://mulecube.local
