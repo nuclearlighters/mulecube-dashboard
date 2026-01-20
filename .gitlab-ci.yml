@@ -1,14 +1,6 @@
 # =============================================================================
-# MuleCube Device Dashboard Pipeline
+# MuleCube Dashboard Pipeline - Dual Deployment (Demo + Device)
 # =============================================================================
-# Dual deployment workflow:
-#   - demo.mulecube.com (DMZ) - every main branch push
-#   - mulecube.local (Pi)    - version tags only (v1.0.0)
-#
-# Demo builds include a banner showing "This is a demo"
-# Device builds are clean production builds
-# =============================================================================
-
 stages:
   - build
   - docker
@@ -22,10 +14,9 @@ variables:
   AWX_HOST: "https://awx.nuclearlighters.net"
 
 # =============================================================================
-# BUILD STAGE
+# BUILD STAGE - Compile Hugo site (parallel builds)
 # =============================================================================
 
-# Build for demo site (includes demo banner)
 build:demo:
   stage: build
   image: $HUGO_IMAGE
@@ -42,7 +33,6 @@ build:demo:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-# Build for device (clean production build)
 build:device:
   stage: build
   image: $HUGO_IMAGE
@@ -51,19 +41,18 @@ build:device:
   script:
     - hugo version
     - hugo --minify --gc --ignoreCache
-    - echo "Built for device deployment"
+    - echo "Built for device environment"
   artifacts:
     paths:
       - public/
     expire_in: 1 hour
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 # =============================================================================
-# DOCKER STAGE
+# DOCKER STAGE - Build and push images (parallel builds)
 # =============================================================================
 
-# Docker image for demo site
 docker:demo:
   stage: docker
   image: $HUGO_IMAGE
@@ -81,17 +70,15 @@ docker:demo:
       FROM ${BASE_IMAGE}
       COPY public/ /usr/share/nginx/html/
       DOCKERFILE
-    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:demo-${CI_COMMIT_SHORT_SHA} -t ${GHCR_IMAGE}:demo .
-    - docker push ${GHCR_IMAGE}:demo-${CI_COMMIT_SHORT_SHA}
+    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:demo .
     - docker push ${GHCR_IMAGE}:demo
-    - echo "Demo image pushed - ${GHCR_IMAGE}:demo"
+    - echo "✅ Demo image pushed: ${GHCR_IMAGE}:demo"
   needs:
     - job: build:demo
       artifacts: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-# Docker image for device (tagged releases)
 docker:device:
   stage: docker
   image: $HUGO_IMAGE
@@ -109,21 +96,20 @@ docker:device:
       FROM ${BASE_IMAGE}
       COPY public/ /usr/share/nginx/html/
       DOCKERFILE
-    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:${CI_COMMIT_TAG} -t ${GHCR_IMAGE}:latest .
-    - docker push ${GHCR_IMAGE}:${CI_COMMIT_TAG}
+    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
     - docker push ${GHCR_IMAGE}:latest
-    - echo "Device image pushed - ${GHCR_IMAGE}:${CI_COMMIT_TAG}"
+    - docker push ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA}
+    - echo "✅ Device image pushed: ${GHCR_IMAGE}:latest"
   needs:
     - job: build:device
       artifacts: true
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 # =============================================================================
-# DEPLOY STAGE
+# DEPLOY STAGE - Deploy to targets (parallel deployments)
 # =============================================================================
 
-# Deploy demo to DMZ hosts
 deploy:demo:
   stage: deploy
   image: $HUGO_IMAGE
@@ -137,18 +123,18 @@ deploy:demo:
         -H "Content-Type: application/json" \
         -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard", "image_tag": "demo"}}' \
         "${AWX_HOST}/api/v2/job_templates/${AWX_DEMO_TEMPLATE_ID}/launch/")
-      
+
       JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-      
+
       if [ -z "$JOB_ID" ]; then
         echo "Failed to launch AWX job"
         echo "$RESPONSE" | jq .
         exit 1
       fi
-      
+
       echo "AWX Job launched: ID=$JOB_ID"
       echo "Job URL: ${AWX_HOST}/#/jobs/playbook/${JOB_ID}/output"
-      
+
       for i in $(seq 1 30); do
         sleep 10
         STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" \
@@ -168,7 +154,6 @@ deploy:demo:
     name: demo
     url: https://demo.mulecube.com
 
-# Deploy to MuleCube device (Raspberry Pi)
 deploy:device:
   stage: deploy
   image: $HUGO_IMAGE
@@ -176,24 +161,24 @@ deploy:device:
     - docker
   script:
     - |
-      echo "📦 Deploying ${CI_COMMIT_TAG} to MuleCube device..."
+      echo "📦 Deploying to Raspberry Pi device..."
       RESPONSE=$(curl -s -X POST \
         -H "Authorization: Bearer ${AWX_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-landing", "image_tag": "'"${CI_COMMIT_TAG}"'"}}' \
+        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-landing", "image_tag": "latest"}}' \
         "${AWX_HOST}/api/v2/job_templates/${AWX_DEVICE_TEMPLATE_ID}/launch/")
-      
+
       JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-      
+
       if [ -z "$JOB_ID" ]; then
         echo "Failed to launch AWX job"
         echo "$RESPONSE" | jq .
         exit 1
       fi
-      
+
       echo "AWX Job launched: ID=$JOB_ID"
       echo "Job URL: ${AWX_HOST}/#/jobs/playbook/${JOB_ID}/output"
-      
+
       for i in $(seq 1 30); do
         sleep 10
         STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" \
@@ -208,7 +193,8 @@ deploy:device:
   needs:
     - job: docker:device
   rules:
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: true  # Pi might be offline
   environment:
     name: production
     url: http://mulecube.local
