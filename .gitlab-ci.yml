@@ -9,7 +9,7 @@ stages:
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   HUGO_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/hugo-runner:1.4"
-  BASE_IMAGE: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-dashboard-base:latest"
+  BASE_IMAGE_DEMO: "registry-gitlab.nuclearlighters.net/infrastructure/nllei01/production/mulecube-nginx-base:latest"
   GHCR_IMAGE: "ghcr.io/nuclearlighters/mulecube/mulecube-dashboard"
   AWX_HOST: "https://awx.nuclearlighters.net"
 
@@ -62,7 +62,7 @@ docker:demo:
     - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
     - docker login registry-gitlab.nuclearlighters.net -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
-    - echo "FROM ${BASE_IMAGE}" > Dockerfile
+    - echo "FROM ${BASE_IMAGE_DEMO}" > Dockerfile
     - echo "COPY public/ /usr/share/nginx/html/" >> Dockerfile
     - docker build --no-cache -t ${GHCR_IMAGE}:demo .
     - docker push ${GHCR_IMAGE}:demo
@@ -73,27 +73,9 @@ docker:demo:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-docker:device:
-  stage: docker
-  image: $HUGO_IMAGE
-  tags:
-    - docker
-  variables:
-    DOCKER_API_VERSION: "1.41"
-  before_script:
-    - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
-    - docker login registry-gitlab.nuclearlighters.net -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-  script:
-    - echo "FROM ${BASE_IMAGE}" > Dockerfile
-    - echo "COPY public/ /usr/share/nginx/html/" >> Dockerfile
-    - docker buildx create --name armbuilder --use 2>/dev/null || docker buildx use armbuilder
-    - docker buildx build --platform linux/arm64 --push -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
-    - echo "✅ Device image pushed (arm64)"
-  needs:
-    - job: build:device
-      artifacts: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+# Device build disabled until hugo-runner has buildx
+# docker:device:
+#   ...
 
 # =============================================================================
 # DEPLOY STAGE
@@ -133,39 +115,3 @@ deploy:demo:
   environment:
     name: demo
     url: https://demo.mulecube.com
-
-deploy:device:
-  stage: deploy
-  image: $HUGO_IMAGE
-  tags:
-    - docker
-  script:
-    - echo "📦 Deploying to Raspberry Pi..."
-    - >
-      RESPONSE=$(curl -s -X POST
-      -H "Authorization: Bearer ${AWX_TOKEN}"
-      -H "Content-Type: application/json"
-      -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}'
-      "${AWX_HOST}/api/v2/job_templates/${AWX_DEVICE_TEMPLATE_ID}/launch/")
-    - JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-    - if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
-    - echo "AWX Job launched - ID=$JOB_ID"
-    - |
-      for i in $(seq 1 30); do
-        sleep 10
-        STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
-        echo "Status: $STATUS"
-        case "$STATUS" in
-          successful) echo "✅ Device deployment successful"; exit 0 ;;
-          failed|error|canceled) echo "❌ Deployment $STATUS"; exit 1 ;;
-        esac
-      done
-      echo "❌ Timeout"; exit 1
-  needs:
-    - job: docker:device
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  allow_failure: true
-  environment:
-    name: production
-    url: http://mulecube.local
