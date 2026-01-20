@@ -19,6 +19,7 @@ params:
       items:
         - name: LibreTranslate
           url: "http://translate.mulecube.local"
+          demo_url: "https://docs.libretranslate.com/"
           description: "Offline Translation"
           service: libretranslate
           icon: "https://libretranslate.com/static/favicon.ico"
@@ -26,7 +27,7 @@ params:
           gradient: "#3b82f6, #1d4ed8"
         - name: Open WebUI
           url: "http://ai.mulecube.local"
-          demo_url: "https://docs.openwebui.com"
+          demo_url: "https://docs.openwebui.com/"
           description: "AI Chat Interface"
           service: openwebui
           icon: "https://openwebui.com/favicon.png"
@@ -38,6 +39,7 @@ params:
       items:
         - name: Kiwix
           url: "http://wiki.mulecube.local"
+          demo_url: "https://kiwix.org/"
           description: "Offline Wikipedia"
           service: kiwix
           icon: "https://www.kiwix.org/favicon.ico"
@@ -45,6 +47,7 @@ params:
           gradient: "#22c55e, #16a34a"
         - name: Maps
           url: "http://maps.mulecube.local"
+          demo_url: "https://docs.maptiler.com/guides/self-hosting/map-server/"
           description: "Offline Maps"
           service: maps
           icon: ""
@@ -52,6 +55,7 @@ params:
           gradient: "#f59e0b, #d97706"
         - name: Calibre
           url: "http://books.mulecube.local"
+          demo_url: "https://github.com/janeczku/calibre-web?tab=readme-ov-file#calibre-web"
           description: "Ebook Library"
           service: calibre
           icon: "https://calibre-ebook.com/favicon.ico"
@@ -59,6 +63,7 @@ params:
           gradient: "#8b4513, #a0522d"
         - name: Emergency
           url: "http://emergency.mulecube.local"
+          demo_url: "https://wiki.radioreference.com/index.php/Main_Page"
           description: "Radio Frequencies Reference"
           service: emergency
           icon: ""
@@ -70,6 +75,7 @@ params:
       items:
         - name: CryptPad
           url: "http://pad.mulecube.local"
+          demo_url: "https://docs.cryptpad.org/en/"
           description: "Encrypted Documents"
           service: cryptpad
           icon: "https://cryptpad.org/favicon.ico"
@@ -77,6 +83,7 @@ params:
           gradient: "#8b5cf6, #7c3aed"
         - name: Excalidraw
           url: "http://draw.mulecube.local"
+          demo_url: "https://plus.excalidraw.com/how-to-start"
           description: "Collaborative Drawing"
           service: excalidraw
           icon: "https://excalidraw.com/favicon.ico"
@@ -84,6 +91,7 @@ params:
           gradient: "#ec4899, #db2777"
         - name: BentoPDF
           url: "http://pdf.mulecube.local"
+          demo_url: "https://www.bentopdf.com/about.html"
           description: "PDF Tools"
           service: bentopdf
           icon: ""
@@ -95,6 +103,7 @@ params:
       items:
         - name: Vaultwarden
           url: "https://vault.mulecube.local"
+          demo_url: "https://bitwarden.com/help/getting-started-webvault/"
           description: "Password Manager"
           service: vaultwarden
           icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
@@ -106,6 +115,7 @@ params:
       items:
         - name: File Browser
           url: "http://files.mulecube.local"
+          demo_url: "https://filebrowser.org/"
           description: "File Manager"
           service: filebrowser
           icon: "https://filebrowser.org/img/logo.svg"
@@ -113,6 +123,7 @@ params:
           gradient: "#f97316, #ea580c"
         - name: Syncthing
           url: "http://sync.mulecube.local"
+          demo_url: "https://docs.syncthing.net/intro/getting-started.html"
           description: "File Synchronization"
           service: syncthing
           icon: "https://syncthing.net/img/favicon.png"
@@ -120,6 +131,7 @@ params:
           gradient: "#06b6d4, #0891b2"
         - name: Linkwarden
           url: "http://links.mulecube.local"
+          demo_url: "https://linkwarden.app/#features"
           description: "Bookmarks Archive"
           service: linkwarden
           icon: "https://linkwarden.app/favicon.ico"
@@ -127,6 +139,7 @@ params:
           gradient: "#6366f1, #4f46e5"
         - name: Open Archiver
           url: "http://archive.mulecube.local"
+          demo_url: "https://openarchiver.com/"
           description: "Email Archive"
           service: openarchiver
           icon: ""
@@ -138,6 +151,7 @@ params:
       items:
         - name: Element Chat
           url: "http://chat.mulecube.local"
+          demo_url: "https://element.io/en/user-guide"
           description: "Matrix Client"
           service: element
           icon: "https://element.io/favicon.ico"
@@ -145,6 +159,7 @@ params:
           gradient: "#0dbd8b, #0a9d74"
         - name: Meshtastic
           url: "http://mesh.mulecube.local"
+          demo_url: "https://meshtastic.org/"
           description: "LoRa Mesh Network"
           service: meshtastic
           icon: "https://meshtastic.org/img/favicon.ico"
@@ -152,6 +167,7 @@ params:
           gradient: "#67e8f9, #22d3ee"
         - name: Conduit
           url: "http://matrix.mulecube.local"
+          demo_url: "https://docs.conduit.rs/"
           description: "Matrix Server"
           service: conduit
           icon: ""
@@ -163,6 +179,7 @@ params:
       items:
         - name: IT-Tools
           url: "http://tools.mulecube.local"
+          demo_url: "https://it-tools.tech/about"
           description: "Developer Utilities"
           service: it-tools
           icon: "https://it-tools.tech/favicon.ico"
@@ -170,6 +187,7 @@ params:
           gradient: "#6366f1, #4f46e5"
         - name: Network Tools
           url: "http://network.mulecube.local"
+          demo_url: "https://networkingtoolbox.net/about"
           description: "Network Diagnostics"
           service: network-tools
           icon: ""
@@ -181,6 +199,7 @@ params:
       items:
         - name: Beszel
           url: "http://monitor.mulecube.local"
+          demo_url: "https://beszel.dev/guide/what-is-beszel"
           description: "System Monitoring"
           service: beszel
           icon: "https://raw.githubusercontent.com/henrygd/beszel/main/site/static/favicon.svg"
@@ -188,6 +207,7 @@ params:
           gradient: "#3b82f6, #2563eb"
         - name: Uptime Kuma
           url: "http://status.mulecube.local"
+          demo_url: "https://github.com/louislam/uptime-kuma/wiki"
           description: "Status Page"
           service: uptime-kuma
           icon: "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
@@ -195,6 +215,7 @@ params:
           gradient: "#84cc16, #65a30d"
         - name: Pi-hole
           url: "http://dns.mulecube.local/admin"
+          demo_url: "https://docs.pi-hole.net/"
           description: "DNS & Ad Blocking"
           service: pihole
           icon: "https://pi-hole.net/wp-content/uploads/2016/12/cropped-Vortex-R-32x32.png"
@@ -202,6 +223,7 @@ params:
           gradient: "#ef4444, #dc2626"
         - name: Ollama
           url: "http://ollama.mulecube.local"
+          demo_url: "https://docs.ollama.com/"
           description: "LLM Runtime"
           service: ollama
           icon: "https://ollama.com/public/ollama.png"
