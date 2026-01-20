@@ -1,7 +1,7 @@
 <!-- Footer -->
 <footer class="site-footer">
     <div class="footer-logo">
-        {{ partial "logo-svg.html" dict }}
+        {{ partial "logo-svg.html" (dict "width" 60 "height" 60) }}
     </div>
     <p>MuleCube by <a href="https://mulecube.com" target="_blank">Nuclear Lighters Inc.</a></p>
     <p class="tagline">{{ .Site.Params.tagline | safeHTML }}</p>
