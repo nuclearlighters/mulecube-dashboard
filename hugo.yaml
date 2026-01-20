@@ -54,7 +54,7 @@ params:
           fallback: "🗺️"
           gradient: "#f59e0b, #d97706"
         - name: Navigation
-          url: "http://navigation.mulecube.local"
+          url: "http://navigation.mulecube.local/@signalk/freeboard-sk/"
           demo_url: "https://signalk.org/about/"
           description: "Marine Chart Plotter"
           service: signalk
