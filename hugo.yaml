@@ -26,6 +26,7 @@ params:
           gradient: "#3b82f6, #1d4ed8"
         - name: Open WebUI
           url: "http://ai.mulecube.local"
+          demo_url: "https://docs.openwebui.com"
           description: "AI Chat Interface"
           service: openwebui
           icon: "https://openwebui.com/favicon.png"
