@@ -135,7 +135,7 @@ deploy:demo:
       RESPONSE=$(curl -s -X POST \
         -H "Authorization: Bearer ${AWX_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard-demo", "compose_dir": "/srv/mulecube-dashboard", "image_tag": "demo"}}' \
+        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard", "image_tag": "demo"}}' \
         "${AWX_HOST}/api/v2/job_templates/${AWX_DEMO_TEMPLATE_ID}/launch/")
       
       JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
