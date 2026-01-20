@@ -1,0 +1,23 @@
+{{- with .category }}
+<div class="service-category">
+    <h3 class="category-title">{{ .title }}</h3>
+    <div class="service-grid">
+        {{- range .items }}
+        <a href="{{ .url }}" class="service-card" data-service="{{ .service }}">
+            <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
+                {{- if .icon }}
+                <img src="{{ .icon }}" alt="" onerror="this.parentElement.innerHTML='{{ .fallback }}'">
+                {{- else }}
+                {{ .fallback }}
+                {{- end }}
+            </div>
+            <div class="service-info">
+                <h3>{{ .name }}</h3>
+                <p>{{ .description }}</p>
+            </div>
+            <div class="service-status"></div>
+        </a>
+        {{- end }}
+    </div>
+</div>
+{{- end }}

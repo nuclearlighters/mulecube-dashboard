@@ -1,0 +1,51 @@
+{{ define "main" }}
+
+<!-- Hero Section with Slideshow -->
+<section class="hero">
+    <div class="hero-slideshow">
+        {{- range $i, $img := .Site.Params.heroImages }}
+        <div class="hero-slide{{ if eq $i 0 }} active{{ end }}" style="background-image: url('/images/hero/{{ $img }}.jpg')"></div>
+        {{- end }}
+    </div>
+    
+    <div class="hero-content container">
+        <h1>The <span class="accent">*internet,</span><br>in your backpack</h1>
+        <p class="subtitle">
+            When there's no signal, no power grid, no cell towers — MuleCube still works.
+            Wikipedia. Maps. AI. Emergency messaging. All offline. All private.
+        </p>
+        <div role="group">
+            <a href="#services" role="button">Browse Services</a>
+            <a href="https://mulecube.com/products" role="button" class="secondary outline" target="_blank">View Products</a>
+        </div>
+    </div>
+    
+    <div class="hero-image">
+        <img src="/images/product-base.png" alt="MuleCube Device">
+    </div>
+</section>
+
+<!-- Status Banner -->
+<div class="status-banner" id="statusBanner">
+    <span class="status-dot"></span>
+    <span id="statusText">Checking services...</span>
+</div>
+
+<!-- Services Section -->
+<main class="services-section" id="services">
+    <h2>Your Offline Services</h2>
+    <p class="section-subtitle">Everything running on this device — no internet required</p>
+
+    {{- $services := .Site.Params.services }}
+    
+    {{ partial "service-category.html" (dict "category" $services.ai) }}
+    {{ partial "service-category.html" (dict "category" $services.knowledge) }}
+    {{ partial "service-category.html" (dict "category" $services.collaboration) }}
+    {{ partial "service-category.html" (dict "category" $services.security) }}
+    {{ partial "service-category.html" (dict "category" $services.files) }}
+    {{ partial "service-category.html" (dict "category" $services.communication) }}
+    {{ partial "service-category.html" (dict "category" $services.tools) }}
+    {{ partial "service-category.html" (dict "category" $services.infrastructure) }}
+</main>
+
+{{ end }}

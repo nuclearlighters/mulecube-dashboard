@@ -1,0 +1,8 @@
+# Demo environment configuration
+# Built with: hugo -e demo
+# Enables demo mode banner and simulated stats
+
+baseURL: "https://demo.mulecube.com/"
+
+params:
+  demoMode: true

@@ -1,0 +1,597 @@
+/**
+ * MuleCube Dashboard Custom Styles
+ * Built on top of Pico CSS v2
+ */
+
+/* ==========================================
+   CSS Variables - MuleCube Brand
+   ========================================== */
+:root {
+    --mc-primary: #10b981;
+    --mc-primary-dark: #059669;
+    --mc-primary-light: #34d399;
+    --mc-accent: #f59e0b;
+    --mc-bg-dark: #0f172a;
+    --mc-bg-darker: #020617;
+    --mc-text-light: rgba(255, 255, 255, 0.9);
+    --mc-text-muted: rgba(255, 255, 255, 0.6);
+    --mc-card-bg: rgba(30, 41, 59, 0.8);
+    --mc-card-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Override Pico primary color */
+[data-theme="dark"] {
+    --pico-primary: var(--mc-primary);
+    --pico-primary-background: var(--mc-primary);
+    --pico-primary-hover-background: var(--mc-primary-dark);
+}
+
+[data-theme="light"] {
+    --pico-primary: var(--mc-primary-dark);
+    --pico-primary-background: var(--mc-primary-dark);
+    --pico-primary-hover-background: var(--mc-primary);
+}
+
+/* ==========================================
+   Header Styles
+   ========================================== */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--mc-card-border);
+    padding: 0 1rem;
+}
+
+[data-theme="light"] .site-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.site-header nav {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.5rem 0;
+}
+
+.site-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--mc-text-light);
+    text-decoration: none;
+}
+
+[data-theme="light"] .site-header .logo {
+    color: var(--mc-bg-dark);
+}
+
+.site-header .logo svg {
+    flex-shrink: 0;
+}
+
+.theme-toggle {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   Stats Bar
+   ========================================== */
+.stats-bar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+    border-bottom: 1px solid var(--mc-card-border);
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+
+[data-theme="light"] .stats-bar {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05));
+}
+
+.stats-bar .label {
+    font-weight: 600;
+    color: var(--mc-primary);
+    white-space: nowrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.stat-label {
+    color: var(--mc-text-muted);
+}
+
+[data-theme="light"] .stat-label {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.stat-value {
+    font-weight: 600;
+    font-family: ui-monospace, monospace;
+}
+
+.stats-right {
+    margin-left: auto;
+    display: flex;
+    gap: 1rem;
+}
+
+/* ==========================================
+   Hero Section with Slideshow
+   ========================================== */
+.hero {
+    position: relative;
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    padding-top: 120px;
+    overflow: hidden;
+}
+
+.hero-slideshow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.hero-slide.active {
+    opacity: 1;
+}
+
+.hero-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.92) 0%,
+        rgba(15, 23, 42, 0.85) 50%,
+        rgba(15, 23, 42, 0.75) 100%
+    );
+}
+
+[data-theme="light"] .hero-slide::after {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(255, 255, 255, 0.85) 100%
+    );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+}
+
+.hero .accent {
+    color: var(--mc-primary);
+}
+
+.hero .subtitle {
+    font-size: 1.125rem;
+    color: var(--mc-text-muted);
+    margin-bottom: 2rem;
+}
+
+[data-theme="light"] .hero .subtitle {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.hero-image {
+    position: absolute;
+    right: 5%;
+    bottom: 10%;
+    z-index: 1;
+    max-width: 350px;
+    opacity: 0.9;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
+}
+
+@media (max-width: 1024px) {
+    .hero-image {
+        display: none;
+    }
+}
+
+/* ==========================================
+   Status Banner
+   ========================================== */
+.status-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-banner.some-down {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--mc-primary);
+    animation: pulse 2s infinite;
+}
+
+.status-dot.down {
+    background: var(--mc-accent);
+    animation: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ==========================================
+   Services Section
+   ========================================== */
+.services-section {
+    padding: 3rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.services-section h2 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--mc-text-muted);
+    margin-bottom: 3rem;
+}
+
+[data-theme="light"] .section-subtitle {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.service-category {
+    margin-bottom: 2.5rem;
+}
+
+.category-title {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--mc-card-border);
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+/* ==========================================
+   Service Cards
+   ========================================== */
+.service-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--mc-card-bg);
+    border: 1px solid var(--mc-card-border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+
+[data-theme="light"] .service-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--mc-primary);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+
+.service-card.down {
+    opacity: 0.6;
+}
+
+.service-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.service-icon img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.service-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.service-info h3 {
+    font-size: 1rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-info p {
+    font-size: 0.85rem;
+    color: var(--mc-text-muted);
+    margin: 0;
+}
+
+[data-theme="light"] .service-info p {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.service-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mc-primary);
+    flex-shrink: 0;
+}
+
+.service-status.down {
+    background: #ef4444;
+}
+
+/* ==========================================
+   Footer
+   ========================================== */
+.site-footer {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    border-top: 1px solid var(--mc-card-border);
+    background: rgba(15, 23, 42, 0.5);
+}
+
+[data-theme="light"] .site-footer {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.footer-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.footer-logo svg {
+    width: 48px;
+    height: 48px;
+}
+
+.site-footer .tagline {
+    color: var(--mc-text-muted);
+    font-style: italic;
+}
+
+/* ==========================================
+   Responsive Adjustments
+   ========================================== */
+@media (max-width: 768px) {
+    .stats-bar {
+        padding: 0.5rem 1rem;
+        gap: 1rem;
+        font-size: 0.75rem;
+    }
+
+    .stats-right {
+        display: none;
+    }
+
+    .hero {
+        min-height: 70vh;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   Utilities
+   ========================================== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* ==========================================
+   Demo Mode Styles
+   ========================================== */
+.demo-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.demo-banner .demo-subtitle {
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.demo-banner .demo-cta {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.demo-banner .demo-cta:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Adjust header position when demo banner is shown */
+.demo-mode .site-header {
+    top: 40px;
+}
+
+.demo-mode .stats-bar {
+    top: 100px;
+}
+
+.demo-mode .hero {
+    padding-top: 160px;
+}
+
+/* Demo mode indicator on status banner */
+.demo-mode .status-banner {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Subtle animation on demo stats to show they're simulated */
+.demo-mode .stat-value {
+    transition: color 0.3s ease;
+}
+
+/* Make service cards clickable but show they're demo */
+.demo-mode .service-card {
+    cursor: default;
+}
+
+.demo-mode .service-card:hover {
+    transform: none;
+}
+
+/* Demo mode tooltip on service cards */
+.demo-mode .service-card::after {
+    content: 'Demo';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.demo-mode .service-card:hover::after {
+    opacity: 1;
+}
+
+.demo-mode .service-card {
+    position: relative;
+}
+
+/* Responsive demo banner */
+@media (max-width: 768px) {
+    .demo-banner {
+        font-size: 0.8rem;
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    .demo-banner .demo-subtitle {
+        display: none;
+    }
+
+    .demo-mode .site-header {
+        top: 36px;
+    }
+
+    .demo-mode .stats-bar {
+        top: 96px;
+    }
+
+    .demo-mode .hero {
+        padding-top: 150px;
+    }
+}

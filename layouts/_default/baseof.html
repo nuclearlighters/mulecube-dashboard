@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    {{- if .Site.Params.demoMode }}
+    <meta name="mulecube-mode" content="demo">
+    {{- end }}
+    <title>{{ .Title }} | MuleCube</title>
+    <meta name="description" content="{{ .Site.Params.description }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/pico.min.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    {{- partial "header.html" . -}}
+    
+    {{- block "main" . }}{{- end }}
+    
+    {{- partial "footer.html" . -}}
+    
+    <!-- JavaScript -->
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

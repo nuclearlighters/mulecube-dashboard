@@ -1,0 +1,201 @@
+baseURL: "http://mulecube.local/"
+languageCode: "en-us"
+title: "MuleCube Dashboard"
+theme: []
+
+# Disable RSS and sitemap since this is a local device
+disableKinds:
+  - RSS
+  - sitemap
+  - taxonomy
+  - term
+
+params:
+  description: "Your offline world in a cube"
+  tagline: "The *internet, in your backpack."
+  
+  # Service categories for the dashboard
+  services:
+    ai:
+      title: "🤖 AI Services"
+      items:
+        - name: LibreTranslate
+          url: "http://translate.mulecube.local"
+          description: "Offline Translation"
+          service: libretranslate
+          icon: "https://libretranslate.com/static/favicon.ico"
+          fallback: "🌐"
+          gradient: "#3b82f6, #1d4ed8"
+        - name: Open WebUI
+          url: "http://ai.mulecube.local"
+          description: "AI Chat Interface"
+          service: openwebui
+          icon: "https://openwebui.com/favicon.png"
+          fallback: "🧠"
+          gradient: "#6366f1, #4f46e5"
+    
+    knowledge:
+      title: "📚 Knowledge"
+      items:
+        - name: Kiwix
+          url: "http://wiki.mulecube.local"
+          description: "Offline Wikipedia"
+          service: kiwix
+          icon: "https://www.kiwix.org/favicon.ico"
+          fallback: "📖"
+          gradient: "#22c55e, #16a34a"
+        - name: Maps
+          url: "http://maps.mulecube.local"
+          description: "Offline Maps"
+          service: maps
+          icon: ""
+          fallback: "🗺️"
+          gradient: "#f59e0b, #d97706"
+    
+    collaboration:
+      title: "🤝 Collaboration"
+      items:
+        - name: CryptPad
+          url: "http://pad.mulecube.local"
+          description: "Encrypted Documents"
+          service: cryptpad
+          icon: "https://cryptpad.org/favicon.ico"
+          fallback: "📝"
+          gradient: "#8b5cf6, #7c3aed"
+        - name: Excalidraw
+          url: "http://draw.mulecube.local"
+          description: "Collaborative Drawing"
+          service: excalidraw
+          icon: "https://excalidraw.com/favicon.ico"
+          fallback: "✏️"
+          gradient: "#ec4899, #db2777"
+    
+    security:
+      title: "🔐 Security"
+      items:
+        - name: Vaultwarden
+          url: "http://vault.mulecube.local"
+          description: "Password Manager"
+          service: vaultwarden
+          icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
+          fallback: "🔑"
+          gradient: "#14b8a6, #0d9488"
+    
+    files:
+      title: "📁 Files & Sync"
+      items:
+        - name: File Browser
+          url: "http://files.mulecube.local"
+          description: "File Manager"
+          service: filebrowser
+          icon: "https://filebrowser.org/img/logo.svg"
+          fallback: "📂"
+          gradient: "#f97316, #ea580c"
+        - name: Syncthing
+          url: "http://sync.mulecube.local"
+          description: "File Synchronization"
+          service: syncthing
+          icon: "https://syncthing.net/img/favicon.png"
+          fallback: "🔄"
+          gradient: "#06b6d4, #0891b2"
+    
+    communication:
+      title: "💬 Communication"
+      items:
+        - name: Element Chat
+          url: "http://chat.mulecube.local"
+          description: "Matrix Client"
+          service: element
+          icon: "https://element.io/favicon.ico"
+          fallback: "💬"
+          gradient: "#0dbd8b, #0a9d74"
+        - name: Meshtastic
+          url: "http://mesh.mulecube.local"
+          description: "LoRa Mesh Network"
+          service: meshtastic
+          icon: "https://meshtastic.org/img/favicon.ico"
+          fallback: "📡"
+          gradient: "#67e8f9, #22d3ee"
+    
+    tools:
+      title: "🔧 Tools"
+      items:
+        - name: IT-Tools
+          url: "http://tools.mulecube.local"
+          description: "Developer Utilities"
+          service: it-tools
+          icon: "https://it-tools.tech/favicon.ico"
+          fallback: "🛠️"
+          gradient: "#6366f1, #4f46e5"
+        - name: Network Tools
+          url: "http://network.mulecube.local"
+          description: "Network Diagnostics"
+          service: network-tools
+          icon: ""
+          fallback: "🌐"
+          gradient: "#06b6d4, #0891b2"
+    
+    infrastructure:
+      title: "⚙️ Infrastructure"
+      items:
+        - name: Beszel
+          url: "http://monitor.mulecube.local"
+          description: "System Monitoring"
+          service: beszel
+          icon: "https://raw.githubusercontent.com/henrygd/beszel/main/site/static/favicon.svg"
+          fallback: "📊"
+          gradient: "#3b82f6, #2563eb"
+        - name: Uptime Kuma
+          url: "http://status.mulecube.local"
+          description: "Status Page"
+          service: uptime-kuma
+          icon: "https://raw.githubusercontent.com/louislam/uptime-kuma/master/public/icon.svg"
+          fallback: "📈"
+          gradient: "#84cc16, #65a30d"
+        - name: Pi-hole
+          url: "http://dns.mulecube.local/admin"
+          description: "DNS & Ad Blocking"
+          service: pihole
+          icon: "https://pi-hole.net/wp-content/uploads/2016/12/cropped-Vortex-R-32x32.png"
+          fallback: "🛡️"
+          gradient: "#ef4444, #dc2626"
+        - name: Ollama
+          url: "http://ollama.mulecube.local"
+          description: "LLM Runtime"
+          service: ollama
+          icon: "https://ollama.com/public/ollama.png"
+          fallback: "🦙"
+          gradient: "#1e1e1e, #333"
+
+# Hero slideshow images
+  heroImages:
+    - camping
+    - sailing
+    - emergency
+    - remote-work
+    - expeditions
+
+menu:
+  main:
+    - identifier: services
+      name: Services
+      url: "#services"
+      weight: 1
+    - identifier: products
+      name: Products
+      url: "https://mulecube.com/products"
+      weight: 2
+      params:
+        external: true
+    - identifier: faq
+      name: FAQ
+      url: "https://mulecube.com/faq"
+      weight: 3
+      params:
+        external: true
+    - identifier: github
+      name: GitHub ↗
+      url: "https://github.com/nuclearlighters/mulecube"
+      weight: 4
+      params:
+        external: true

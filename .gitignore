@@ -1,0 +1,17 @@
+# Hugo build output
+public/
+resources/_gen/
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local development
+.hugo_build.lock

@@ -1,0 +1,29 @@
+<!-- Header -->
+<header class="site-header">
+    <nav>
+        <ul>
+            <li>
+                <a href="/" class="logo">
+                    {{ partial "logo-svg.html" (dict "width" 40 "height" 40) }}
+                    MuleCube
+                </a>
+            </li>
+            {{- range .Site.Menus.main }}
+            <li>
+                <a href="{{ .URL }}"{{ if .Params.external }} target="_blank"{{ end }}>
+                    {{ .Name }}
+                </a>
+            </li>
+            {{- end }}
+        </ul>
+        <ul>
+            <li>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    🌙
+                </button>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+{{ partial "stats-bar.html" . }}
