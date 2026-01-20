@@ -3,7 +3,6 @@ languageCode: "en-us"
 title: "MuleCube Dashboard"
 theme: []
 
-# Disable RSS and sitemap since this is a local device
 disableKinds:
   - RSS
   - sitemap
@@ -14,7 +13,6 @@ params:
   description: "Your offline world in a cube"
   tagline: "The *internet, in your backpack."
   
-  # Service categories for the dashboard
   services:
     ai:
       title: "AI Services"
@@ -51,6 +49,20 @@ params:
           icon: ""
           fallback: "🗺️"
           gradient: "#f59e0b, #d97706"
+        - name: Calibre
+          url: "http://books.mulecube.local"
+          description: "Ebook Library"
+          service: calibre
+          icon: "https://calibre-ebook.com/favicon.ico"
+          fallback: "📚"
+          gradient: "#8b4513, #a0522d"
+        - name: Emergency
+          url: "http://emergency.mulecube.local"
+          description: "Radio Frequencies Reference"
+          service: emergency
+          icon: ""
+          fallback: "📻"
+          gradient: "#dc2626, #b91c1c"
     
     collaboration:
       title: "Collaboration"
@@ -69,12 +81,19 @@ params:
           icon: "https://excalidraw.com/favicon.ico"
           fallback: "✏️"
           gradient: "#ec4899, #db2777"
+        - name: BentoPDF
+          url: "http://pdf.mulecube.local"
+          description: "PDF Tools"
+          service: bentopdf
+          icon: ""
+          fallback: "📄"
+          gradient: "#f43f5e, #e11d48"
     
     security:
       title: "Security"
       items:
         - name: Vaultwarden
-          url: "http://vault.mulecube.local"
+          url: "https://vault.mulecube.local"
           description: "Password Manager"
           service: vaultwarden
           icon: "https://raw.githubusercontent.com/dani-garcia/vaultwarden/main/resources/vaultwarden-icon.svg"
@@ -98,6 +117,20 @@ params:
           icon: "https://syncthing.net/img/favicon.png"
           fallback: "🔄"
           gradient: "#06b6d4, #0891b2"
+        - name: Linkwarden
+          url: "http://links.mulecube.local"
+          description: "Bookmarks Archive"
+          service: linkwarden
+          icon: "https://linkwarden.app/favicon.ico"
+          fallback: "🔗"
+          gradient: "#6366f1, #4f46e5"
+        - name: Open Archiver
+          url: "http://archive.mulecube.local"
+          description: "Email Archive"
+          service: openarchiver
+          icon: ""
+          fallback: "📧"
+          gradient: "#0ea5e9, #0284c7"
     
     communication:
       title: "Communication"
@@ -116,6 +149,13 @@ params:
           icon: "https://meshtastic.org/img/favicon.ico"
           fallback: "📡"
           gradient: "#67e8f9, #22d3ee"
+        - name: Conduit
+          url: "http://matrix.mulecube.local"
+          description: "Matrix Server"
+          service: conduit
+          icon: ""
+          fallback: "🔌"
+          gradient: "#a855f7, #9333ea"
     
     tools:
       title: "Tools"
@@ -167,7 +207,6 @@ params:
           fallback: "🦙"
           gradient: "#1e1e1e, #333"
 
-  # Hero slideshow images
   heroImages:
     - camping
     - sailing
@@ -175,7 +214,6 @@ params:
     - remote-work
     - expeditions
 
-# Navigation menu - device-appropriate links
 menu:
   main:
     - identifier: services
