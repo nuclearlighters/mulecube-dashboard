@@ -53,6 +53,14 @@ params:
           icon: ""
           fallback: "🗺️"
           gradient: "#f59e0b, #d97706"
+          - name: Navigation
+          url: "http://navigation.mulecube.local"
+          demo_url: "https://signalk.org/about/"
+          description: "Marine Chart Plotter"
+          service: signalk
+          icon: ""
+          fallback: "⚓"
+          gradient: "#0077be, #005a8c"
         - name: Calibre
           url: "http://books.mulecube.local"
           demo_url: "https://github.com/janeczku/calibre-web?tab=readme-ov-file#calibre-web"
