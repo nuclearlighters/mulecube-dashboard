@@ -177,6 +177,14 @@ params:
     tools:
       title: "Tools"
       items:
+        - name: App Store
+          url: "http://apps.mulecube.local"
+          demo_url: "https://f-droid.org/en/about/"
+          description: "Offline Android Apps"
+          service: apkrepo
+          icon: ""
+          fallback: "📱"
+          gradient: "#22c55e, #16a34a"
         - name: IT-Tools
           url: "http://tools.mulecube.local"
           demo_url: "https://it-tools.tech/about"
