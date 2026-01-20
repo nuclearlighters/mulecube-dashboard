@@ -62,15 +62,11 @@ docker:demo:
     - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
     - docker login registry-gitlab.nuclearlighters.net -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
-    - |
-      cat > Dockerfile << 'DOCKERFILE'
-      ARG BASE_IMAGE
-      FROM ${BASE_IMAGE}
-      COPY public/ /usr/share/nginx/html/
-      DOCKERFILE
-    - docker build --no-cache --build-arg BASE_IMAGE=${BASE_IMAGE} -t ${GHCR_IMAGE}:demo .
+    - echo "FROM ${BASE_IMAGE}" > Dockerfile
+    - echo "COPY public/ /usr/share/nginx/html/" >> Dockerfile
+    - docker build --no-cache -t ${GHCR_IMAGE}:demo .
     - docker push ${GHCR_IMAGE}:demo
-    - echo "✅ Demo image pushed: ${GHCR_IMAGE}:demo"
+    - echo "✅ Demo image pushed"
   needs:
     - job: build:demo
       artifacts: true
@@ -88,15 +84,11 @@ docker:device:
     - echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
     - docker login registry-gitlab.nuclearlighters.net -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
   script:
-    - |
-      cat > Dockerfile << 'DOCKERFILE'
-      ARG BASE_IMAGE
-      FROM ${BASE_IMAGE}
-      COPY public/ /usr/share/nginx/html/
-      DOCKERFILE
+    - echo "FROM ${BASE_IMAGE}" > Dockerfile
+    - echo "COPY public/ /usr/share/nginx/html/" >> Dockerfile
     - docker buildx create --name armbuilder --use 2>/dev/null || docker buildx use armbuilder
-    - docker buildx build --platform linux/arm64 --build-arg BASE_IMAGE=${BASE_IMAGE} --push -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
-    - echo "✅ Device image pushed: ${GHCR_IMAGE}:latest (arm64)"
+    - docker buildx build --platform linux/arm64 --push -t ${GHCR_IMAGE}:latest -t ${GHCR_IMAGE}:${CI_COMMIT_SHORT_SHA} .
+    - echo "✅ Device image pushed (arm64)"
   needs:
     - job: build:device
       artifacts: true
@@ -113,16 +105,17 @@ deploy:demo:
   tags:
     - docker
   script:
+    - echo "🎭 Deploying demo to DMZ hosts..."
+    - >
+      RESPONSE=$(curl -s -X POST
+      -H "Authorization: Bearer ${AWX_TOKEN}"
+      -H "Content-Type: application/json"
+      -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}'
+      "${AWX_HOST}/api/v2/job_templates/${AWX_DEMO_TEMPLATE_ID}/launch/")
+    - JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
+    - if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
+    - echo "AWX Job launched - ID=$JOB_ID"
     - |
-      echo "🎭 Deploying demo to DMZ hosts..."
-      RESPONSE=$(curl -s -X POST \
-        -H "Authorization: Bearer ${AWX_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}' \
-        "${AWX_HOST}/api/v2/job_templates/${AWX_DEMO_TEMPLATE_ID}/launch/")
-      JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-      if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
-      echo "AWX Job launched: ID=$JOB_ID"
       for i in $(seq 1 30); do
         sleep 10
         STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
@@ -147,16 +140,17 @@ deploy:device:
   tags:
     - docker
   script:
+    - echo "📦 Deploying to Raspberry Pi..."
+    - >
+      RESPONSE=$(curl -s -X POST
+      -H "Authorization: Bearer ${AWX_TOKEN}"
+      -H "Content-Type: application/json"
+      -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}'
+      "${AWX_HOST}/api/v2/job_templates/${AWX_DEVICE_TEMPLATE_ID}/launch/")
+    - JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
+    - if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
+    - echo "AWX Job launched - ID=$JOB_ID"
     - |
-      echo "📦 Deploying to Raspberry Pi..."
-      RESPONSE=$(curl -s -X POST \
-        -H "Authorization: Bearer ${AWX_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d '{"extra_vars": {"service_name": "mulecube-dashboard", "compose_dir": "/srv/mulecube-dashboard"}}' \
-        "${AWX_HOST}/api/v2/job_templates/${AWX_DEVICE_TEMPLATE_ID}/launch/")
-      JOB_ID=$(echo "$RESPONSE" | jq -r '.id // empty')
-      if [ -z "$JOB_ID" ]; then echo "Failed to launch AWX job"; echo "$RESPONSE" | jq .; exit 1; fi
-      echo "AWX Job launched: ID=$JOB_ID"
       for i in $(seq 1 30); do
         sleep 10
         STATUS=$(curl -s -H "Authorization: Bearer ${AWX_TOKEN}" "${AWX_HOST}/api/v2/jobs/${JOB_ID}/" | jq -r '.status')
