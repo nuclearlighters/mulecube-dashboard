@@ -8,20 +8,22 @@
         {{- end }}
     </div>
     
-    <div class="hero-content container">
-        <h1>The <span class="accent">*internet,</span><br>in your backpack</h1>
-        <p class="subtitle">
-            When there's no signal, no power grid, no cell towers — MuleCube still works.
-            Wikipedia. Maps. AI. Emergency messaging. All offline. All private.
-        </p>
-        <div role="group">
-            <a href="#services" role="button">Browse Services</a>
-            <a href="https://mulecube.com/products" role="button" class="secondary outline" target="_blank">View Products</a>
+    <div class="container">
+        <div class="hero-content">
+            <h1>The <span class="highlight">*internet,</span><br>in your backpack</h1>
+            <p class="subtitle">
+                When there's no signal, no power grid, no cell towers — MuleCube still works.
+                Wikipedia. Maps. AI. Emergency messaging. All offline. All private.
+            </p>
+            <div class="hero-cta">
+                <a href="#services" class="btn btn-primary">Browse Services</a>
+                <a href="https://mulecube.com/products/" class="btn btn-secondary" target="_blank">View Products</a>
+            </div>
         </div>
-    </div>
-    
-    <div class="hero-image">
-        <img src="/images/product-base.png" alt="MuleCube Device">
+        
+        <div class="hero-image">
+            <img src="/images/product-base.png" alt="MuleCube Device">
+        </div>
     </div>
 </section>
 
@@ -32,20 +34,29 @@
 </div>
 
 <!-- Services Section -->
-<main class="services-section" id="services">
+<main class="services-section container" id="services">
     <h2>Your Offline Services</h2>
     <p class="section-subtitle">Everything running on this device — no internet required</p>
+    
+    <!-- Search/Filter -->
+    <div class="services-filter">
+        <input type="text" 
+               id="serviceSearch" 
+               class="search-input" 
+               placeholder="🔍 Search services..."
+               autocomplete="off">
+    </div>
 
     {{- $services := .Site.Params.services }}
     
-    {{ partial "service-category.html" (dict "category" $services.ai) }}
-    {{ partial "service-category.html" (dict "category" $services.knowledge) }}
-    {{ partial "service-category.html" (dict "category" $services.collaboration) }}
-    {{ partial "service-category.html" (dict "category" $services.security) }}
-    {{ partial "service-category.html" (dict "category" $services.files) }}
-    {{ partial "service-category.html" (dict "category" $services.communication) }}
-    {{ partial "service-category.html" (dict "category" $services.tools) }}
-    {{ partial "service-category.html" (dict "category" $services.infrastructure) }}
+    {{ partial "service-category.html" (dict "category" $services.ai "icon" "🤖") }}
+    {{ partial "service-category.html" (dict "category" $services.knowledge "icon" "📚") }}
+    {{ partial "service-category.html" (dict "category" $services.collaboration "icon" "🤝") }}
+    {{ partial "service-category.html" (dict "category" $services.security "icon" "🔐") }}
+    {{ partial "service-category.html" (dict "category" $services.files "icon" "📁") }}
+    {{ partial "service-category.html" (dict "category" $services.communication "icon" "💬") }}
+    {{ partial "service-category.html" (dict "category" $services.tools "icon" "🔧") }}
+    {{ partial "service-category.html" (dict "category" $services.infrastructure "icon" "⚙️") }}
 </main>
 
 {{ end }}

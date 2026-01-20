@@ -1,278 +1,330 @@
 /**
- * MuleCube Dashboard JavaScript
- * Handles: Theme toggle, stats polling, service status, hero slideshow
- * Supports both device mode (real stats) and demo mode (simulated)
+ * MuleCube Dashboard - Unified JavaScript
+ * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow
  */
 
 (function() {
     'use strict';
 
-    // ========================================
+    // ==========================================
+    // Configuration
+    // ==========================================
+    const CONFIG = {
+        statsEndpoint: '/stats.json',
+        statsPollInterval: 5000,
+        serviceCheckTimeout: 3000,
+        slideshowInterval: 5000
+    };
+
+    // ==========================================
     // Mode Detection
-    // ========================================
+    // ==========================================
     const ModeManager = {
         isDemo: false,
         
         init() {
-            // Check if running in demo mode via meta tag or failed stats fetch
-            const metaMode = document.querySelector('meta[name="mulecube-mode"]');
-            if (metaMode && metaMode.content === 'demo') {
-                this.setDemoMode();
+            // Check for demo mode meta tag
+            const metaTag = document.querySelector('meta[name="mulecube-mode"]');
+            this.isDemo = metaTag && metaTag.content === 'demo';
+            
+            if (this.isDemo) {
+                document.body.classList.add('demo-mode');
+                this.injectDemoBanner();
             }
+            
+            return this.isDemo;
         },
         
-        setDemoMode() {
-            this.isDemo = true;
-            document.body.classList.add('demo-mode');
-            this.showDemoBanner();
-            console.log('🎭 Running in demo mode');
-        },
-        
-        showDemoBanner() {
+        injectDemoBanner() {
             const banner = document.createElement('div');
             banner.className = 'demo-banner';
             banner.innerHTML = `
-                <span>🎭 Demo Mode</span>
-                <span class="demo-subtitle">This is a preview — on a real MuleCube, services run locally</span>
-                <a href="https://mulecube.com/products" class="demo-cta">Get Your MuleCube →</a>
+                <span class="demo-label">🎭 Demo Mode</span>
+                <span class="demo-text">This is a preview — on a real MuleCube, services run locally</span>
+                <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube →</a>
             `;
-            document.body.prepend(banner);
+            document.body.insertBefore(banner, document.body.firstChild);
         }
     };
 
-    // ========================================
-    // Theme Management
-    // ========================================
-    const ThemeManager = {
-        STORAGE_KEY: 'mulecube-theme',
-        
-        init() {
-            const savedTheme = localStorage.getItem(this.STORAGE_KEY);
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-            
-            this.setTheme(theme);
-            this.bindToggle();
-        },
-        
-        setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem(this.STORAGE_KEY, theme);
-            this.updateToggleIcon(theme);
-        },
-        
-        toggle() {
-            const current = document.documentElement.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            this.setTheme(next);
-        },
-        
-        updateToggleIcon(theme) {
-            const btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.textContent = theme === 'dark' ? '🌙' : '☀️';
-                btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`);
-            }
-        },
-        
-        bindToggle() {
-            const btn = document.getElementById('themeToggle');
-            if (btn) {
-                btn.addEventListener('click', () => this.toggle());
-            }
-        }
-    };
-
-    // ========================================
-    // Stats Polling
-    // ========================================
+    // ==========================================
+    // Stats Manager
+    // ==========================================
     const StatsManager = {
-        POLL_INTERVAL: 5000,
-        DEMO_POLL_INTERVAL: 3000,
-        demoStats: {
-            cpu: { min: 15, max: 45, current: 23 },
-            memory: { min: 40, max: 55, current: 47 },
-            disk: { base: 62 }
-        },
+        elements: {},
         
         init() {
-            this.fetchStats();
-            // In demo mode, animate stats more frequently
-            const interval = ModeManager.isDemo ? this.DEMO_POLL_INTERVAL : this.POLL_INTERVAL;
-            setInterval(() => this.fetchStats(), interval);
+            this.elements = {
+                cpu: document.getElementById('cpuValue'),
+                memory: document.getElementById('memValue'),
+                disk: document.getElementById('diskValue'),
+                wifi: document.getElementById('wifiValue'),
+                ethernet: document.getElementById('ethValue'),
+                hostname: document.getElementById('hostname'),
+                uptime: document.getElementById('uptime')
+            };
+            
+            if (ModeManager.isDemo) {
+                this.startDemoStats();
+            } else {
+                this.fetchStats();
+                setInterval(() => this.fetchStats(), CONFIG.statsPollInterval);
+            }
         },
         
         async fetchStats() {
-            // If already in demo mode, just update demo stats
-            if (ModeManager.isDemo) {
-                this.updateDemoStats();
-                return;
-            }
-            
             try {
-                const response = await fetch('/stats.json');
-                if (!response.ok) throw new Error('Stats unavailable');
+                const response = await fetch(CONFIG.statsEndpoint, { 
+                    cache: 'no-store',
+                    signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
+                });
                 
-                const stats = await response.json();
-                this.updateUI(stats);
+                if (!response.ok) throw new Error('Stats fetch failed');
+                
+                const data = await response.json();
+                this.updateDisplay(data);
             } catch (error) {
-                console.warn('Stats unavailable, switching to demo mode');
-                ModeManager.setDemoMode();
-                this.updateDemoStats();
+                console.warn('Stats fetch error:', error);
+                // Keep last values on error
             }
         },
         
-        updateUI(stats) {
-            this.updateElement('cpuValue', `${stats.cpu}%`);
-            this.updateElement('memValue', `${stats.memory}%`);
-            this.updateElement('diskValue', `${stats.disk}%`);
-            this.updateElement('wifiValue', stats.wifi || 'N/A');
-            this.updateElement('ethValue', stats.ethernet || 'N/A');
-            this.updateElement('hostname', stats.hostname || 'mulecube');
-            this.updateElement('uptime', stats.uptime || '--');
+        updateDisplay(data) {
+            if (this.elements.cpu) this.elements.cpu.textContent = `${data.cpu}%`;
+            if (this.elements.memory) this.elements.memory.textContent = `${data.memory}%`;
+            if (this.elements.disk) this.elements.disk.textContent = `${data.disk}%`;
+            if (this.elements.wifi) this.elements.wifi.textContent = data.wifi || 'N/A';
+            if (this.elements.ethernet) this.elements.ethernet.textContent = data.ethernet || 'N/A';
+            if (this.elements.hostname) this.elements.hostname.textContent = data.hostname || 'mulecube';
+            if (this.elements.uptime) this.elements.uptime.textContent = data.uptime || '--';
         },
         
-        updateDemoStats() {
-            // Simulate realistic fluctuating stats
-            this.demoStats.cpu.current = this.fluctuate(
-                this.demoStats.cpu.current, 
-                this.demoStats.cpu.min, 
-                this.demoStats.cpu.max, 
-                5
-            );
-            this.demoStats.memory.current = this.fluctuate(
-                this.demoStats.memory.current, 
-                this.demoStats.memory.min, 
-                this.demoStats.memory.max, 
-                2
-            );
+        startDemoStats() {
+            // Simulate realistic stats for demo
+            const updateDemo = () => {
+                const data = {
+                    cpu: Math.floor(Math.random() * 30) + 5,
+                    memory: Math.floor(Math.random() * 20) + 40,
+                    disk: Math.floor(Math.random() * 5) + 60,
+                    wifi: `${Math.floor(Math.random() * 5)} clients`,
+                    ethernet: 'Connected',
+                    hostname: 'mulecube-demo',
+                    uptime: '12d 4h 32m'
+                };
+                this.updateDisplay(data);
+            };
             
-            this.updateElement('cpuValue', `${this.demoStats.cpu.current}%`);
-            this.updateElement('memValue', `${this.demoStats.memory.current}%`);
-            this.updateElement('diskValue', `${this.demoStats.disk.base}%`);
-            this.updateElement('wifiValue', 'MuleCube-AP');
-            this.updateElement('ethValue', 'Connected');
-            this.updateElement('hostname', 'mulecube');
-            this.updateElement('uptime', '3d 14h 22m');
-        },
-        
-        fluctuate(current, min, max, variance) {
-            const change = (Math.random() - 0.5) * variance * 2;
-            let newValue = Math.round(current + change);
-            return Math.max(min, Math.min(max, newValue));
-        },
-        
-        updateElement(id, value) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value;
+            updateDemo();
+            setInterval(updateDemo, CONFIG.statsPollInterval);
         }
     };
 
-    // ========================================
-    // Service Status Checker
-    // ========================================
-    const ServiceChecker = {
+    // ==========================================
+    // Service Status Manager
+    // ==========================================
+    const ServiceManager = {
         services: [],
+        statusBanner: null,
+        statusText: null,
         
         init() {
-            this.services = Array.from(document.querySelectorAll('.service-card[data-service]'));
+            this.statusBanner = document.getElementById('statusBanner');
+            this.statusText = document.getElementById('statusText');
+            this.services = document.querySelectorAll('.service-card');
             
             if (ModeManager.isDemo) {
-                // In demo mode, simulate all services online
-                this.simulateAllOnline();
+                this.simulateOnline();
             } else {
                 this.checkAllServices();
+                // Re-check every 30 seconds
                 setInterval(() => this.checkAllServices(), 30000);
             }
         },
         
-        simulateAllOnline() {
-            const totalCount = this.services.length;
+        async checkAllServices() {
+            let online = 0;
+            let total = this.services.length;
             
-            // Mark all services as online
+            // Set all to checking state
             this.services.forEach(card => {
-                card.classList.remove('down');
-                const statusDot = card.querySelector('.service-status');
-                if (statusDot) statusDot.classList.remove('down');
+                const status = card.querySelector('.service-status');
+                if (status) status.className = 'service-status checking';
             });
             
-            this.updateStatusBanner(totalCount, totalCount, true);
-        },
-        
-        async checkAllServices() {
-            let upCount = 0;
-            let totalCount = this.services.length;
-            
-            for (const card of this.services) {
-                const isUp = await this.checkService(card);
-                if (isUp) upCount++;
-            }
-            
-            this.updateStatusBanner(upCount, totalCount, false);
-        },
-        
-        async checkService(card) {
-            const url = card.getAttribute('href');
-            const statusDot = card.querySelector('.service-status');
-            
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 3000);
+            // Check each service
+            const checks = Array.from(this.services).map(async (card) => {
+                const url = card.getAttribute('href');
+                const status = card.querySelector('.service-status');
                 
-                const response = await fetch(url, {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeout);
-                
-                card.classList.remove('down');
-                if (statusDot) statusDot.classList.remove('down');
-                return true;
-            } catch (error) {
-                card.classList.add('down');
-                if (statusDot) statusDot.classList.add('down');
-                return false;
-            }
-        },
-        
-        updateStatusBanner(up, total, isDemo) {
-            const banner = document.getElementById('statusBanner');
-            const text = document.getElementById('statusText');
-            const dot = banner?.querySelector('.status-dot');
-            
-            if (!banner || !text) return;
-            
-            if (up === total) {
-                banner.classList.remove('some-down');
-                if (isDemo) {
-                    text.textContent = `All ${total} services simulated`;
-                } else {
-                    text.textContent = `All ${total} services operational`;
+                if (!url || url === '#' || url.startsWith('http')) {
+                    // External or no URL - assume online
+                    if (status) status.className = 'service-status';
+                    return true;
                 }
-                if (dot) dot.classList.remove('down');
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
+                    });
+                    
+                    if (status) status.className = 'service-status';
+                    card.classList.remove('offline');
+                    return true;
+                } catch (error) {
+                    if (status) status.className = 'service-status offline';
+                    card.classList.add('offline');
+                    return false;
+                }
+            });
+            
+            const results = await Promise.all(checks);
+            online = results.filter(r => r).length;
+            
+            this.updateBanner(online, total);
+        },
+        
+        updateBanner(online, total) {
+            if (!this.statusBanner || !this.statusText) return;
+            
+            const dot = this.statusBanner.querySelector('.status-dot');
+            
+            if (online === total) {
+                this.statusBanner.className = 'status-banner';
+                if (dot) dot.className = 'status-dot';
+                this.statusText.textContent = `All ${total} services operational`;
             } else {
-                banner.classList.add('some-down');
-                text.textContent = `${up}/${total} services online`;
-                if (dot) dot.classList.add('down');
+                this.statusBanner.className = 'status-banner warning';
+                if (dot) dot.className = 'status-dot warning';
+                this.statusText.textContent = `${online}/${total} services online`;
+            }
+        },
+        
+        simulateOnline() {
+            const total = this.services.length;
+            this.services.forEach(card => {
+                const status = card.querySelector('.service-status');
+                if (status) status.className = 'service-status';
+            });
+            this.updateBanner(total, total);
+        }
+    };
+
+    // ==========================================
+    // Search/Filter Manager
+    // ==========================================
+    const SearchManager = {
+        input: null,
+        
+        init() {
+            this.input = document.getElementById('serviceSearch');
+            if (!this.input) return;
+            
+            this.input.addEventListener('input', (e) => this.filter(e.target.value));
+            
+            // Clear on Escape
+            this.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    this.input.value = '';
+                    this.filter('');
+                }
+            });
+        },
+        
+        filter(query) {
+            const normalized = query.toLowerCase().trim();
+            const cards = document.querySelectorAll('.service-card');
+            const categories = document.querySelectorAll('.service-category');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                const desc = card.querySelector('p')?.textContent.toLowerCase() || '';
+                const matches = !normalized || name.includes(normalized) || desc.includes(normalized);
+                card.classList.toggle('hidden', !matches);
+            });
+            
+            // Hide empty categories
+            categories.forEach(cat => {
+                const visibleCards = cat.querySelectorAll('.service-card:not(.hidden)');
+                cat.style.display = visibleCards.length ? '' : 'none';
+            });
+        }
+    };
+
+    // ==========================================
+    // Theme Manager
+    // ==========================================
+    const ThemeManager = {
+        toggle: null,
+        
+        init() {
+            this.toggle = document.getElementById('themeToggle');
+            if (!this.toggle) return;
+            
+            // Load saved theme
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                this.updateIcon(saved);
+            }
+            
+            this.toggle.addEventListener('click', () => this.toggleTheme());
+        },
+        
+        toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            this.updateIcon(next);
+        },
+        
+        updateIcon(theme) {
+            if (this.toggle) {
+                this.toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
             }
         }
     };
 
-    // ========================================
+    // ==========================================
     // Hero Slideshow
-    // ========================================
-    const HeroSlideshow = {
-        INTERVAL: 6000,
-        currentIndex: 0,
+    // ==========================================
+    const Slideshow = {
         slides: [],
+        currentIndex: 0,
+        interval: null,
         
         init() {
-            this.slides = Array.from(document.querySelectorAll('.hero-slide'));
+            this.slides = document.querySelectorAll('.hero-slide');
             if (this.slides.length <= 1) return;
             
-            setInterval(() => this.next(), this.INTERVAL);
+            this.start();
+            
+            // Pause on hover
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                hero.addEventListener('mouseenter', () => this.pause());
+                hero.addEventListener('mouseleave', () => this.start());
+            }
+            
+            // Pause when tab hidden
+            document.addEventListener('visibilitychange', () => {
+                document.hidden ? this.pause() : this.start();
+            });
+        },
+        
+        start() {
+            if (this.interval) return;
+            this.interval = setInterval(() => this.next(), CONFIG.slideshowInterval);
+        },
+        
+        pause() {
+            if (this.interval) {
+                clearInterval(this.interval);
+                this.interval = null;
+            }
         },
         
         next() {
@@ -282,41 +334,62 @@
         }
     };
 
-    // ========================================
-    // Smooth Scroll for Anchor Links
-    // ========================================
+    // ==========================================
+    // Mobile Menu
+    // ==========================================
+    const MobileMenu = {
+        init() {
+            const toggle = document.querySelector('.menu-toggle');
+            const nav = document.querySelector('.nav-links');
+            
+            if (!toggle || !nav) return;
+            
+            toggle.addEventListener('click', () => {
+                nav.classList.toggle('active');
+                toggle.classList.toggle('active');
+            });
+            
+            // Close on link click
+            nav.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    nav.classList.remove('active');
+                    toggle.classList.remove('active');
+                });
+            });
+        }
+    };
+
+    // ==========================================
+    // Smooth Scroll
+    // ==========================================
     const SmoothScroll = {
         init() {
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', (e) => {
-                    const href = anchor.getAttribute('href');
-                    if (href === '#') return;
-                    
-                    const target = document.querySelector(href);
+                    e.preventDefault();
+                    const target = document.querySelector(anchor.getAttribute('href'));
                     if (target) {
-                        e.preventDefault();
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
             });
         }
     };
 
-    // ========================================
-    // Initialize Everything
-    // ========================================
+    // ==========================================
+    // Initialize
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
         ModeManager.init();
-        ThemeManager.init();
         StatsManager.init();
-        ServiceChecker.init();
-        HeroSlideshow.init();
+        ServiceManager.init();
+        SearchManager.init();
+        ThemeManager.init();
+        Slideshow.init();
+        MobileMenu.init();
         SmoothScroll.init();
         
-        console.log('🟩 MuleCube Dashboard initialized');
+        console.log('🟩 MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
 
 })();

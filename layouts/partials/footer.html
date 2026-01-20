@@ -1,8 +1,46 @@
-<!-- Footer -->
+<!-- Footer - Matches main site -->
 <footer class="site-footer">
-    <div class="footer-logo">
-        {{ partial "logo-svg.html" (dict "width" 60 "height" 60) }}
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/images/logo.png" alt="MuleCube" class="logo-img" style="height: 32px;">
+                </a>
+                <p>The *internet, in your backpack.</p>
+                <p class="footer-tagline">Built in the Netherlands 🇳🇱</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="#services">All Services</a></li>
+                    <li><a href="http://openwebui.mulecube.local" target="_blank">Open WebUI</a></li>
+                    <li><a href="http://kiwix.mulecube.local" target="_blank">Wikipedia</a></li>
+                    <li><a href="http://maps.mulecube.local" target="_blank">Offline Maps</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://mulecube.com/docs/" target="_blank" rel="noopener">Documentation ↗</a></li>
+                    <li><a href="https://github.com/nuclearlighters/mulecube" target="_blank" rel="noopener">GitHub ↗</a></li>
+                    <li><a href="https://mulecube.com/faq/" target="_blank" rel="noopener">FAQ ↗</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4>MuleCube</h4>
+                <ul>
+                    <li><a href="https://mulecube.com/" target="_blank" rel="noopener">Website ↗</a></li>
+                    <li><a href="https://mulecube.com/products/" target="_blank" rel="noopener">Products ↗</a></li>
+                    <li><a href="https://mulecube.com/about/" target="_blank" rel="noopener">About ↗</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {{ now.Year }} Nuclear Lighters Inc. All rights reserved.</p>
+        </div>
     </div>
-    <p>MuleCube by <a href="https://mulecube.com" target="_blank">Nuclear Lighters Inc.</a></p>
-    <p class="tagline">{{ .Site.Params.tagline | safeHTML }}</p>
 </footer>

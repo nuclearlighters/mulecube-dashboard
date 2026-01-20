@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
     {{- if .Site.Params.demoMode }}
     <meta name="mulecube-mode" content="demo">
     {{- end }}
@@ -13,9 +12,14 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/pico.min.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
@@ -25,7 +29,6 @@
     
     {{- partial "footer.html" . -}}
     
-    <!-- JavaScript -->
     <script src="/js/dashboard.js"></script>
 </body>
 </html>

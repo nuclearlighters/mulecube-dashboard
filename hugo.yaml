@@ -17,7 +17,7 @@ params:
   # Service categories for the dashboard
   services:
     ai:
-      title: "🤖 AI Services"
+      title: "AI Services"
       items:
         - name: LibreTranslate
           url: "http://translate.mulecube.local"
@@ -35,7 +35,7 @@ params:
           gradient: "#6366f1, #4f46e5"
     
     knowledge:
-      title: "📚 Knowledge"
+      title: "Knowledge"
       items:
         - name: Kiwix
           url: "http://wiki.mulecube.local"
@@ -53,7 +53,7 @@ params:
           gradient: "#f59e0b, #d97706"
     
     collaboration:
-      title: "🤝 Collaboration"
+      title: "Collaboration"
       items:
         - name: CryptPad
           url: "http://pad.mulecube.local"
@@ -71,7 +71,7 @@ params:
           gradient: "#ec4899, #db2777"
     
     security:
-      title: "🔐 Security"
+      title: "Security"
       items:
         - name: Vaultwarden
           url: "http://vault.mulecube.local"
@@ -82,7 +82,7 @@ params:
           gradient: "#14b8a6, #0d9488"
     
     files:
-      title: "📁 Files & Sync"
+      title: "Files & Sync"
       items:
         - name: File Browser
           url: "http://files.mulecube.local"
@@ -100,7 +100,7 @@ params:
           gradient: "#06b6d4, #0891b2"
     
     communication:
-      title: "💬 Communication"
+      title: "Communication"
       items:
         - name: Element Chat
           url: "http://chat.mulecube.local"
@@ -118,7 +118,7 @@ params:
           gradient: "#67e8f9, #22d3ee"
     
     tools:
-      title: "🔧 Tools"
+      title: "Tools"
       items:
         - name: IT-Tools
           url: "http://tools.mulecube.local"
@@ -136,7 +136,7 @@ params:
           gradient: "#06b6d4, #0891b2"
     
     infrastructure:
-      title: "⚙️ Infrastructure"
+      title: "Infrastructure"
       items:
         - name: Beszel
           url: "http://monitor.mulecube.local"
@@ -167,7 +167,7 @@ params:
           fallback: "🦙"
           gradient: "#1e1e1e, #333"
 
-# Hero slideshow images
+  # Hero slideshow images
   heroImages:
     - camping
     - sailing
@@ -175,27 +175,22 @@ params:
     - remote-work
     - expeditions
 
+# Navigation menu - device-appropriate links
 menu:
   main:
     - identifier: services
       name: Services
       url: "#services"
       weight: 1
-    - identifier: products
-      name: Products
-      url: "https://mulecube.com/products"
+    - identifier: docs
+      name: Docs
+      url: "https://mulecube.com/docs/"
       weight: 2
       params:
         external: true
-    - identifier: faq
-      name: FAQ
-      url: "https://mulecube.com/faq"
-      weight: 3
-      params:
-        external: true
     - identifier: github
-      name: GitHub ↗
+      name: GitHub
       url: "https://github.com/nuclearlighters/mulecube"
-      weight: 4
+      weight: 3
       params:
         external: true
