@@ -1,6 +1,6 @@
 {{- with .category }}
 <div class="service-category">
-    <h3 class="category-title">{{ with $.icon }}{{ . }} {{ end }}{{ .title }}</h3>
+    <h3 class="category-title">{{ with $.icon }}<img src="{{ . }}" alt="" class="category-icon"> {{ end }}{{ .title }}</h3>
     <div class="service-grid">
         {{- range .items }}
         {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}

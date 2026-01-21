@@ -39,7 +39,7 @@
             const banner = document.createElement('div');
             banner.className = 'demo-banner';
             banner.innerHTML = `
-                <span class="demo-label">🎭 Demo Mode</span>
+                <span class="demo-label">Demo Mode</span>
                 <span class="demo-text">This is a preview — on a real MuleCube, services run locally</span>
                 <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube →</a>
             `;
@@ -112,7 +112,7 @@
             // Battery (only show when available)
             if (this.elements.batteryContainer && data.battery_available) {
                 this.elements.batteryContainer.style.display = 'flex';
-                if (this.elements.batteryIcon) this.elements.batteryIcon.textContent = data.battery_charging ? '⚡' : '🔋';
+                if (this.elements.batteryIcon) this.elements.batteryIcon.innerHTML = '<img src="/images/icons/stat-battery.svg" class="stat-icon">';
                 if (this.elements.batteryValue) {
                     this.elements.batteryValue.textContent = `${data.battery_percent}%`;
                     this.elements.batteryValue.style.color = data.battery_percent < 20 ? '#ef4444' : data.battery_percent < 50 ? '#f59e0b' : '#22c55e';
@@ -408,6 +408,33 @@
     };
 
     // ==========================================
+    // Advanced Toggle
+    // ==========================================
+    const AdvancedToggle = {
+        init() {
+            const btn = document.getElementById('advancedToggle');
+            const section = document.getElementById('advancedSection');
+            
+            if (!btn || !section) return;
+            
+            btn.addEventListener('click', () => {
+                const isVisible = section.style.display !== 'none';
+                section.style.display = isVisible ? 'none' : 'block';
+                btn.classList.toggle('active', !isVisible);
+                btn.innerHTML = isVisible 
+                    ? '<span class="toggle-icon">▶</span> Show Admin Tools' 
+                    : '<span class="toggle-icon">▶</span> Hide Admin Tools';
+                
+                if (!isVisible) {
+                    setTimeout(() => section.classList.add('visible'), 10);
+                } else {
+                    section.classList.remove('visible');
+                }
+            });
+        }
+    };
+
+    // ==========================================
     // Initialize
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
@@ -419,8 +446,9 @@
         Slideshow.init();
         MobileMenu.init();
         SmoothScroll.init();
+        AdvancedToggle.init();
         
-        console.log('🟩 MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
+        console.log('MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
 
 })();

@@ -18,6 +18,7 @@
     --color-border: #27272a;
     --color-border-light: #3f3f46;
     --color-warning: #f59e0b;
+    --icon-filter: invert(1);
     --color-danger: #ef4444;
     
     /* Typography */
@@ -246,6 +247,13 @@ a:hover {
     font-weight: 600;
     font-family: var(--font-mono);
     font-size: 0.85rem;
+}
+
+.stat-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+    filter: var(--icon-filter, none);
 }
 
 .stats-info {
@@ -507,6 +515,14 @@ a:hover {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+}
+
+
+.category-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+    filter: var(--icon-filter, none);
 }
 
 .service-grid {
@@ -839,6 +855,7 @@ a:hover {
     --color-text-muted: #52525b;
     --color-border: #d4d4d8;
     --color-border-light: #a1a1aa;
+    --icon-filter: none;
 }
 
 [data-theme="light"] body {
@@ -895,6 +912,80 @@ a:hover {
 
 [data-theme="light"] .demo-banner {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Quick Start Section */
+.quick-start {
+    margin-bottom: var(--space-2xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.quick-start-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-lg);
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
+}
+
+@media (max-width: 1024px) {
+    .quick-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Advanced Toggle */
+.advanced-toggle {
+    margin: var(--space-2xl) 0 var(--space-lg);
+    text-align: center;
+}
+
+.toggle-btn {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--space-sm) var(--space-lg);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.toggle-icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin-right: var(--space-xs);
+}
+
+.toggle-btn.active .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.advanced-section {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.advanced-section.visible {
+    opacity: 1;
 }
 
 /* Theme-aware logo */

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer" />
+
+    <!-- HTML Meta Tags -->
+    <title>Error - CryptPad.org</title>
+
+
+    <meta name="description" content="Page not found">
+    <meta property="og:url" content="http://cryptpad.org/error.html">
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="http://cryptpad.org/error.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Error">
+    <meta property="og:description" content="Page not found">
+    <meta property="og:image" content="http://cryptpad.org/images/opengraph_preview.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="http://cryptpad.org">
+    <meta property="twitter:url" content="http://cryptpad.org/error.html">
+    <meta name="twitter:title" content="Error">
+    <meta name="twitter:description" content="Page not found">
+    <meta name="twitter:image" content="http://cryptpad.org/images/opengraph_preview.png">
+
+    <meta name="robots" content="index, archive" />
+    <meta name="canonical" href="http://cryptpad.org/error.html" />
+
+    <link type="image/png" rel="icon" href="/images/main-favicon.png" />
+    <link rel="stylesheet" href="/style.css?ver=1760604316167">
+    <script src="/index.js?ver=1760604316167"></script>
+</head>
+
+<body>
+    
+    
+    <nav>
+        <div class="logo">
+            <a href="/" aria-label="Return to homepage">
+                <img src="/images/CryptPad_logo_text_horizontal.svg" alt="CryptPad logo">
+            </a>
+        </div>
+    <!--start of hamburger menu -->
+    <button id="hamburger" class="hamburger" aria-label="Show Navigation Menu" aria-expanded="false" tabindex="0"><i class="fa fa-bars"></i></button>
+    <div id="dropDown">
+    <ul>
+    
+    <li>
+        <a href="/pricing" class="btn">
+            <i class="fa fa-ticket" aria-hidden="true"></i>
+            <span>Pricing</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="https://docs.cryptpad.org/" class="btn">
+            <i class="fa fa-book" aria-hidden="true"></i>
+            <span>Documentation</span>
+        </a>
+    </li>
+    
+        <li>
+            <a href="/about/" class="btn">
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                <span>About</span>
+            </a>
+        </li>
+    
+    <li>
+        <a href="https://opencollective.com/cryptpad/contribute/" class="btn">
+            <i class="fa fa-money" aria-hidden="true"></i>
+            <span>Donate</span>
+        </a>
+    </li>
+</ul>
+
+    </div>
+    <!--end of hamburger menu and start of navbuttons for large screens -->
+    <div class="navButtons">
+    <ul>
+    
+    <li>
+        <a href="/pricing" class="btn">
+            <i class="fa fa-ticket" aria-hidden="true"></i>
+            <span>Pricing</span>
+        </a>
+    </li>
+    
+    <li>
+        <a href="https://docs.cryptpad.org/" class="btn">
+            <i class="fa fa-book" aria-hidden="true"></i>
+            <span>Documentation</span>
+        </a>
+    </li>
+    
+        <li>
+            <a href="/about/" class="btn">
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                <span>About</span>
+            </a>
+        </li>
+    
+    <li>
+        <a href="https://opencollective.com/cryptpad/contribute/" class="btn">
+            <i class="fa fa-money" aria-hidden="true"></i>
+            <span>Donate</span>
+        </a>
+    </li>
+</ul>
+
+    </div>
+    </nav>
+
+    
+        
+
+<section class="full">
+    <h1>Error</h1>
+    <h2>404 - Page not found</h2>
+    <p style="text-align: center;"><a href="/">Take me home</a></p>
+</section>
+    
+
+    <footer>
+    <div class="logo">
+        <a href="/"><img src="/images/CryptPad_logo_text.svg" alt="return to homepage"></a>
+    </div>
+
+    <div class="link-col wide">
+        <ul>
+            <li>
+                <a href="https://opencollective.com/cryptpad/contribute" class="highlight">
+                    <i aria-hidden="true" class="fa fa-open-collective"></i>Donate on OpenCollective
+                </a>
+            </li>
+            <li aria-hidden="true">&nbsp;</li>
+            <li>
+                <a href="/about/">
+                    <i aria-hidden="true" class="fa fa-question-circle-o"></i>About CryptPad
+                </a>
+            </li>
+            <li>
+                <a href="https://cryptpad.fr">
+                    <i aria-hidden="true" class="fa fa-flag"></i>Flagship instance
+                </a>
+            </li>
+            <li>
+                <a href="/instances/">
+                    <i aria-hidden="true" class="fa fa-list-ul"></i>Public instances
+                </a>
+            </li>
+            <li>
+                <a href="https://docs.cryptpad.org">
+                    <i aria-hidden="true" class="fa fa-book"></i>Documentation
+                </a>
+            </li>
+            <li>
+                <a href="https://cryptpad.fr/kanban/#/2/kanban/view/PLM0C3tFWvYhd+EPzXrbT+NxB76Z5DtZhAA5W5hG9wo/">
+                    <i aria-hidden="true" class="fa fa-binoculars"></i>Roadmap
+                </a>
+            </li>
+            <li>
+                <a href="/jobs/">
+                    <i aria-hidden="true" class="fa fa-briefcase"></i>Jobs
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/cryptpad/cryptpad">
+                    <i aria-hidden="true" class="fa fa-github"></i>Source code
+                </a>
+            </li>
+            <li>
+                <a href="/contact/">
+                    <i aria-hidden="true" class="fa fa-envelope-o"></i>Contact
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="link-col wide">
+        <ul>
+            <li>
+                <a href="/pricing/" class="highlight">
+                    <i aria-hidden="true" class="fa fa-ticket"></i>Pricing
+                </a>
+            </li>
+            <li>
+                <a href="/try-cloud/" class="highlight">
+                    <i aria-hidden="true" class="fa fa-cloud"></i>Launch Demo instance
+                </a>
+            </li>
+            <li aria-hidden="true">&nbsp;</li>
+            <li>
+                Use-cases
+            </li>
+            <li>
+                <a href="/use-case/enterprise/">
+                    <i aria-hidden="true" class="fa fa-briefcase"></i>Enterprise
+                </a>
+            </li>
+            <li>
+                <a href="/use-case/nonprofit/">
+                    <i aria-hidden="true" class="fa fa-users"></i>Nonprofit
+                </a>
+            </li>
+            <li>
+                <a href="/use-case/education/">
+                    <i aria-hidden="true" class="fa fa-graduation-cap"></i>Education
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="link-col">
+        <ul>
+            <li aria-hidden="true">&nbsp;</li>
+            <li aria-hidden="true">&nbsp;</li>
+            <li>
+                <a href="https://blog.cryptpad.org">
+                    <i aria-hidden="true" class="fa fa-newspaper-o"></i>Blog
+                </a>
+            </li>
+            <li>
+                <a href="https://forum.cryptpad.org">
+                    <i aria-hidden="true" class="fa fa-bullhorn"></i>Forum
+                </a>
+            </li>
+            <li>
+                <a href="https://matrix.to/#/#cryptpad:matrix.xwiki.com">
+                    <i aria-hidden="true" class="fa fa-matrix-org"></i>Chat (Matrix)
+                </a>
+            </li>
+            <li>
+                <a rel="me" href="https://social.xwiki.com/@CryptPad">
+                    <i aria-hidden="true" class="fa fa-mastodon"></i>Mastodon
+                </a>
+            </li>
+            <li>
+                <a href="https://peertube.xwiki.com/c/cryptpad_channel/videos">
+                    <i aria-hidden="true" class="fa fa-peertube"></i>Peertube
+                </a>
+            </li>
+            <li>
+                <a href="https://pixelfed.social/cryptpad_design">
+                    <i aria-hidden="true" class="fa fa-pixelfed"></i>Pixelfed
+                </a>
+            </li>
+            <li>
+                <a href="https://uptime.cryptpad.org/status/cryptpad">
+                    <i aria-hidden="true" class="fa fa-fire-extinguisher"></i>Status page
+                </a>
+            </li>
+        </ul>
+    </div>
+</footer>
+
+
+</body>

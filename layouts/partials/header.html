@@ -20,7 +20,7 @@
             </li>
             {{- end }}
             <li>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><img src="/images/icons/ui-moon.svg" alt="" class="theme-icon" id="themeIcon"></button>
             </li>
         </ul>
     </nav>
@@ -30,8 +30,8 @@
 <div class="stats-panel">
     <div class="stats-container">
         <div class="stats-group stats-info">
-            <span class="stat-item">🖥️ <span id="hostname">mulecube</span></span>
-            <span class="stat-item">⏱️ <span id="uptime">--</span></span>
+            <span class="stat-item"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
+            <span class="stat-item"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
         </div>
 
         <div class="stats-group stats-primary">
@@ -46,9 +46,9 @@
         </div>
         
         <div class="stats-group stats-hardware">
-            <span class="stat-item">🌡️ <span class="stat-val" id="tempValue">--°C</span></span>
+            <span class="stat-item"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
             <span class="stat-item" id="batteryContainer" style="display: none;">
-                <span id="batteryIcon">🔋</span> <span class="stat-val" id="batteryValue">--%</span>
+                <span id="batteryIcon"><img src="/images/icons/stat-battery.svg" alt="" class="stat-icon"></span> <span class="stat-val" id="batteryValue">--%</span>
             </span>
         </div>
         
@@ -354,7 +354,7 @@
     
     if (rebootBtn) {
         rebootBtn.addEventListener('click', () => {
-            showModal('reboot', '🔄 Reboot MuleCube?', 
+            showModal('reboot', 'Reboot MuleCube?', 
                 'System will restart in 1 minute. Services will be briefly unavailable.', true);
         });
     }
