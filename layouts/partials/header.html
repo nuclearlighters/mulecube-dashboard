@@ -26,7 +26,6 @@
         </ul>
     </nav>
 </header>
-
 <!-- System Stats Panel -->
 <div class="stats-panel">
     <div class="container">
@@ -60,9 +59,237 @@
             <span class="stat-value" id="batteryValue">--%</span>
             <span id="batteryTime" style="font-size: 0.75em; opacity: 0.7; margin-left: 4px;"></span>
         </div>
+        <!-- Power Controls -->
+        <div class="stat-item power-controls">
+            <button class="power-btn reboot-btn" id="rebootBtn" title="Reboot MuleCube">🔄</button>
+            <button class="power-btn shutdown-btn" id="shutdownBtn" title="Shut Down MuleCube">⏻</button>
+        </div>
         <div class="stats-info">
             <span>🖥️ <span id="hostname" class="hostname">mulecube</span></span>
             <span>⏱️ <span id="uptime">--</span></span>
         </div>
     </div>
 </div>
+
+<!-- Power Control Confirmation Modal -->
+<div id="powerModal" class="power-modal" style="display: none;">
+    <div class="power-modal-content">
+        <h3 id="powerModalTitle">Confirm Action</h3>
+        <p id="powerModalMessage">Are you sure?</p>
+        <div class="power-modal-buttons">
+            <button id="powerModalCancel" class="modal-btn cancel-btn">Cancel</button>
+            <button id="powerModalConfirm" class="modal-btn confirm-btn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Power button styles */
+.power-controls {
+    display: flex;
+    gap: 8px;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255,255,255,0.2);
+}
+
+.power-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.power-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.reboot-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.shutdown-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.power-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Modal styles */
+.power-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.power-modal-content {
+    background: #1a1a2e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.power-modal-content h3 {
+    margin: 0 0 12px 0;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+.power-modal-content p {
+    margin: 0 0 20px 0;
+    color: rgba(255,255,255,0.7);
+}
+
+.power-modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btn {
+    padding: 10px 24px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.confirm-btn {
+    background: #ef4444;
+    color: #fff;
+}
+
+.confirm-btn:hover {
+    background: #dc2626;
+}
+
+.confirm-btn.reboot {
+    background: #3b82f6;
+}
+
+.confirm-btn.reboot:hover {
+    background: #2563eb;
+}
+</style>
+
+<script>
+(function() {
+    // Power control functionality
+    const rebootBtn = document.getElementById('rebootBtn');
+    const shutdownBtn = document.getElementById('shutdownBtn');
+    const modal = document.getElementById('powerModal');
+    const modalTitle = document.getElementById('powerModalTitle');
+    const modalMessage = document.getElementById('powerModalMessage');
+    const modalCancel = document.getElementById('powerModalCancel');
+    const modalConfirm = document.getElementById('powerModalConfirm');
+    
+    let pendingAction = null;
+    
+    function showModal(action, title, message, isReboot) {
+        pendingAction = action;
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+        modalConfirm.className = 'modal-btn confirm-btn' + (isReboot ? ' reboot' : '');
+        modal.style.display = 'flex';
+    }
+    
+    function hideModal() {
+        modal.style.display = 'none';
+        pendingAction = null;
+    }
+    
+    async function executeAction(endpoint, successMessage) {
+        try {
+            const response = await fetch(endpoint, { method: 'POST' });
+            const data = await response.json();
+            if (response.ok) {
+                alert(successMessage + '\n\n' + (data.message || ''));
+            } else {
+                alert('Error: ' + (data.detail || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Failed to connect: ' + error.message);
+        }
+    }
+    
+    if (rebootBtn) {
+        rebootBtn.addEventListener('click', () => {
+            showModal(
+                'reboot',
+                '🔄 Reboot MuleCube?',
+                'The system will restart in 1 minute. All services will be briefly unavailable.',
+                true
+            );
+        });
+    }
+    
+    if (shutdownBtn) {
+        shutdownBtn.addEventListener('click', () => {
+            showModal(
+                'shutdown',
+                '⏻ Shut Down MuleCube?',
+                'The system will power off in 1 minute. You will need physical access to turn it back on!',
+                false
+            );
+        });
+    }
+    
+    if (modalCancel) {
+        modalCancel.addEventListener('click', hideModal);
+    }
+    
+    if (modalConfirm) {
+        modalConfirm.addEventListener('click', async () => {
+            if (pendingAction === 'reboot') {
+                await executeAction('http://192.168.42.1:9001/api/reboot', '✅ Reboot scheduled!');
+            } else if (pendingAction === 'shutdown') {
+                await executeAction('http://192.168.42.1:9001/api/shutdown', '✅ Shutdown scheduled!');
+            }
+            hideModal();
+        });
+    }
+    
+    // Close modal on outside click
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) hideModal();
+        });
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+            hideModal();
+        }
+    });
+})();
+</script>
