@@ -303,7 +303,7 @@ menu:
   main:
     - identifier: services
       name: Services
-      url: "#services"
+      url: "/#services"
       weight: 1
     - identifier: docs
       name: Docs

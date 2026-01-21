@@ -20,7 +20,7 @@
             </li>
             {{- end }}
             <li>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><img src="/images/icons/ui-moon.svg" alt="" class="theme-icon" id="themeIcon"></button>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Switch to light/dark mode"><img src="/images/icons/ui-moon.svg" alt="" class="theme-icon" id="themeIcon"></button>
             </li>
         </ul>
     </nav>
@@ -73,164 +73,140 @@
 </div>
 
 <style>
-/* Stats Panel - Compact and Readable */
+/* Stats Panel - Aligned with site container */
 .stats-panel {
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 8px 0;
-    font-size: 13px;
+    background: var(--color-bg-secondary, #111113);
+    border-bottom: 1px solid var(--color-border, #27272a);
+    padding: 10px 0;
+    font-size: 0.8rem;
 }
 
 .stats-container {
-    max-width: 1400px;
+    max-width: var(--container-max, 1200px);
     margin: 0 auto;
-    padding: 0 16px;
+    padding: 0 var(--space-lg, 1.5rem);
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px 20px;
+    justify-content: space-between;
+    gap: 16px;
 }
 
 .stats-group {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .stat-item {
-    color: rgba(255,255,255,0.9);
+    color: var(--color-text-muted, #a1a1aa);
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    font-size: 0.75rem;
+}
+
+.stat-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+    filter: var(--icon-filter, none);
 }
 
 .stat-label {
-    color: rgba(255,255,255,0.5);
-    font-size: 11px;
-    font-weight: 500;
+    color: var(--color-text-muted, #a1a1aa);
+    font-size: 0.65rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    opacity: 0.7;
 }
 
 .stat-val {
-    color: #22c55e;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
+    color: var(--color-primary, #22c55e);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-weight: 500;
+    font-size: 0.75rem;
 }
 
-/* Group separators */
-.stats-primary { 
-    padding-right: 16px; 
-    border-right: 1px solid rgba(255,255,255,0.2); 
+/* No separators - cleaner look */
+.stats-info,
+.stats-primary,
+.stats-network,
+.stats-hardware {
+    /* Clean, no borders */
 }
 
-.stats-network { 
-    padding-right: 16px; 
-    border-right: 1px solid rgba(255,255,255,0.2); 
-}
-
-.stats-hardware { 
-    padding-right: 16px; 
-    border-right: 1px solid rgba(255,255,255,0.2); 
-}
-
-.stats-controls {
-    padding-right: 16px;
-    border-right: 1px solid rgba(255,255,255,0.2);
-}
-
-/* Power buttons */
+/* Power buttons - refined */
 .power-btn {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 4px;
-    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--color-border, #27272a);
+    border-radius: var(--border-radius, 6px);
+    padding: 6px 12px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 0.7rem;
     font-weight: 500;
     transition: all 0.2s ease;
-    line-height: 1;
-    color: rgba(255,255,255,0.8);
+    color: var(--color-text-muted, #a1a1aa);
 }
 
 .power-btn:hover {
-    background: rgba(255,255,255,0.15);
-    transform: scale(1.05);
-}
-
-/* Light theme power buttons */
-[data-theme="light"] .power-btn {
-    background: rgba(0,0,0,0.05);
-    border-color: rgba(0,0,0,0.15);
-    color: rgba(0,0,0,0.6);
-}
-
-[data-theme="light"] .power-btn.reboot:hover {
-    background: rgba(59, 130, 246, 0.2);
-}
-
-[data-theme="light"] .power-btn.shutdown:hover {
-    background: rgba(239, 68, 68, 0.2);
-}
-
-.power-btn.reboot {
-    border-color: rgba(59, 130, 246, 0.4);
+    border-color: var(--color-border-light, #3f3f46);
+    color: var(--color-text, #e4e4e7);
 }
 
 .power-btn.reboot:hover {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
-}
-
-.power-btn.shutdown {
-    border-color: rgba(239, 68, 68, 0.4);
+    border-color: #3b82f6;
+    color: #3b82f6;
 }
 
 .power-btn.shutdown:hover {
-    background: rgba(239, 68, 68, 0.3);
-    border-color: rgba(239, 68, 68, 0.5);
+    border-color: #ef4444;
+    color: #ef4444;
 }
 
-.stats-info {
-    padding-right: 16px;
-    border-right: 1px solid rgba(255,255,255,0.2);
+/* Light theme adjustments */
+[data-theme="light"] .stats-panel {
+    background: #f4f4f5;
+    border-color: #e4e4e7;
 }
 
-/* Responsive adjustments */
+[data-theme="light"] .stat-val {
+    color: #16a34a;
+}
 
-/* Responsive adjustments */
-@media (max-width: 1000px) {
+[data-theme="light"] .power-btn {
+    border-color: #d4d4d8;
+    color: #71717a;
+}
+
+[data-theme="light"] .power-btn:hover {
+    color: #3f3f46;
+}
+
+/* Responsive - hide elements progressively */
+@media (max-width: 1100px) {
     .stats-info { display: none; }
-    .stats-controls { 
-        border-right: none; 
-        padding-right: 0; 
+}
+
+@media (max-width: 900px) {
+    .stats-container { 
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 20px;
     }
 }
 
 @media (max-width: 768px) {
-    .stats-panel { padding: 6px 0; font-size: 12px; }
-    .stats-container { gap: 6px 12px; }
-    .stats-group { gap: 8px; }
-    .stats-primary, .stats-network, .stats-hardware, .stats-controls { 
-        padding-right: 10px; 
-    }
-}
-
-@media (max-width: 600px) {
+    .stats-panel { padding: 8px 0; }
     .stats-network { display: none; }
-    .stats-hardware { 
-        border-right: none; 
-        padding-right: 0; 
-    }
+    .stats-group { gap: 12px; }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 500px) {
+    .stats-hardware { display: none; }
     .stats-container { justify-content: space-between; }
-    .stat-label { font-size: 10px; }
-    .stats-primary { border-right: none; padding-right: 0; }
+    .power-btn { padding: 6px 10px; font-size: 0.65rem; }
 }
 
 /* Modal styles */
@@ -248,9 +224,9 @@
 }
 
 .power-modal-content {
-    background: #1a1a2e;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
+    background: var(--color-bg-card, #161618);
+    border: 1px solid var(--color-border, #27272a);
+    border-radius: var(--border-radius-lg, 12px);
     padding: 24px 32px;
     max-width: 380px;
     text-align: center;
@@ -259,14 +235,14 @@
 
 .power-modal-content h3 {
     margin: 0 0 12px 0;
-    color: #fff;
-    font-size: 1.2rem;
+    color: var(--color-text, #e4e4e7);
+    font-size: 1.1rem;
 }
 
 .power-modal-content p {
     margin: 0 0 20px 0;
-    color: rgba(255,255,255,0.7);
-    font-size: 0.9rem;
+    color: var(--color-text-muted, #a1a1aa);
+    font-size: 0.85rem;
     line-height: 1.5;
 }
 
@@ -278,21 +254,22 @@
 
 .modal-btn {
     padding: 10px 24px;
-    border-radius: 6px;
+    border-radius: var(--border-radius, 6px);
     border: none;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.85rem;
     font-weight: 500;
     transition: all 0.2s ease;
 }
 
 .cancel-btn {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+    background: var(--color-bg-secondary, #111113);
+    border: 1px solid var(--color-border, #27272a);
+    color: var(--color-text, #e4e4e7);
 }
 
 .cancel-btn:hover {
-    background: rgba(255,255,255,0.2);
+    background: var(--color-bg-card, #161618);
 }
 
 .confirm-btn {
@@ -310,6 +287,18 @@
 
 .confirm-btn.reboot:hover {
     background: #2563eb;
+}
+
+/* Light theme modal */
+[data-theme="light"] .power-modal-content {
+    background: #fff;
+    border-color: #e4e4e7;
+}
+
+[data-theme="light"] .cancel-btn {
+    background: #f4f4f5;
+    border-color: #e4e4e7;
+    color: #3f3f46;
 }
 </style>
 
