@@ -20,7 +20,7 @@ params:
         - name: LibreTranslate
           url: "http://translate.mulecube.local"
           demo_url: "https://docs.libretranslate.com/"
-          description: "Offline Translation"
+          description: "Translate text between languages"
           service: libretranslate
           icon: "/images/icons/libretranslate.ico"
           fallback: "◆"
@@ -28,7 +28,7 @@ params:
         - name: Open WebUI
           url: "http://ai.mulecube.local"
           demo_url: "https://docs.openwebui.com/"
-          description: "AI Chat Interface"
+          description: "Chat with AI assistant"
           service: openwebui
           icon: "/images/icons/openwebui.png"
           fallback: "◆"
@@ -40,7 +40,7 @@ params:
         - name: Kiwix
           url: "http://wiki.mulecube.local"
           demo_url: "https://kiwix.org/"
-          description: "Offline Wikipedia"
+          description: "Browse Wikipedia offline"
           service: kiwix
           icon: "/images/icons/kiwix.ico"
           fallback: "◆"
@@ -48,7 +48,7 @@ params:
         - name: Maps
           url: "http://maps.mulecube.local"
           demo_url: "https://docs.maptiler.com/guides/self-hosting/map-server/"
-          description: "Offline Maps"
+          description: "View maps & plan routes"
           service: maps
           icon: ""
           fallback: "◆"
@@ -56,7 +56,7 @@ params:
         - name: Navigation
           url: "http://navigation.mulecube.local/@signalk/freeboard-sk/"
           demo_url: "https://signalk.org/about/"
-          description: "Marine Chart Plotter"
+          description: "Navigate with nautical charts"
           service: signalk
           icon: ""
           fallback: "⚓"
@@ -64,7 +64,7 @@ params:
         - name: Calibre
           url: "http://books.mulecube.local"
           demo_url: "https://github.com/janeczku/calibre-web?tab=readme-ov-file#calibre-web"
-          description: "Ebook Library"
+          description: "Read & manage your books"
           service: calibre
           icon: "/images/icons/calibre.ico"
           fallback: "◆"
@@ -72,7 +72,7 @@ params:
         - name: Emergency
           url: "http://emergency.mulecube.local"
           demo_url: "https://wiki.radioreference.com/index.php/Main_Page"
-          description: "Radio Frequencies Reference"
+          description: "Look up radio frequencies"
           service: emergency
           icon: ""
           fallback: "◆"
@@ -84,7 +84,7 @@ params:
         - name: CryptPad
           url: "http://pad.mulecube.local"
           demo_url: "https://docs.cryptpad.org/en/"
-          description: "Encrypted Documents"
+          description: "Create secure documents"
           service: cryptpad
           icon: "/images/icons/cryptpad.ico"
           fallback: "◆"
@@ -92,7 +92,7 @@ params:
         - name: Excalidraw
           url: "http://draw.mulecube.local"
           demo_url: "https://plus.excalidraw.com/how-to-start"
-          description: "Collaborative Drawing"
+          description: "Sketch diagrams together"
           service: excalidraw
           icon: "/images/icons/excalidraw.ico"
           fallback: "✏️"
@@ -100,7 +100,7 @@ params:
         - name: BentoPDF
           url: "http://pdf.mulecube.local"
           demo_url: "https://www.bentopdf.com/about.html"
-          description: "PDF Tools"
+          description: "Edit & convert PDFs"
           service: bentopdf
           icon: ""
           fallback: "◆"
@@ -112,7 +112,7 @@ params:
         - name: Vaultwarden
           url: "https://vault.mulecube.local"
           demo_url: "https://bitwarden.com/help/getting-started-webvault/"
-          description: "Password Manager"
+          description: "Store passwords securely"
           service: vaultwarden
           icon: "/images/icons/vaultwarden.svg"
           fallback: "◆"
@@ -124,7 +124,7 @@ params:
         - name: File Browser
           url: "http://files.mulecube.local"
           demo_url: "https://filebrowser.org/"
-          description: "File Manager"
+          description: "Browse & share files"
           service: filebrowser
           icon: "/images/icons/filebrowser.svg"
           fallback: "◆"
@@ -132,7 +132,7 @@ params:
         - name: Syncthing
           url: "http://sync.mulecube.local"
           demo_url: "https://docs.syncthing.net/intro/getting-started.html"
-          description: "File Synchronization"
+          description: "Sync files across devices"
           service: syncthing
           icon: "/images/icons/syncthing.png"
           fallback: "◆"
@@ -140,7 +140,7 @@ params:
         - name: Linkwarden
           url: "http://links.mulecube.local"
           demo_url: "https://linkwarden.app/#features"
-          description: "Bookmarks Archive"
+          description: "Save & organize links"
           service: linkwarden
           icon: "/images/icons/linkwarden.ico"
           fallback: "◆"
@@ -148,7 +148,7 @@ params:
         - name: Open Archiver
           url: "http://archive.mulecube.local"
           demo_url: "https://openarchiver.com/"
-          description: "Email Archive"
+          description: "Archive your emails"
           service: openarchiver
           icon: ""
           fallback: "◆"
@@ -160,7 +160,7 @@ params:
         - name: Element Chat
           url: "http://chat.mulecube.local"
           demo_url: "https://element.io/en/user-guide"
-          description: "Matrix Client"
+          description: "Chat with your team"
           service: element
           icon: "/images/icons/element.ico"
           fallback: "◆"
@@ -168,7 +168,7 @@ params:
         - name: Meshtastic
           url: "http://mesh.mulecube.local"
           demo_url: "https://meshtastic.org/"
-          description: "LoRa Mesh Network"
+          description: "Message without internet"
           service: meshtastic
           icon: "/images/icons/meshtastic.ico"
           fallback: "◆"
@@ -176,7 +176,7 @@ params:
         - name: Conduit
           url: "http://matrix.mulecube.local"
           demo_url: "https://docs.conduit.rs/"
-          description: "Matrix Server"
+          description: "Host private chat rooms"
           service: conduit
           icon: ""
           fallback: "◆"
@@ -188,7 +188,7 @@ params:
         - name: App Store
           url: "http://apps.mulecube.local"
           demo_url: "https://f-droid.org/en/about/"
-          description: "Offline Android Apps"
+          description: "Download apps offline"
           service: apkrepo
           icon: ""
           fallback: "◆"
@@ -196,7 +196,7 @@ params:
         - name: IT-Tools
           url: "http://tools.mulecube.local"
           demo_url: "https://it-tools.tech/about"
-          description: "Developer Utilities"
+          description: "Handy dev tools"
           service: it-tools
           icon: "/images/icons/ittools.ico"
           fallback: "◆"
@@ -204,7 +204,7 @@ params:
         - name: Network Tools
           url: "http://network.mulecube.local"
           demo_url: "https://networkingtoolbox.net/about"
-          description: "Network Diagnostics"
+          description: "Test your network"
           service: network-tools
           icon: ""
           fallback: "◆"
@@ -216,7 +216,7 @@ params:
         - name: Beszel
           url: "http://monitor.mulecube.local"
           demo_url: "https://beszel.dev/guide/what-is-beszel"
-          description: "System Monitoring"
+          description: "Monitor system resources"
           service: beszel
           icon: "/images/icons/docker.png"
           fallback: "◆"
@@ -224,7 +224,7 @@ params:
         - name: Uptime Kuma
           url: "http://status.mulecube.local"
           demo_url: "https://github.com/louislam/uptime-kuma/wiki"
-          description: "Status Page"
+          description: "Check service health"
           service: uptime-kuma
           icon: "/images/icons/uptimekuma.svg"
           fallback: "◆"
@@ -232,7 +232,7 @@ params:
         - name: Pi-hole
           url: "http://dns.mulecube.local/admin"
           demo_url: "https://docs.pi-hole.net/"
-          description: "DNS & Ad Blocking"
+          description: "Block ads & trackers"
           service: pihole
           icon: "/images/icons/pihole.png"
           fallback: "◆"
@@ -240,7 +240,7 @@ params:
         - name: Ollama
           url: "http://ollama.mulecube.local"
           demo_url: "https://docs.ollama.com/"
-          description: "LLM Runtime"
+          description: "Run AI models locally"
           service: ollama
           icon: "/images/icons/ollama.png"
           fallback: "◆"
@@ -252,7 +252,7 @@ params:
         - name: Containers
           url: "http://dockge.mulecube.local:5001"
           demo_url: "https://dockge.kuma.pet/"
-          description: "Docker Management"
+          description: "Manage containers"
           service: dockge
           icon: "/images/icons/dockge.svg"
           fallback: "◆"
@@ -260,7 +260,7 @@ params:
         - name: Logs
           url: "http://logs.mulecube.local:9999"
           demo_url: "https://dozzle.dev/"
-          description: "Container Logs"
+          description: "View container logs"
           service: dozzle
           icon: "/images/icons/dozzle.ico"
           fallback: "◆"
@@ -268,7 +268,7 @@ params:
         - name: Terminal
           url: "http://terminal.mulecube.local:7681"
           demo_url: "https://tsl0922.github.io/ttyd/"
-          description: "Web Shell"
+          description: "Access terminal remotely"
           service: ttyd
           icon: ""
           fallback: "◆"
@@ -276,7 +276,7 @@ params:
         - name: Diagnostics
           url: "http://diagnostics.mulecube.local:9007/api/full"
           demo_url: "#"
-          description: "System Health"
+          description: "View system diagnostics"
           service: diagnostics
           icon: ""
           fallback: "🩺"
@@ -284,7 +284,7 @@ params:
         - name: Backup
           url: "http://backup.mulecube.local:9005/api/backups"
           demo_url: "#"
-          description: "Backup & Restore"
+          description: "Backup & restore your data"
           service: backup
           icon: ""
           fallback: "◆"
