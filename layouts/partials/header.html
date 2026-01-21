@@ -29,6 +29,11 @@
 <!-- System Stats Panel -->
 <div class="stats-panel">
     <div class="stats-container">
+        <div class="stats-group stats-info">
+            <span class="stat-item">🖥️ <span id="hostname">mulecube</span></span>
+            <span class="stat-item">⏱️ <span id="uptime">--</span></span>
+        </div>
+
         <div class="stats-group stats-primary">
             <span class="stat-item"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
             <span class="stat-item"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
@@ -52,10 +57,6 @@
 	    <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
 	</div>        
 
-        <div class="stats-group stats-info">
-            <span class="stat-item">🖥️ <span id="hostname">mulecube</span></span>
-            <span class="stat-item">⏱️ <span id="uptime">--</span></span>
-        </div>
     </div>
 </div>
 
@@ -160,6 +161,21 @@
     transform: scale(1.05);
 }
 
+/* Light theme power buttons */
+[data-theme="light"] .power-btn {
+    background: rgba(0,0,0,0.05);
+    border-color: rgba(0,0,0,0.15);
+    color: rgba(0,0,0,0.6);
+}
+
+[data-theme="light"] .power-btn.reboot:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="light"] .power-btn.shutdown:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
 .power-btn.reboot {
     border-color: rgba(59, 130, 246, 0.4);
 }
@@ -177,6 +193,13 @@
     background: rgba(239, 68, 68, 0.3);
     border-color: rgba(239, 68, 68, 0.5);
 }
+
+.stats-info {
+    padding-right: 16px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Responsive adjustments */
 
 /* Responsive adjustments */
 @media (max-width: 1000px) {

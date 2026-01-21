@@ -131,7 +131,7 @@
                     memory: Math.floor(Math.random() * 20) + 40,
                     disk: Math.floor(Math.random() * 5) + 60,
                     wifi: `${Math.floor(Math.random() * 5)} clients`,
-                    ethernet: 'Connected',
+                    ethernet: 'Disconnected',
                     hostname: 'mulecube-demo',
                     uptime: '12d 4h 32m',
                     temperature: Math.floor(Math.random() * 15) + 45,
