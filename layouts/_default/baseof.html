@@ -9,10 +9,24 @@
     <title>{{ .Title }} | MuleCube</title>
     <meta name="description" content="{{ .Site.Params.description }}">
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MuleCube">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="MuleCube">
+    <meta name="msapplication-TileColor" content="#0a0a0b">
+    <meta name="msapplication-config" content="none">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/images/favicon-32x32.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
     
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

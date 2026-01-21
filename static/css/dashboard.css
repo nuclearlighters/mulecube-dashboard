@@ -1,7 +1,7 @@
 /* ========================================
    MULECUBE DASHBOARD - Unified Branding
    Matches mulecube.com styling
-   v0.2.0 - UX Improvements
+   v0.3.0 - PWA + Polish
    ======================================== */
 
 /* CSS Custom Properties - Identical to main site */
@@ -479,6 +479,45 @@ a:hover {
     background: var(--color-danger);
 }
 
+/* Warning state - some services offline */
+.status-banner.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-banner.warning .status-dot {
+    background: var(--color-warning);
+}
+
+.status-banner.error:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.status-banner.warning:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+/* Status count badge */
+.status-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+.status-count.offline {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+.status-count.disabled {
+    background: rgba(113, 113, 122, 0.2);
+    color: #a1a1aa;
+}
+
 /* ========================================
    SERVICES SECTION
    ======================================== */
@@ -726,35 +765,64 @@ a:hover {
     max-width: 150px;
 }
 
-/* Custom Tooltip on Hover */
-.service-card[title] {
+/* Custom Tooltip on Hover - Cloud Popup */
+.service-card[data-tooltip] {
     position: relative;
 }
 
-.service-card::before {
+.service-card[data-tooltip]::before {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 8px);
+    bottom: calc(100% + 12px);
     left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 12px;
+    transform: translateX(-50%) scale(0.95);
+    padding: 10px 14px;
     background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-light);
     border-radius: var(--border-radius);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--color-text);
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s, visibility 0.2s;
-    z-index: 100;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    z-index: 1000;
     pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    max-width: 280px;
+    text-align: center;
 }
 
-.service-card:hover::before {
+/* Tooltip arrow */
+.service-card[data-tooltip]::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--color-border-light);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1001;
+}
+
+.service-card[data-tooltip]:hover::before {
     opacity: 1;
     visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+.service-card[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Don't show tooltip if no content */
+.service-card[data-tooltip=""]::before,
+.service-card[data-tooltip=""]::after {
+    display: none;
 }
 
 /* Service Status Indicator */
@@ -808,42 +876,53 @@ a:hover {
 }
 
 /* ========================================
-   ADVANCED TOGGLE
+   ADVANCED TOGGLE - Subtle styling
    ======================================== */
 .advanced-toggle {
-    margin: var(--space-2xl) 0 var(--space-lg);
+    margin: var(--space-xl) 0 var(--space-lg);
     text-align: center;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
 }
 
 .toggle-btn {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
+    background: transparent;
+    border: none;
     border-radius: var(--border-radius);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     color: var(--color-text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     cursor: pointer;
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: 6px;
     min-height: 44px; /* Touch target */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
 }
 
 .toggle-btn:hover {
-    border-color: var(--color-primary);
     color: var(--color-text);
+    opacity: 1;
 }
 
 .toggle-icon {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     transition: transform 0.2s ease;
     filter: var(--icon-filter, none);
+    opacity: 0.6;
 }
 
 .toggle-btn.active .toggle-icon {
     transform: rotate(90deg);
+}
+
+.toggle-btn.active {
+    color: var(--color-text);
+    opacity: 1;
 }
 
 .advanced-section {

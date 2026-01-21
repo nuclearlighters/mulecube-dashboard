@@ -304,13 +304,22 @@
             if (!this.statusBanner || !this.statusText) return;
             
             const offline = total - online;
+            const offlinePercent = (offline / total) * 100;
+            
+            // Remove all state classes
+            this.statusBanner.classList.remove('error', 'warning');
             
             if (offline === 0) {
-                this.statusBanner.classList.remove('error');
-                this.statusText.textContent = `All ${total} services operational`;
+                // All services operational - green
+                this.statusText.innerHTML = `All ${total} services operational`;
+            } else if (offlinePercent <= 20) {
+                // Minor issue (1-20% offline) - warning/orange
+                this.statusBanner.classList.add('warning');
+                this.statusText.innerHTML = `${online} services online <span class="status-count offline">${offline} offline</span>`;
             } else {
+                // Major issue (>20% offline) - error/red
                 this.statusBanner.classList.add('error');
-                this.statusText.textContent = `${online}/${total} services online • ${offline} offline`;
+                this.statusText.innerHTML = `${online}/${total} services online <span class="status-count offline">${offline} offline</span>`;
             }
         },
         
