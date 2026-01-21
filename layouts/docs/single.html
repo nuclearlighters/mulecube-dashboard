@@ -1,0 +1,71 @@
+{{ define "main" }}
+<section class="docs-hero">
+    <div class="container">
+        <h1>{{ .Title }}</h1>
+        <p class="lead">{{ .Description }}</p>
+    </div>
+</section>
+
+<section class="docs-content">
+    <div class="container">
+        <div class="docs-grid">
+            <!-- Sidebar Navigation -->
+            <nav class="docs-sidebar">
+                <h3>Documentation</h3>
+                <ul>
+                    {{ range (where .Site.RegularPages "Section" "docs").ByWeight }}
+                    <li class="{{ if eq $.RelPermalink .RelPermalink }}active{{ end }}">
+                        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                    </li>
+                    {{ end }}
+                </ul>
+                
+                <div class="docs-sidebar-footer">
+                    <a href="https://github.com/nuclearlighters/mulecube" target="_blank" rel="noopener">
+                        View on GitHub →
+                    </a>
+                </div>
+            </nav>
+            
+            <!-- Main Content -->
+            <article class="docs-article">
+                <div class="docs-article-content">
+                    {{ .Content }}
+                </div>
+                
+                <footer class="docs-article-footer">
+                    <div class="docs-nav">
+                        {{ $pages := (where .Site.RegularPages "Section" "docs").ByWeight }}
+                        {{ $currentIndex := 0 }}
+                        {{ range $i, $p := $pages }}
+                            {{ if eq $.RelPermalink $p.RelPermalink }}
+                                {{ $currentIndex = $i }}
+                            {{ end }}
+                        {{ end }}
+                        
+                        {{ if gt $currentIndex 0 }}
+                            {{ $prev := index $pages (sub $currentIndex 1) }}
+                            <a href="{{ $prev.RelPermalink }}" class="docs-nav-prev">
+                                ← {{ $prev.Title }}
+                            </a>
+                        {{ end }}
+                        
+                        {{ if lt $currentIndex (sub (len $pages) 1) }}
+                            {{ $next := index $pages (add $currentIndex 1) }}
+                            <a href="{{ $next.RelPermalink }}" class="docs-nav-next">
+                                {{ $next.Title }} →
+                            </a>
+                        {{ end }}
+                    </div>
+                    
+                    <p class="docs-edit">
+                        <a href="https://github.com/nuclearlighters/mulecube/edit/main/docs/{{ .File.LogicalName }}" target="_blank" rel="noopener">
+                            Edit this page on GitHub
+                        </a>
+                    </p>
+                </footer>
+            </article>
+        </div>
+    </div>
+</section>
+{{ end }}

@@ -305,10 +305,8 @@ menu:
       weight: 1
     - identifier: docs
       name: Docs
-      url: "https://mulecube.com/docs/"
+      url: "/docs/"
       weight: 2
-      params:
-        external: true
     - identifier: github
       name: GitHub
       url: "https://github.com/nuclearlighters/mulecube"

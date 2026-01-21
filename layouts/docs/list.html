@@ -1,0 +1,47 @@
+{{ define "main" }}
+<section class="docs-hero">
+    <div class="container">
+        <h1>{{ .Title }}</h1>
+        <p class="lead">{{ .Description }}</p>
+    </div>
+</section>
+
+<section class="docs-index">
+    <div class="container">
+        {{ .Content }}
+        
+        <div class="docs-cards">
+            {{ range (where .Site.RegularPages "Section" "docs").ByWeight }}
+            <a href="{{ .RelPermalink }}" class="docs-card">
+                <div class="docs-card-icon">
+                    {{ if eq .Title "Getting Started" }}📦{{ end }}
+                    {{ if eq .Title "Using the Services" }}🔧{{ end }}
+                    {{ if eq .Title "Battery Management" }}🔋{{ end }}
+                    {{ if eq .Title "Network Setup" }}📡{{ end }}
+                    {{ if eq .Title "Adding Content" }}📚{{ end }}
+                    {{ if eq .Title "Software Updates" }}🔄{{ end }}
+                    {{ if eq .Title "Building Your Own" }}🛠️{{ end }}
+                    {{ if eq .Title "Troubleshooting" }}🔍{{ end }}
+                    {{ if eq .Title "Service Reference" }}📋{{ end }}
+                </div>
+                <h3>{{ .Title }}</h3>
+                <p>{{ .Description }}</p>
+            </a>
+            {{ end }}
+        </div>
+        
+        <div class="docs-cta">
+            <h2>Questions?</h2>
+            <p>Email <a href="mailto:hello@mulecube.com">hello@mulecube.com</a> — happy to help with any setup or configuration questions.</p>
+            <p>
+                <a href="https://github.com/nuclearlighters/mulecube/issues" class="btn btn-secondary" target="_blank" rel="noopener">
+                    Report an Issue
+                </a>
+                <a href="https://github.com/nuclearlighters/mulecube/discussions" class="btn btn-primary" target="_blank" rel="noopener">
+                    Join Discussions
+                </a>
+            </p>
+        </div>
+    </div>
+</section>
+{{ end }}
