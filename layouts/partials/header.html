@@ -48,11 +48,11 @@
             </span>
         </div>
         
-        <div class="stats-group stats-controls">
-            <button class="power-btn" id="rebootBtn" title="Reboot">🔄</button>
-            <button class="power-btn" id="shutdownBtn" title="Shutdown">⏻</button>
-        </div>
-        
+	<div class="stats-group stats-controls">
+	    <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
+	    <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
+	</div>        
+
         <div class="stats-group stats-info">
             <span class="stat-item">🖥️ <span id="hostname">mulecube</span></span>
             <span class="stat-item">⏱️ <span id="uptime">--</span></span>
@@ -147,11 +147,13 @@
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 4px 10px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 11px;
+    font-weight: 500;
     transition: all 0.2s ease;
     line-height: 1;
+    color: rgba(255,255,255,0.8);
 }
 
 .power-btn:hover {
@@ -159,12 +161,20 @@
     transform: scale(1.05);
 }
 
-#rebootBtn:hover {
+.power-btn.reboot {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.power-btn.reboot:hover {
     background: rgba(59, 130, 246, 0.3);
     border-color: rgba(59, 130, 246, 0.5);
 }
 
-#shutdownBtn:hover {
+.power-btn.shutdown {
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.power-btn.shutdown:hover {
     background: rgba(239, 68, 68, 0.3);
     border-color: rgba(239, 68, 68, 0.5);
 }
