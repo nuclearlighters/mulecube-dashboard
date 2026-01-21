@@ -1,6 +1,7 @@
 /* ========================================
    MULECUBE DASHBOARD - Unified Branding
    Matches mulecube.com styling
+   v0.2.0 - UX Improvements
    ======================================== */
 
 /* CSS Custom Properties - Identical to main site */
@@ -190,7 +191,7 @@ a:hover {
     background: var(--color-bg-card);
 }
 
-/* FIX #2: Hide hamburger menu by default - only show on mobile */
+/* Hide hamburger menu by default - only show on mobile */
 .menu-toggle {
     display: none;
     justify-content: center;
@@ -289,11 +290,11 @@ a:hover {
     align-items: center;
     position: relative;
     overflow: hidden;
-    /* FIX #5: Add transition for collapse animation */
+    /* Add transition for collapse animation */
     transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
 }
 
-/* FIX #5: Hero collapsed state */
+/* Hero collapsed state */
 .hero.collapsed {
     max-height: 0 !important;
     padding: 0 !important;
@@ -395,6 +396,8 @@ a:hover {
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
+    min-height: 44px; /* Mobile touch target */
+    min-width: 44px;
 }
 
 .btn-primary {
@@ -431,7 +434,7 @@ a:hover {
     justify-content: center;
     gap: var(--space-sm);
     font-size: 0.85rem;
-    /* FIX #5: Make status banner clickable */
+    /* Make status banner clickable */
     cursor: pointer;
     user-select: none;
     transition: background 0.2s;
@@ -441,7 +444,7 @@ a:hover {
     background: rgba(34, 197, 94, 0.15);
 }
 
-/* FIX #5: Toggle indicator on status banner */
+/* Toggle indicator on status banner */
 .status-banner::after {
     content: '▲';
     font-size: 0.7em;
@@ -494,30 +497,97 @@ a:hover {
     margin-bottom: var(--space-2xl);
 }
 
-/* Search/Filter */
+/* ========================================
+   SEARCH BAR - LARGER WITH ICON
+   ======================================== */
 .services-filter {
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto var(--space-2xl);
+    position: relative;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+    filter: var(--icon-filter, none);
+    pointer-events: none;
 }
 
 .search-input {
     width: 100%;
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-md) var(--space-md) var(--space-md) 48px;
     background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
     color: var(--color-text);
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .search-input:focus {
     outline: none;
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
 .search-input::placeholder {
     color: var(--color-text-muted);
+}
+
+/* ========================================
+   RECENTLY USED / QUICK START SECTION
+   ======================================== */
+.quick-start {
+    margin-bottom: var(--space-2xl);
+    padding: var(--space-lg);
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.quick-start-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    margin-bottom: var(--space-lg);
+}
+
+/* Empty state for Recently Used */
+.recently-used-empty {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+.recently-used-empty p {
+    margin: 0;
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
+}
+
+@media (max-width: 1024px) {
+    .quick-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .quick-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Service Categories */
@@ -535,6 +605,36 @@ a:hover {
     color: var(--color-text-muted);
 }
 
+/* Collapsible category title */
+.category-title.collapsible {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.category-title.collapsible:hover {
+    color: var(--color-text);
+}
+
+.category-toggle-indicator {
+    margin-left: auto;
+    font-size: 0.7em;
+    opacity: 0.5;
+    transition: transform 0.3s ease;
+}
+
+.category-toggle-indicator.collapsed {
+    transform: rotate(-90deg);
+}
+
+/* Service count in category title */
+.category-count {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+}
+
 .category-icon {
     width: 20px;
     height: 20px;
@@ -546,6 +646,15 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: var(--space-md);
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Collapsed grid */
+.service-grid.collapsed {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-bottom: 0;
 }
 
 @media (min-width: 1200px) {
@@ -576,6 +685,7 @@ a:hover {
     box-shadow: 0 8px 30px rgba(34, 197, 94, 0.1);
 }
 
+/* Service Icon - MONOCHROME with gradient background */
 .service-icon {
     width: 48px;
     height: 48px;
@@ -591,6 +701,8 @@ a:hover {
     width: 28px;
     height: 28px;
     object-fit: contain;
+    /* MONOCHROME: Invert icons to white in dark mode, keep original in light */
+    filter: var(--icon-filter, none);
 }
 
 .service-info {
@@ -614,6 +726,37 @@ a:hover {
     max-width: 150px;
 }
 
+/* Custom Tooltip on Hover */
+.service-card[title] {
+    position: relative;
+}
+
+.service-card::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 12px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 0.75rem;
+    color: var(--color-text);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.service-card:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
 /* Service Status Indicator */
 .service-status {
     width: 8px;
@@ -632,9 +775,84 @@ a:hover {
     animation: pulse 1s infinite;
 }
 
-/* FIX #4: Hide cards during search */
+/* Hide cards during search */
 .service-card.hidden {
     display: none !important;
+}
+
+/* Hide status indicator on Quick Start cards */
+.quick-card .service-status {
+    display: none !important;
+}
+
+/* Fix card alignment - consistent height */
+.service-card {
+    min-height: 72px;
+}
+
+.service-info p {
+    max-width: 150px;
+}
+
+/* Disable hover tooltip expansion - use title attribute instead */
+.service-card:hover .service-info p {
+    white-space: nowrap;
+    overflow: hidden;
+    position: static;
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    min-width: auto;
+    max-width: 150px;
+}
+
+/* ========================================
+   ADVANCED TOGGLE
+   ======================================== */
+.advanced-toggle {
+    margin: var(--space-2xl) 0 var(--space-lg);
+    text-align: center;
+}
+
+.toggle-btn {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--space-sm) var(--space-lg);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 44px; /* Touch target */
+}
+
+.toggle-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.toggle-icon {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+    filter: var(--icon-filter, none);
+}
+
+.toggle-btn.active .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.advanced-section {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.advanced-section.visible {
+    opacity: 1;
 }
 
 /* ========================================
@@ -661,6 +879,13 @@ a:hover {
 
 .footer-brand .footer-tagline {
     font-size: 0.85rem;
+}
+
+.footer-brand .footer-version {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    opacity: 0.7;
+    font-family: var(--font-mono);
 }
 
 .footer-links h4 {
@@ -816,7 +1041,7 @@ a:hover {
         display: flex;
     }
     
-    /* FIX #2: Only show hamburger on mobile */
+    /* Only show hamburger on mobile */
     .menu-toggle {
         display: flex;
     }
@@ -862,6 +1087,26 @@ a:hover {
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    
+    /* Simplified mobile stats - hide less important ones */
+    .stats-network {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Hide even more stats on very small screens */
+    .stats-hardware {
+        display: none;
     }
 }
 
@@ -935,86 +1180,8 @@ a:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Quick Start Section */
-.quick-start {
-    margin-bottom: var(--space-2xl);
-    padding: var(--space-lg);
-    background: var(--color-bg-secondary);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--color-border);
-}
-
-.quick-start-subtitle {
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
-    margin-bottom: var(--space-lg);
-}
-
-.quick-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-md);
-}
-
-@media (max-width: 1024px) {
-    .quick-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-    .quick-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Advanced Toggle */
-.advanced-toggle {
-    margin: var(--space-2xl) 0 var(--space-lg);
-    text-align: center;
-}
-
-.toggle-btn {
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: var(--space-sm) var(--space-lg);
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-}
-
-.toggle-btn:hover {
-    border-color: var(--color-primary);
-    color: var(--color-text);
-}
-
-.toggle-icon {
-    width: 12px;
-    height: 12px;
-    transition: transform 0.2s ease;
-    filter: var(--icon-filter, none);
-}
-
-.toggle-btn.active .toggle-icon {
-    transform: rotate(90deg);
-}
-
-.advanced-section {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.advanced-section.visible {
-    opacity: 1;
-}
-
 /* ========================================
-   FIX #1: Theme-aware logo switching
+   THEME-AWARE LOGO SWITCHING
    Dark theme (default) = show WHITE logo (logo-dark class)
    Light theme = show BLACK logo (logo-light class)
    ======================================== */
@@ -1035,30 +1202,28 @@ a:hover {
 }
 
 /* ========================================
-   FIX #3: Hide status indicator on Quick Start cards
+   MOBILE TOUCH TARGETS
+   Ensure all interactive elements are at least 44x44px
    ======================================== */
-.quick-card .service-status {
-    display: none !important;
-}
-
-/* Fix card alignment - consistent height */
-.service-card {
-    min-height: 72px;
-}
-
-.service-info p {
-    max-width: 150px;
-}
-
-/* Disable hover tooltip expansion - use title attribute instead */
-.service-card:hover .service-info p {
-    white-space: nowrap;
-    overflow: hidden;
-    position: static;
-    background: none;
-    border: none;
-    padding: 0;
-    box-shadow: none;
-    min-width: auto;
-    max-width: 150px;
+@media (max-width: 768px) {
+    .service-card {
+        min-height: 64px;
+        padding: var(--space-md);
+    }
+    
+    .nav-links a,
+    .footer-links a {
+        display: block;
+        padding: var(--space-sm) 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .theme-toggle,
+    .toggle-btn,
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
 }

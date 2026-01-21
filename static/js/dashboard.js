@@ -1,6 +1,6 @@
 /**
  * MuleCube Dashboard - Unified JavaScript
- * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow
+ * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow, Recently Used
  */
 
 (function() {
@@ -13,7 +13,8 @@
         statsEndpoint: '/stats.json',
         statsPollInterval: 5000,
         serviceCheckTimeout: 3000,
-        slideshowInterval: 5000
+        slideshowInterval: 5000,
+        recentlyUsedMax: 5
     };
 
     // ==========================================
@@ -44,6 +45,92 @@
                 <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube →</a>
             `;
             document.body.insertBefore(banner, document.body.firstChild);
+        }
+    };
+
+    // ==========================================
+    // Recently Used Manager
+    // ==========================================
+    const RecentlyUsedManager = {
+        storageKey: 'mulecube-recently-used',
+        container: null,
+        emptyState: null,
+        
+        init() {
+            this.container = document.getElementById('recentlyUsedGrid');
+            this.emptyState = document.getElementById('recentlyUsedEmpty');
+            
+            if (!this.container) return;
+            
+            // Track clicks on all service cards
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const serviceName = card.dataset.service;
+                    if (serviceName) {
+                        this.trackUsage(serviceName);
+                    }
+                });
+            });
+            
+            // Render initial state
+            this.render();
+        },
+        
+        getRecent() {
+            try {
+                const data = localStorage.getItem(this.storageKey);
+                return data ? JSON.parse(data) : [];
+            } catch {
+                return [];
+            }
+        },
+        
+        trackUsage(serviceName) {
+            let recent = this.getRecent();
+            
+            // Remove if already exists
+            recent = recent.filter(s => s !== serviceName);
+            
+            // Add to front
+            recent.unshift(serviceName);
+            
+            // Limit to max
+            recent = recent.slice(0, CONFIG.recentlyUsedMax);
+            
+            localStorage.setItem(this.storageKey, JSON.stringify(recent));
+        },
+        
+        render() {
+            if (!this.container) return;
+            
+            const recent = this.getRecent();
+            
+            // Show empty state if no recent items
+            if (recent.length === 0) {
+                this.container.style.display = 'none';
+                if (this.emptyState) this.emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Hide empty state
+            if (this.emptyState) this.emptyState.style.display = 'none';
+            this.container.style.display = 'grid';
+            
+            // Clear and rebuild
+            this.container.innerHTML = '';
+            
+            // Find and clone service cards for recently used
+            recent.forEach(serviceName => {
+                const originalCard = document.querySelector(`.service-category .service-card[data-service="${serviceName}"]`);
+                if (originalCard) {
+                    const clone = originalCard.cloneNode(true);
+                    clone.classList.add('recently-used-card');
+                    // Remove status indicator from recently used
+                    const status = clone.querySelector('.service-status');
+                    if (status) status.style.display = 'none';
+                    this.container.appendChild(clone);
+                }
+            });
         }
     };
 
@@ -159,7 +246,7 @@
         init() {
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
-            // FIX #3: Only count services in .service-category, not Quick Start
+            // Only count services in .service-category, not Quick Start/Recently Used
             this.services = document.querySelectorAll('.service-category .service-card');
             
             if (ModeManager.isDemo) {
@@ -208,104 +295,107 @@
             });
             
             const results = await Promise.all(checks);
-            online = results.filter(Boolean).length;
+            online = results.filter(r => r).length;
             
-            this.updateBanner(online, total);
+            this.updateStatusBanner(online, total);
+        },
+        
+        updateStatusBanner(online, total) {
+            if (!this.statusBanner || !this.statusText) return;
+            
+            const offline = total - online;
+            
+            if (offline === 0) {
+                this.statusBanner.classList.remove('error');
+                this.statusText.textContent = `All ${total} services operational`;
+            } else {
+                this.statusBanner.classList.add('error');
+                this.statusText.textContent = `${online}/${total} services online • ${offline} offline`;
+            }
         },
         
         simulateOnline() {
-            // In demo mode, show all services as online
+            // In demo mode, all services appear online
+            const total = this.services.length;
+            
             this.services.forEach(card => {
                 const status = card.querySelector('.service-status');
                 if (status) status.className = 'service-status';
             });
             
-            this.updateBanner(this.services.length, this.services.length);
-        },
-        
-        updateBanner(online, total) {
-            if (!this.statusBanner || !this.statusText) return;
-            
-            if (online === total) {
-                this.statusText.textContent = `All ${total} services operational`;
-                this.statusBanner.classList.remove('error');
-            } else {
-                this.statusText.textContent = `${online}/${total} services online`;
-                this.statusBanner.classList.add('error');
+            if (this.statusText) {
+                this.statusText.textContent = `All ${total} services simulated`;
             }
         }
     };
 
     // ==========================================
-    // Search Manager - FIX #4: Show individual cards, not categories
+    // Search Manager
     // ==========================================
     const SearchManager = {
         input: null,
+        services: [],
+        categories: [],
+        quickStart: null,
+        advancedSection: null,
         
         init() {
             this.input = document.getElementById('serviceSearch');
+            // Only search within service-category containers
+            this.services = document.querySelectorAll('.service-category .service-card');
+            this.categories = document.querySelectorAll('.service-category');
+            this.quickStart = document.querySelector('.quick-start');
+            this.advancedSection = document.getElementById('advancedSection');
+            
             if (!this.input) return;
             
-            this.input.addEventListener('input', (e) => {
-                this.filter(e.target.value);
-            });
+            this.input.addEventListener('input', (e) => this.filter(e.target.value));
             
             // Clear on Escape
             this.input.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     this.input.value = '';
                     this.filter('');
+                    this.input.blur();
                 }
             });
         },
         
         filter(query) {
-            const normalized = query.toLowerCase().trim();
-            // FIX #4: Only filter cards in .service-category, not Quick Start
-            const cards = document.querySelectorAll('.service-category .service-card');
-            const categories = document.querySelectorAll('.service-category');
-            const quickStart = document.querySelector('.quick-start');
-            const advancedToggle = document.querySelector('.advanced-toggle');
-            const advancedSection = document.getElementById('advancedSection');
+            const search = query.toLowerCase().trim();
             
-            // Hide Quick Start and Admin toggle when searching
-            if (quickStart) {
-                quickStart.style.display = normalized ? 'none' : '';
-            }
-            if (advancedToggle) {
-                advancedToggle.style.display = normalized ? 'none' : '';
-            }
-            if (advancedSection && normalized) {
-                // Show advanced section during search so those services are searchable
-                advancedSection.style.display = 'block';
-                advancedSection.classList.add('visible');
+            if (!search) {
+                // Reset - show all cards, restore category visibility
+                this.services.forEach(card => card.classList.remove('hidden'));
+                this.categories.forEach(cat => cat.style.display = '');
+                if (this.quickStart) this.quickStart.style.display = '';
+                // Restore advanced section to its toggle state
+                const advToggleBtn = document.getElementById('advancedToggle');
+                if (this.advancedSection && advToggleBtn && !advToggleBtn.classList.contains('active')) {
+                    this.advancedSection.style.display = 'none';
+                }
+                return;
             }
             
-            // FIX #4: Filter individual cards, toggle .hidden class
-            cards.forEach(card => {
+            // Hide Quick Start during search
+            if (this.quickStart) this.quickStart.style.display = 'none';
+            
+            // Show advanced section during search so those services are searchable
+            if (this.advancedSection) this.advancedSection.style.display = 'block';
+            
+            // Filter individual cards
+            this.services.forEach(card => {
                 const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
                 const desc = card.querySelector('p')?.textContent.toLowerCase() || '';
-                const matches = !normalized || name.includes(normalized) || desc.includes(normalized);
-                card.classList.toggle('hidden', !matches);
+                const match = name.includes(search) || desc.includes(search);
+                card.classList.toggle('hidden', !match);
             });
             
-            // Hide empty categories
-            categories.forEach(cat => {
+            // Hide categories with no visible cards
+            this.categories.forEach(cat => {
                 const visibleCards = cat.querySelectorAll('.service-card:not(.hidden)');
-                cat.style.display = visibleCards.length ? '' : 'none';
+                cat.style.display = visibleCards.length === 0 ? 'none' : '';
             });
-            
-            // Restore normal state when search is cleared
-            if (!normalized) {
-                if (advancedSection) {
-                    // Check if admin tools were manually shown
-                    const btn = document.getElementById('advancedToggle');
-                    if (btn && !btn.classList.contains('active')) {
-                        advancedSection.style.display = 'none';
-                        advancedSection.classList.remove('visible');
-                    }
-                }
-            }
         }
     };
 
@@ -317,33 +407,35 @@
         
         init() {
             this.toggle = document.getElementById('themeToggle');
-            if (!this.toggle) return;
             
-            // Load saved theme
+            // Load saved theme or use system preference
             const saved = localStorage.getItem('theme');
-            if (saved) {
-                document.documentElement.setAttribute('data-theme', saved);
-                this.updateIcon(saved);
-            }
+            const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            const theme = saved || system;
             
-            this.toggle.addEventListener('click', () => this.toggleTheme());
+            document.documentElement.setAttribute('data-theme', theme);
+            this.updateIcon(theme);
+            
+            if (this.toggle) {
+                this.toggle.addEventListener('click', () => this.toggleTheme());
+            }
         },
         
         toggleTheme() {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const current = document.documentElement.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
-            
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
             this.updateIcon(next);
         },
         
-	updateIcon(theme) {
-	    if (this.toggle) {
-        	this.toggle.innerHTML = theme === 'dark' 
-	            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-	            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-	    }
+        updateIcon(theme) {
+            if (this.toggle) {
+                this.toggle.innerHTML = theme === 'dark' 
+                    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+                    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+                this.toggle.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+            }
         }
     };
 
@@ -466,12 +558,75 @@
     };
 
     // ==========================================
-    // FIX #5: Hero Toggle - Click status banner to collapse/expand hero
+    // Category Collapse/Expand
+    // ==========================================
+    const CategoryToggle = {
+        storageKey: 'mulecube-collapsed-categories',
+        
+        init() {
+            const categories = document.querySelectorAll('.service-category');
+            const collapsed = this.getCollapsed();
+            
+            categories.forEach(cat => {
+                const title = cat.querySelector('.category-title');
+                const grid = cat.querySelector('.service-grid');
+                const categoryName = title?.textContent.trim();
+                
+                if (!title || !grid || !categoryName) return;
+                
+                // Make title clickable
+                title.style.cursor = 'pointer';
+                title.classList.add('collapsible');
+                
+                // Add toggle indicator
+                const indicator = document.createElement('span');
+                indicator.className = 'category-toggle-indicator';
+                indicator.innerHTML = '▼';
+                title.appendChild(indicator);
+                
+                // Restore collapsed state
+                if (collapsed.includes(categoryName)) {
+                    grid.classList.add('collapsed');
+                    indicator.classList.add('collapsed');
+                }
+                
+                // Toggle on click
+                title.addEventListener('click', () => {
+                    grid.classList.toggle('collapsed');
+                    indicator.classList.toggle('collapsed');
+                    this.saveState(categoryName, grid.classList.contains('collapsed'));
+                });
+            });
+        },
+        
+        getCollapsed() {
+            try {
+                const data = localStorage.getItem(this.storageKey);
+                return data ? JSON.parse(data) : [];
+            } catch {
+                return [];
+            }
+        },
+        
+        saveState(categoryName, isCollapsed) {
+            let collapsed = this.getCollapsed();
+            if (isCollapsed && !collapsed.includes(categoryName)) {
+                collapsed.push(categoryName);
+            } else if (!isCollapsed) {
+                collapsed = collapsed.filter(c => c !== categoryName);
+            }
+            localStorage.setItem(this.storageKey, JSON.stringify(collapsed));
+        }
+    };
+
+    // ==========================================
+    // Hero Toggle - Click status banner to collapse/expand hero
+    // CHANGED: Now defaults to COLLAPSED
     // ==========================================
     const HeroToggle = {
         hero: null,
         statusBanner: null,
-        isCollapsed: false,
+        isCollapsed: true, // Default to collapsed
         
         init() {
             this.hero = document.querySelector('.hero');
@@ -479,8 +634,10 @@
             
             if (!this.hero || !this.statusBanner) return;
             
-            // Load saved state
-            this.isCollapsed = localStorage.getItem('heroCollapsed') === 'true';
+            // Load saved state - DEFAULT TO COLLAPSED (!== 'false' means collapsed unless explicitly set to false)
+            const saved = localStorage.getItem('heroCollapsed');
+            this.isCollapsed = saved !== 'false'; // Collapsed unless user explicitly expanded
+            
             if (this.isCollapsed) {
                 this.collapse(false); // No animation on initial load
             }
@@ -489,6 +646,9 @@
             this.statusBanner.addEventListener('click', () => {
                 this.toggle();
             });
+            
+            // Add tooltip
+            this.statusBanner.title = 'Click to show/hide hero section';
         },
         
         toggle() {
@@ -531,7 +691,9 @@
         MobileMenu.init();
         SmoothScroll.init();
         AdvancedToggle.init();
-        HeroToggle.init();  // FIX #5: Initialize hero toggle
+        CategoryToggle.init();
+        HeroToggle.init();
+        RecentlyUsedManager.init();
         
         console.log('MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
