@@ -190,8 +190,9 @@ a:hover {
     background: var(--color-bg-card);
 }
 
+/* FIX #2: Hide hamburger menu by default - only show on mobile */
 .menu-toggle {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -288,6 +289,17 @@ a:hover {
     align-items: center;
     position: relative;
     overflow: hidden;
+    /* FIX #5: Add transition for collapse animation */
+    transition: max-height 0.4s ease, opacity 0.3s ease, padding 0.4s ease;
+}
+
+/* FIX #5: Hero collapsed state */
+.hero.collapsed {
+    max-height: 0 !important;
+    padding: 0 !important;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .hero-slideshow {
@@ -402,18 +414,6 @@ a:hover {
 }
 
 .btn-secondary:hover {
-    border-color: var(--color-border-light);
-    background: var(--color-bg-secondary);
-    color: var(--color-text);
-}
-
-.btn-outline {
-    background: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-}
-
-.btn-outline:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
 }
@@ -422,31 +422,44 @@ a:hover {
    STATUS BANNER
    ======================================== */
 .status-banner {
+    background: rgba(34, 197, 94, 0.1);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    padding: var(--space-sm) var(--space-md);
+    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
-    padding: var(--space-md);
-    background: rgba(34, 197, 94, 0.1);
-    border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+    font-size: 0.85rem;
+    /* FIX #5: Make status banner clickable */
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
 }
 
-.status-banner.warning {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
+.status-banner:hover {
+    background: rgba(34, 197, 94, 0.15);
+}
+
+/* FIX #5: Toggle indicator on status banner */
+.status-banner::after {
+    content: '▲';
+    font-size: 0.7em;
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.status-banner.hero-hidden::after {
+    transform: rotate(180deg);
 }
 
 .status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    width: 8px;
+    height: 8px;
     background: var(--color-primary);
+    border-radius: 50%;
     animation: pulse 2s infinite;
-}
-
-.status-dot.warning {
-    background: var(--color-warning);
-    animation: none;
 }
 
 @keyframes pulse {
@@ -454,9 +467,13 @@ a:hover {
     50% { opacity: 0.5; }
 }
 
-#statusText {
-    font-size: 0.75rem;
-    font-weight: 500;
+.status-banner.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.status-banner.error .status-dot {
+    background: var(--color-danger);
 }
 
 /* ========================================
@@ -474,7 +491,7 @@ a:hover {
 .section-subtitle {
     text-align: center;
     color: var(--color-text-muted);
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-2xl);
 }
 
 /* Search/Filter */
@@ -485,12 +502,12 @@ a:hover {
 
 .search-input {
     width: 100%;
-    padding: var(--space-md);
-    font-size: 0.75rem;
-    background: var(--color-bg-card);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius);
     color: var(--color-text);
+    font-size: 0.9rem;
     transition: border-color 0.2s;
 }
 
@@ -509,27 +526,25 @@ a:hover {
 }
 
 .category-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: var(--space-md);
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: var(--color-text-muted);
 }
-
 
 .category-icon {
     width: 20px;
     height: 20px;
-    opacity: 0.7;
     filter: var(--icon-filter, none);
 }
 
+/* Service Grid */
 .service-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: var(--space-md);
 }
 
@@ -539,53 +554,42 @@ a:hover {
     }
 }
 
-/* ========================================
-   SERVICE CARDS
-   ======================================== */
+/* Service Cards */
 .service-card {
     display: flex;
     align-items: center;
     gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg);
+    padding: var(--space-md);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
+    border-radius: var(--border-radius);
     text-decoration: none;
-    color: inherit;
-    transition: all 0.2s ease;
+    color: var(--color-text);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    min-height: 72px;
 }
 
 .service-card:hover {
     transform: translateY(-2px);
     border-color: var(--color-primary);
     box-shadow: 0 8px 30px rgba(34, 197, 94, 0.1);
-    color: inherit;
-}
-
-.service-card.offline {
-    opacity: 0.5;
-}
-
-.service-card.hidden {
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .service-icon {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
     flex-shrink: 0;
+    font-size: 1.5rem;
 }
 
 .service-icon img {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
@@ -595,12 +599,9 @@ a:hover {
 }
 
 .service-info h3 {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    margin: 0 0 var(--space-xs);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 2px;
 }
 
 .service-info p {
@@ -610,8 +611,10 @@ a:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 150px;
 }
 
+/* Service Status Indicator */
 .service-status {
     width: 8px;
     height: 8px;
@@ -629,24 +632,25 @@ a:hover {
     animation: pulse 1s infinite;
 }
 
+/* FIX #4: Hide cards during search */
+.service-card.hidden {
+    display: none !important;
+}
+
 /* ========================================
-   FOOTER - Matches main site
+   FOOTER
    ======================================== */
 .site-footer {
-    padding: var(--space-3xl) 0 var(--space-xl);
-    border-top: 1px solid var(--color-border);
     background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-3xl) 0 var(--space-xl);
 }
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr repeat(3, 1fr);
     gap: var(--space-2xl);
     margin-bottom: var(--space-2xl);
-}
-
-.footer-brand .logo {
-    margin-bottom: var(--space-md);
 }
 
 .footer-brand p {
@@ -780,12 +784,9 @@ a:hover {
     }
     
     .hero-image {
-    display: flex;
-    justify-content: center;
-    align-items: center;
         display: flex;
-    justify-content: center;
-    align-items: center;
+        justify-content: center;
+        align-items: center;
     }
     
     .footer-grid {
@@ -799,9 +800,7 @@ a:hover {
     }
     
     .nav-links {
-        display: flex;
-    justify-content: center;
-    align-items: center;
+        display: none;
         position: absolute;
         top: 64px;
         left: 0;
@@ -817,6 +816,7 @@ a:hover {
         display: flex;
     }
     
+    /* FIX #2: Only show hamburger on mobile */
     .menu-toggle {
         display: flex;
     }
@@ -828,8 +828,8 @@ a:hover {
     
     .stats-info {
         display: flex;
-    justify-content: center;
-    align-items: center;
+        justify-content: center;
+        align-items: center;
     }
     
     .hero {
@@ -860,8 +860,8 @@ a:hover {
     
     .demo-banner .demo-text {
         display: flex;
-    justify-content: center;
-    align-items: center;
+        justify-content: center;
+        align-items: center;
     }
 }
 
@@ -983,6 +983,9 @@ a:hover {
     font-size: 0.75rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
 
 .toggle-btn:hover {
@@ -991,9 +994,10 @@ a:hover {
 }
 
 .toggle-icon {
-    display: inline-block;
+    width: 12px;
+    height: 12px;
     transition: transform 0.2s ease;
-    margin-right: var(--space-xs);
+    filter: var(--icon-filter, none);
 }
 
 .toggle-btn.active .toggle-icon {
@@ -1009,22 +1013,32 @@ a:hover {
     opacity: 1;
 }
 
-/* Theme-aware logo */
-.logo-light { display: flex;
-    justify-content: center;
-    align-items: center; }
-.logo-dark { display: block; }
+/* ========================================
+   FIX #1: Theme-aware logo switching
+   Dark theme (default) = show WHITE logo (logo-dark class)
+   Light theme = show BLACK logo (logo-light class)
+   ======================================== */
+.logo-light {
+    display: none;
+}
 
-[data-theme="light"] .logo-light { display: block; }
-[data-theme="light"] .logo-dark { display: flex;
-    justify-content: center;
-    align-items: center; }
+.logo-dark {
+    display: block;
+}
 
-/* Quick Start - hide status indicator */
+[data-theme="light"] .logo-light {
+    display: block;
+}
+
+[data-theme="light"] .logo-dark {
+    display: none;
+}
+
+/* ========================================
+   FIX #3: Hide status indicator on Quick Start cards
+   ======================================== */
 .quick-card .service-status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: none !important;
 }
 
 /* Fix card alignment - consistent height */

@@ -159,6 +159,7 @@
         init() {
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
+            // FIX #3: Only count services in .service-category, not Quick Start
             this.services = document.querySelectorAll('.service-category .service-card');
             
             if (ModeManager.isDemo) {
@@ -199,49 +200,44 @@
                     });
                     
                     if (status) status.className = 'service-status';
-                    card.classList.remove('offline');
                     return true;
                 } catch (error) {
                     if (status) status.className = 'service-status offline';
-                    card.classList.add('offline');
                     return false;
                 }
             });
             
             const results = await Promise.all(checks);
-            online = results.filter(r => r).length;
+            online = results.filter(Boolean).length;
             
             this.updateBanner(online, total);
+        },
+        
+        simulateOnline() {
+            // In demo mode, show all services as online
+            this.services.forEach(card => {
+                const status = card.querySelector('.service-status');
+                if (status) status.className = 'service-status';
+            });
+            
+            this.updateBanner(this.services.length, this.services.length);
         },
         
         updateBanner(online, total) {
             if (!this.statusBanner || !this.statusText) return;
             
-            const dot = this.statusBanner.querySelector('.status-dot');
-            
             if (online === total) {
-                this.statusBanner.className = 'status-banner';
-                if (dot) dot.className = 'status-dot';
                 this.statusText.textContent = `All ${total} services operational`;
+                this.statusBanner.classList.remove('error');
             } else {
-                this.statusBanner.className = 'status-banner warning';
-                if (dot) dot.className = 'status-dot warning';
                 this.statusText.textContent = `${online}/${total} services online`;
+                this.statusBanner.classList.add('error');
             }
-        },
-        
-        simulateOnline() {
-            const total = this.services.length;
-            this.services.forEach(card => {
-                const status = card.querySelector('.service-status');
-                if (status) status.className = 'service-status';
-            });
-            this.updateBanner(total, total);
         }
     };
 
     // ==========================================
-    // Search/Filter Manager
+    // Search Manager - FIX #4: Show individual cards, not categories
     // ==========================================
     const SearchManager = {
         input: null,
@@ -250,7 +246,9 @@
             this.input = document.getElementById('serviceSearch');
             if (!this.input) return;
             
-            this.input.addEventListener('input', (e) => this.filter(e.target.value));
+            this.input.addEventListener('input', (e) => {
+                this.filter(e.target.value);
+            });
             
             // Clear on Escape
             this.input.addEventListener('keydown', (e) => {
@@ -263,9 +261,27 @@
         
         filter(query) {
             const normalized = query.toLowerCase().trim();
-            const cards = document.querySelectorAll('.service-card');
+            // FIX #4: Only filter cards in .service-category, not Quick Start
+            const cards = document.querySelectorAll('.service-category .service-card');
             const categories = document.querySelectorAll('.service-category');
+            const quickStart = document.querySelector('.quick-start');
+            const advancedToggle = document.querySelector('.advanced-toggle');
+            const advancedSection = document.getElementById('advancedSection');
             
+            // Hide Quick Start and Admin toggle when searching
+            if (quickStart) {
+                quickStart.style.display = normalized ? 'none' : '';
+            }
+            if (advancedToggle) {
+                advancedToggle.style.display = normalized ? 'none' : '';
+            }
+            if (advancedSection && normalized) {
+                // Show advanced section during search so those services are searchable
+                advancedSection.style.display = 'block';
+                advancedSection.classList.add('visible');
+            }
+            
+            // FIX #4: Filter individual cards, toggle .hidden class
             cards.forEach(card => {
                 const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
                 const desc = card.querySelector('p')?.textContent.toLowerCase() || '';
@@ -278,6 +294,18 @@
                 const visibleCards = cat.querySelectorAll('.service-card:not(.hidden)');
                 cat.style.display = visibleCards.length ? '' : 'none';
             });
+            
+            // Restore normal state when search is cleared
+            if (!normalized) {
+                if (advancedSection) {
+                    // Check if admin tools were manually shown
+                    const btn = document.getElementById('advancedToggle');
+                    if (btn && !btn.classList.contains('active')) {
+                        advancedSection.style.display = 'none';
+                        advancedSection.classList.remove('visible');
+                    }
+                }
+            }
         }
     };
 
@@ -421,9 +449,12 @@
                 const isVisible = section.style.display !== 'none';
                 section.style.display = isVisible ? 'none' : 'block';
                 btn.classList.toggle('active', !isVisible);
+                
+                // Update button text with icon
+                const iconHtml = '<img src="/images/icons/ui-chevron.svg" alt="" class="toggle-icon">';
                 btn.innerHTML = isVisible 
-                    ? '<span class="toggle-icon">▶</span> Show Admin Tools' 
-                    : '<span class="toggle-icon">▶</span> Hide Admin Tools';
+                    ? iconHtml + ' Show Admin Tools' 
+                    : iconHtml + ' Hide Admin Tools';
                 
                 if (!isVisible) {
                     setTimeout(() => section.classList.add('visible'), 10);
@@ -431,6 +462,59 @@
                     section.classList.remove('visible');
                 }
             });
+        }
+    };
+
+    // ==========================================
+    // FIX #5: Hero Toggle - Click status banner to collapse/expand hero
+    // ==========================================
+    const HeroToggle = {
+        hero: null,
+        statusBanner: null,
+        isCollapsed: false,
+        
+        init() {
+            this.hero = document.querySelector('.hero');
+            this.statusBanner = document.getElementById('statusBanner');
+            
+            if (!this.hero || !this.statusBanner) return;
+            
+            // Load saved state
+            this.isCollapsed = localStorage.getItem('heroCollapsed') === 'true';
+            if (this.isCollapsed) {
+                this.collapse(false); // No animation on initial load
+            }
+            
+            // Click handler for status banner
+            this.statusBanner.addEventListener('click', () => {
+                this.toggle();
+            });
+        },
+        
+        toggle() {
+            if (this.isCollapsed) {
+                this.expand();
+            } else {
+                this.collapse(true);
+            }
+        },
+        
+        collapse(animate = true) {
+            if (!this.hero) return;
+            
+            this.isCollapsed = true;
+            this.hero.classList.add('collapsed');
+            this.statusBanner.classList.add('hero-hidden');
+            localStorage.setItem('heroCollapsed', 'true');
+        },
+        
+        expand() {
+            if (!this.hero) return;
+            
+            this.isCollapsed = false;
+            this.hero.classList.remove('collapsed');
+            this.statusBanner.classList.remove('hero-hidden');
+            localStorage.setItem('heroCollapsed', 'false');
         }
     };
 
@@ -447,6 +531,7 @@
         MobileMenu.init();
         SmoothScroll.init();
         AdvancedToggle.init();
+        HeroToggle.init();  // FIX #5: Initialize hero toggle
         
         console.log('MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
