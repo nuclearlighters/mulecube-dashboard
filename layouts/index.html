@@ -1,36 +1,610 @@
 {{ define "main" }}
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Site.Title }}</title>
+    <meta name="description" content="{{ .Site.Params.description }}">
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        /* Reset & Base */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #22c55e;
+            --accent-hover: #16a34a;
+            --border: #2a2a2a;
+            --status-online: #22c55e;
+            --status-offline: #ef4444;
+            --status-checking: #f59e0b;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #e5e5e5;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        /* Header */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        [data-theme="light"] .site-header {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .site-header nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .logo-img { height: 32px; }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover { color: var(--text-primary); }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: 0.2s;
+        }
+        
+        /* Stats Panel */
+        .stats-panel {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+        
+        .stats-panel .container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .stats-label {
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stat-label { color: var(--text-secondary); }
+        
+        .stat-value {
+            color: var(--accent);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 500;
+        }
+        
+        .stat-value.warning { color: #f59e0b; }
+        .stat-value.critical { color: #ef4444; }
+        
+        .stat-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+        
+        .battery-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stats-info {
+            margin-left: auto;
+            display: flex;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .hostname {
+            color: var(--accent);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
+        /* Temperature status colors */
+        #tempValue[data-status="normal"] { color: #22c55e; }
+        #tempValue[data-status="warning"] { color: #f59e0b; }
+        #tempValue[data-status="critical"] { color: #ef4444; }
+        #tempValue[data-status="throttled"] { color: #ef4444; animation: pulse 1s infinite; }
+        
+        /* Battery status colors */
+        #batteryValue.battery-low { color: #ef4444; }
+        #batteryValue.battery-medium { color: #f59e0b; }
+        #batteryValue.battery-good { color: #22c55e; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #0f1f0f 100%);
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 50%;
+            background: url('/images/hero-bg.jpg') center/cover no-repeat;
+            opacity: 0.3;
+            mask-image: linear-gradient(to left, rgba(0,0,0,0.5), transparent);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 span {
+            color: var(--accent);
+        }
+        
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--text-secondary);
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .hero-image {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 400px;
+            z-index: 1;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: auto;
+        }
+        
+        /* Status Banner */
+        .status-banner {
+            background: rgba(34, 197, 94, 0.1);
+            border-top: 1px solid rgba(34, 197, 94, 0.2);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 0.75rem;
+            text-align: center;
+        }
+        
+        .status-banner.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+        
+        .status-banner.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--status-online);
+            animation: pulse-dot 2s infinite;
+        }
+        
+        .status-banner.warning .status-dot { background: #f59e0b; }
+        .status-banner.error .status-dot { background: #ef4444; }
+        
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Services Section */
+        .services-section {
+            padding: 4rem 0;
+        }
+        
+        .services-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .services-filter {
+            max-width: 400px;
+            margin: 0 auto 3rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        /* Service Categories */
+        .service-category {
+            margin-bottom: 3rem;
+        }
+        
+        .category-title {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Service Cards */
+        .service-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .service-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .service-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+        
+        .service-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .service-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .service-status {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--status-checking);
+        }
+        
+        .service-status.online { background: var(--status-online); }
+        .service-status.offline { background: var(--status-offline); }
+        .service-status.checking { 
+            background: var(--status-checking);
+            animation: pulse-dot 1s infinite;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-brand p {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        
+        .footer-tagline {
+            font-size: 0.875rem;
+        }
+        
+        .footer-links h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .nav-links.active { display: flex; }
+            .menu-toggle { display: flex; }
+            
+            .stats-panel .container {
+                justify-content: center;
+            }
+            
+            .stats-info { 
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h1 { font-size: 2rem; }
+            .hero-image { display: none; }
+            
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .stats-panel .container {
+                font-size: 0.75rem;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
 
-<!-- Hero Section with Slideshow -->
+{{ partial "header.html" . }}
+
+<!-- Hero Section -->
 <section class="hero">
-    <div class="hero-slideshow">
-        {{- range $i, $img := .Site.Params.heroImages }}
-        <div class="hero-slide{{ if eq $i 0 }} active{{ end }}" style="background-image: url('/images/hero/{{ $img }}.jpg')"></div>
-        {{- end }}
-    </div>
-    
     <div class="container">
         <div class="hero-content">
-            <h1>The <span class="highlight">*internet,</span><br>in your backpack</h1>
-            <p class="subtitle">
-                When there's no signal, no power grid, no cell towers — MuleCube still works.
-                Wikipedia. Maps. AI. Emergency messaging. All offline. All private.
-            </p>
-            <div class="hero-cta">
+            <h1>The <span>*internet,</span><br>in your backpack</h1>
+            <p>When there's no signal, no power grid, no cell towers — MuleCube still works. Wikipedia. Maps. AI. Emergency messaging. All offline. All private.</p>
+            <div class="hero-buttons">
                 <a href="#services" class="btn btn-primary">Browse Services</a>
-                <a href="https://mulecube.com/products/" class="btn btn-secondary" target="_blank">View Products</a>
+                <a href="https://mulecube.com/products/" target="_blank" rel="noopener" class="btn btn-secondary">View Products</a>
             </div>
         </div>
-        
         <div class="hero-image">
-            <img src="/images/product-base.png" alt="MuleCube Device">
+            <img src="/images/mulecube-device.png" alt="MuleCube Device">
         </div>
     </div>
 </section>
 
 <!-- Status Banner -->
 <div class="status-banner" id="statusBanner">
-    <span class="status-dot"></span>
-    <span id="statusText">Checking services...</span>
+    <span class="status-indicator">
+        <span class="status-dot"></span>
+        <span id="statusText">All <span id="servicesRunning">--</span> services operational</span>
+    </span>
 </div>
 
 <!-- Services Section -->
@@ -57,6 +631,198 @@
     {{ partial "service-category.html" (dict "category" $services.communication "icon" "💬") }}
     {{ partial "service-category.html" (dict "category" $services.tools "icon" "🔧") }}
     {{ partial "service-category.html" (dict "category" $services.infrastructure "icon" "⚙️") }}
+    {{ partial "service-category.html" (dict "category" $services.admin "icon" "🛠️") }}
 </main>
 
+{{ partial "footer.html" . }}
+
+<script>
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+let currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('theme', theme);
+    currentTheme = theme;
+}
+
+setTheme(currentTheme);
+
+themeToggle.addEventListener('click', () => {
+    setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+// Mobile menu
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+
+menuToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+});
+
+// Service search
+const searchInput = document.getElementById('serviceSearch');
+const serviceCards = document.querySelectorAll('.service-card');
+const serviceCategories = document.querySelectorAll('.service-category');
+
+searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    
+    serviceCategories.forEach(category => {
+        const cards = category.querySelectorAll('.service-card');
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+            const name = card.querySelector('h3').textContent.toLowerCase();
+            const desc = card.querySelector('p').textContent.toLowerCase();
+            const matches = name.includes(query) || desc.includes(query);
+            
+            card.style.display = matches ? '' : 'none';
+            if (matches) visibleCount++;
+        });
+        
+        category.style.display = visibleCount > 0 ? '' : 'none';
+    });
+});
+
+// Update system stats from JSON file
+async function updateStats() {
+    try {
+        const response = await fetch('/data/stats.json?' + Date.now());
+        const stats = await response.json();
+        
+        // Existing stats
+        document.getElementById('cpuValue').textContent = stats.cpu + '%';
+        document.getElementById('memValue').textContent = stats.memory + '%';
+        document.getElementById('diskValue').textContent = stats.disk + '%';
+        document.getElementById('wifiValue').textContent = stats.wifi;
+        document.getElementById('ethValue').textContent = stats.ethernet;
+        document.getElementById('hostname').textContent = stats.hostname;
+        document.getElementById('uptime').textContent = stats.uptime;
+        
+        // Color disk usage if high
+        const diskEl = document.getElementById('diskValue');
+        if (stats.disk >= 95) {
+            diskEl.classList.add('critical');
+            diskEl.classList.remove('warning');
+        } else if (stats.disk >= 85) {
+            diskEl.classList.add('warning');
+            diskEl.classList.remove('critical');
+        } else {
+            diskEl.classList.remove('warning', 'critical');
+        }
+        
+        // NEW: Temperature with status coloring
+        const tempEl = document.getElementById('tempValue');
+        if (tempEl && stats.temperature !== undefined && stats.temperature > 0) {
+            tempEl.textContent = stats.temperature + '°C';
+            tempEl.dataset.status = stats.temp_status || 'normal';
+        }
+        
+        // NEW: Battery (show only when available)
+        const batteryContainer = document.getElementById('batteryContainer');
+        if (batteryContainer && stats.battery_available) {
+            batteryContainer.style.display = 'flex';
+            
+            const batteryIcon = document.getElementById('batteryIcon');
+            const batteryValue = document.getElementById('batteryValue');
+            const batteryTime = document.getElementById('batteryTime');
+            
+            // Icon: charging vs discharging
+            batteryIcon.textContent = stats.battery_charging ? '⚡' : '🔋';
+            
+            // Percentage with color
+            batteryValue.textContent = stats.battery_percent + '%';
+            batteryValue.className = 'stat-value ' + (
+                stats.battery_percent < 20 ? 'battery-low' :
+                stats.battery_percent < 50 ? 'battery-medium' : 'battery-good'
+            );
+            
+            // Time remaining
+            if (stats.battery_time) {
+                batteryTime.textContent = '(' + stats.battery_time + ')';
+            } else {
+                batteryTime.textContent = '';
+            }
+        } else if (batteryContainer) {
+            batteryContainer.style.display = 'none';
+        }
+        
+        // NEW: Update status banner with service counts
+        const servicesRunningEl = document.getElementById('servicesRunning');
+        const statusBanner = document.getElementById('statusBanner');
+        const statusText = document.getElementById('statusText');
+        
+        if (stats.services_total !== undefined) {
+            servicesRunningEl.textContent = stats.services_running;
+            
+            if (stats.services_failed > 0) {
+                statusBanner.className = 'status-banner error';
+                statusText.innerHTML = `<span id="servicesRunning">${stats.services_running}</span> services running, <strong>${stats.services_failed} failed</strong>`;
+            } else if (stats.services_running < stats.services_total) {
+                statusBanner.className = 'status-banner warning';
+                statusText.innerHTML = `<span id="servicesRunning">${stats.services_running}</span> of ${stats.services_total} services running`;
+            } else {
+                statusBanner.className = 'status-banner';
+                statusText.innerHTML = `All <span id="servicesRunning">${stats.services_running}</span> services operational`;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Failed to fetch stats:', error);
+    }
+}
+
+// Check service health
+async function checkServiceHealth() {
+    const cards = document.querySelectorAll('.service-card');
+    
+    cards.forEach(async (card) => {
+        const statusDot = card.querySelector('.service-status');
+        const url = card.getAttribute('href');
+        
+        // Skip external demo URLs
+        if (url.includes('https://') && !url.includes('mulecube')) {
+            statusDot.classList.remove('checking');
+            statusDot.classList.add('online');
+            return;
+        }
+        
+        try {
+            // Use a HEAD request with a short timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            
+            const response = await fetch(url, {
+                method: 'HEAD',
+                mode: 'no-cors',
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            statusDot.classList.remove('checking', 'offline');
+            statusDot.classList.add('online');
+        } catch (error) {
+            statusDot.classList.remove('checking', 'online');
+            statusDot.classList.add('offline');
+        }
+    });
+}
+
+// Initial load
+updateStats();
+checkServiceHealth();
+
+// Refresh stats every 30 seconds
+setInterval(updateStats, 30000);
+
+// Check service health every 60 seconds
+setInterval(checkServiceHealth, 60000);
+</script>
+
+</body>
+</html>
 {{ end }}

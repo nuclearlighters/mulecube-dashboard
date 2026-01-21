@@ -245,6 +245,50 @@ params:
           icon: "https://ollama.com/public/ollama.png"
           fallback: "🦙"
           gradient: "#1e1e1e, #333"
+    
+    admin:
+      title: "Control Panel"
+      items:
+        - name: Containers
+          url: "http://dockge.mulecube.local:5001"
+          demo_url: "https://dockge.kuma.pet/"
+          description: "Docker Management"
+          service: dockge
+          icon: "https://dockge.kuma.pet/icon.svg"
+          fallback: "📦"
+          gradient: "#22c55e, #16a34a"
+        - name: Logs
+          url: "http://logs.mulecube.local:9999"
+          demo_url: "https://dozzle.dev/"
+          description: "Container Logs"
+          service: dozzle
+          icon: "https://dozzle.dev/favicon.ico"
+          fallback: "📋"
+          gradient: "#3b82f6, #1d4ed8"
+        - name: Terminal
+          url: "http://terminal.mulecube.local:7681"
+          demo_url: "https://tsl0922.github.io/ttyd/"
+          description: "Web Shell"
+          service: ttyd
+          icon: ""
+          fallback: "🖥️"
+          gradient: "#1f2937, #374151"
+        - name: Diagnostics
+          url: "http://diagnostics.mulecube.local:9007"
+          demo_url: "#"
+          description: "System Health"
+          service: diagnostics
+          icon: ""
+          fallback: "🩺"
+          gradient: "#8b5cf6, #7c3aed"
+        - name: Backup
+          url: "http://backup.mulecube.local:9005"
+          demo_url: "#"
+          description: "Backup & Restore"
+          service: backup
+          icon: ""
+          fallback: "💾"
+          gradient: "#06b6d4, #0891b2"
 
   heroImages:
     - camping
