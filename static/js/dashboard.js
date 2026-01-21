@@ -234,18 +234,16 @@
     };
 
     // ==========================================
-    // Service Status Manager
+    // Service Status Manager - Per-service tracking
     // ==========================================
     const ServiceManager = {
-        services: [],
         statusBanner: null,
         statusText: null,
+        serviceStatus: {},  // Track status per service ID: { kiwix: 'online', openwebui: 'offline', ... }
         
         init() {
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
-            // Only count services in .service-category, not Quick Start/Recently Used
-            this.services = document.querySelectorAll('.service-category .service-card');
             
             if (ModeManager.isDemo) {
                 this.simulateOnline();
@@ -256,38 +254,59 @@
             }
         },
         
-        async checkAllServices() {
-            let online = 0;
-            let total = this.services.length;
+        // Update all cards with a given service ID to a specific status
+        updateServiceStatus(serviceId, status) {
+            this.serviceStatus[serviceId] = status;
             
-            // Set all to checking state
-            this.services.forEach(card => {
-                const status = card.querySelector('.service-status');
-                if (status) status.className = 'service-status checking';
+            // Find ALL cards with this service ID (categories, Start Here, Recently Used, Admin)
+            document.querySelectorAll(`.service-card[data-service="${serviceId}"]`).forEach(card => {
+                const statusDot = card.querySelector('.service-status');
+                if (statusDot) {
+                    statusDot.className = 'service-status' + (status === 'offline' ? ' offline' : status === 'checking' ? ' checking' : '');
+                }
+            });
+        },
+        
+        async checkAllServices() {
+            // Get unique services from category cards (source of truth)
+            const categoryCards = document.querySelectorAll('.service-category .service-card');
+            const uniqueServices = new Map();
+            
+            categoryCards.forEach(card => {
+                const serviceId = card.getAttribute('data-service');
+                const url = card.getAttribute('href');
+                if (serviceId && !uniqueServices.has(serviceId)) {
+                    uniqueServices.set(serviceId, url);
+                }
             });
             
-            // Check each service
-            const checks = Array.from(this.services).map(async (card) => {
-                const url = card.getAttribute('href');
-                const status = card.querySelector('.service-status');
-                
+            // Set all to checking state
+            uniqueServices.forEach((url, serviceId) => {
+                this.updateServiceStatus(serviceId, 'checking');
+            });
+            
+            // Check each unique service
+            let online = 0;
+            const total = uniqueServices.size;
+            
+            const checks = Array.from(uniqueServices.entries()).map(async ([serviceId, url]) => {
                 if (!url || url === '#' || url.startsWith('http')) {
                     // External or no URL - assume online
-                    if (status) status.className = 'service-status';
+                    this.updateServiceStatus(serviceId, 'online');
                     return true;
                 }
                 
                 try {
-                    const response = await fetch(url, {
+                    await fetch(url, {
                         method: 'HEAD',
                         mode: 'no-cors',
                         signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
                     });
                     
-                    if (status) status.className = 'service-status';
+                    this.updateServiceStatus(serviceId, 'online');
                     return true;
                 } catch (error) {
-                    if (status) status.className = 'service-status offline';
+                    this.updateServiceStatus(serviceId, 'offline');
                     return false;
                 }
             });
@@ -322,23 +341,22 @@
         },
         
         simulateOnline() {
-            // In demo mode, all services appear online
-            const total = this.services.length;
+            // Get all unique service IDs from category cards
+            const categoryCards = document.querySelectorAll('.service-category .service-card');
+            const serviceIds = new Set();
             
-            // Update status for category services
-            this.services.forEach(card => {
-                const status = card.querySelector('.service-status');
-                if (status) status.className = 'service-status';
+            categoryCards.forEach(card => {
+                const serviceId = card.getAttribute('data-service');
+                if (serviceId) serviceIds.add(serviceId);
             });
             
-            // Also update Start Here and Recently Used cards
-            document.querySelectorAll('.start-here .service-card, .quick-start .service-card').forEach(card => {
-                const status = card.querySelector('.service-status');
-                if (status) status.className = 'service-status';
+            // Set each service to online - this updates ALL cards with that service ID
+            serviceIds.forEach(serviceId => {
+                this.updateServiceStatus(serviceId, 'online');
             });
             
             if (this.statusText) {
-                this.statusText.textContent = `All ${total} services simulated`;
+                this.statusText.textContent = `All ${serviceIds.size} services simulated`;
             }
         }
     };
