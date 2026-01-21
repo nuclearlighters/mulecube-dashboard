@@ -274,7 +274,7 @@ params:
           fallback: "🖥️"
           gradient: "#1f2937, #374151"
         - name: Diagnostics
-          url: "http://diagnostics.mulecube.local:9007"
+          url: "http://diagnostics.mulecube.local:9007/api/full"
           demo_url: "#"
           description: "System Health"
           service: diagnostics
@@ -282,7 +282,7 @@ params:
           fallback: "🩺"
           gradient: "#8b5cf6, #7c3aed"
         - name: Backup
-          url: "http://backup.mulecube.local:9005"
+          url: "http://backup.mulecube.local:9005/api/backups"
           demo_url: "#"
           description: "Backup & Restore"
           service: backup
