@@ -61,7 +61,12 @@
                 wifi: document.getElementById('wifiValue'),
                 ethernet: document.getElementById('ethValue'),
                 hostname: document.getElementById('hostname'),
-                uptime: document.getElementById('uptime')
+                uptime: document.getElementById('uptime'),
+                temperature: document.getElementById('tempValue'),
+                batteryContainer: document.getElementById('batteryContainer'),
+                batteryIcon: document.getElementById('batteryIcon'),
+                batteryValue: document.getElementById('batteryValue'),
+                batteryTime: document.getElementById('batteryTime')
             };
             
             if (ModeManager.isDemo) {
@@ -97,6 +102,25 @@
             if (this.elements.ethernet) this.elements.ethernet.textContent = data.ethernet || 'N/A';
             if (this.elements.hostname) this.elements.hostname.textContent = data.hostname || 'mulecube';
             if (this.elements.uptime) this.elements.uptime.textContent = data.uptime || '--';
+            
+            // Temperature with color coding
+            if (this.elements.temperature && data.temperature) {
+                this.elements.temperature.textContent = `${data.temperature}°C`;
+                this.elements.temperature.style.color = data.temperature > 80 ? '#ef4444' : data.temperature > 70 ? '#f59e0b' : '#22c55e';
+            }
+            
+            // Battery (only show when available)
+            if (this.elements.batteryContainer && data.battery_available) {
+                this.elements.batteryContainer.style.display = 'flex';
+                if (this.elements.batteryIcon) this.elements.batteryIcon.textContent = data.battery_charging ? '⚡' : '🔋';
+                if (this.elements.batteryValue) {
+                    this.elements.batteryValue.textContent = `${data.battery_percent}%`;
+                    this.elements.batteryValue.style.color = data.battery_percent < 20 ? '#ef4444' : data.battery_percent < 50 ? '#f59e0b' : '#22c55e';
+                }
+                if (this.elements.batteryTime) this.elements.batteryTime.textContent = data.battery_time ? `(${data.battery_time})` : '';
+            } else if (this.elements.batteryContainer) {
+                this.elements.batteryContainer.style.display = 'none';
+            }
         },
         
         startDemoStats() {
@@ -109,7 +133,12 @@
                     wifi: `${Math.floor(Math.random() * 5)} clients`,
                     ethernet: 'Connected',
                     hostname: 'mulecube-demo',
-                    uptime: '12d 4h 32m'
+                    uptime: '12d 4h 32m',
+                    temperature: Math.floor(Math.random() * 15) + 45,
+                    battery_available: true,
+                    battery_percent: Math.floor(Math.random() * 30) + 60,
+                    battery_charging: Math.random() > 0.5,
+                    battery_time: '3h 45m'
                 };
                 this.updateDisplay(data);
             };
