@@ -4,6 +4,7 @@
    ======================================== */
 
 /* CSS Custom Properties - Identical to main site */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700&display=swap');
 :root {
     /* Colors */
     --color-bg: #0a0a0b;
@@ -135,11 +136,15 @@ a:hover {
     font-weight: 600;
     text-decoration: none;
 }
-
+.logo span {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.5px;
+}
 .logo:hover {
     color: var(--color-text);
 }
-
 .logo-img {
     height: 40px;
     width: auto;
