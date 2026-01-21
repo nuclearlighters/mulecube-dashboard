@@ -125,9 +125,7 @@
                 if (originalCard) {
                     const clone = originalCard.cloneNode(true);
                     clone.classList.add('recently-used-card');
-                    // Remove status indicator from recently used
-                    const status = clone.querySelector('.service-status');
-                    if (status) status.style.display = 'none';
+                    // Keep status indicator - will be updated by ServiceManager
                     this.container.appendChild(clone);
                 }
             });
@@ -700,7 +698,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         ModeManager.init();
         StatsManager.init();
-        ServiceManager.init();
+        RecentlyUsedManager.init();  // Must run before ServiceManager to populate cards
+        ServiceManager.init();       // Then update all status dots including Recently Used
         SearchManager.init();
         ThemeManager.init();
         Slideshow.init();
@@ -709,7 +708,6 @@
         AdvancedToggle.init();
         CategoryToggle.init();
         HeroToggle.init();
-        RecentlyUsedManager.init();
         
         console.log('MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
