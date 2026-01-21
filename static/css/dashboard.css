@@ -891,3 +891,10 @@ a:hover {
 [data-theme="light"] .demo-banner {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Theme-aware logo */
+.logo-light { display: none; }
+.logo-dark { display: block; }
+
+[data-theme="light"] .logo-light { display: block; }
+[data-theme="light"] .logo-dark { display: none; }
