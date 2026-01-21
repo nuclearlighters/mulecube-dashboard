@@ -210,8 +210,9 @@ params:
           fallback: "◆"
           gradient: "#06b6d4, #0891b2"
     
+    # RENAMED: Infrastructure → Monitoring
     infrastructure:
-      title: "Infrastructure"
+      title: "Monitoring"
       items:
         - name: Beszel
           url: "http://monitor.mulecube.local"
@@ -246,8 +247,9 @@ params:
           fallback: "◆"
           gradient: "#1e1e1e, #333"
     
+    # RENAMED: Control Panel → Admin
     admin:
-      title: "Control Panel"
+      title: "Admin"
       items:
         - name: Containers
           url: "http://dockge.mulecube.local:5001"

@@ -1,12 +1,12 @@
 {{- with .category }}
 <div class="service-category">
-    <h3 class="category-title">{{ with $.icon }}<img src="{{ . }}" alt="" class="category-icon"> {{ end }}{{ .title }}</h3>
+    <h3 class="category-title">{{ with $.icon }}<img src="{{ . }}" alt="" class="category-icon"> {{ end }}{{ .title }} <span class="category-count">({{ len .items }})</span></h3>
     <div class="service-grid">
         {{- range .items }}
         {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
         {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-        <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}">
-            <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
+        <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+            <div class="service-icon">
                 {{- if .icon }}
                 <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
                 {{- else }}
@@ -15,7 +15,7 @@
             </div>
             <div class="service-info">
                 <h3>{{ .name }}</h3>
-                <p title="{{ .description }}">{{ .description }}</p>
+                <p>{{ .description }}</p>
             </div>
             <div class="service-status checking"></div>
         </a>

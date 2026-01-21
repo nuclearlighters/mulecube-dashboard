@@ -38,7 +38,7 @@
     <h2>Your Offline Services</h2>
     <p class="section-subtitle">Everything running on this device — no internet required</p>
     
-    <!-- Search/Filter - LARGER WITH ICON -->
+    <!-- Search/Filter - With Icon -->
     <div class="services-filter">
         <div class="search-wrapper">
             <img src="/images/icons/ui-search.svg" alt="" class="search-icon">
@@ -52,255 +52,117 @@
 
     {{- $services := .Site.Params.services }}
 
-    <!-- Recently Used / Quick Start Section -->
+    <!-- START HERE - Curated essentials for new users -->
+    <div class="start-here">
+        <h3 class="category-title"><img src="/images/icons/ui-star.svg" alt="" class="category-icon"> Start Here</h3>
+        <p class="quick-start-subtitle">The essentials — tap any tile to open</p>
+        <div class="service-grid start-here-grid">
+            {{- /* Wikipedia */ -}}
+            {{- with index $services.knowledge.items 0 }}
+            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
+            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+                <div class="service-icon">
+                    {{- if .icon }}
+                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
+                    {{- else }}
+                    {{ .fallback }}
+                    {{- end }}
+                </div>
+                <div class="service-info">
+                    <h3>{{ .name }}</h3>
+                    <p>{{ .description }}</p>
+                </div>
+                <div class="service-status checking"></div>
+            </a>
+            {{- end }}
+            
+            {{- /* Maps */ -}}
+            {{- with index $services.knowledge.items 1 }}
+            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
+            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+                <div class="service-icon">
+                    {{- if .icon }}
+                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
+                    {{- else }}
+                    {{ .fallback }}
+                    {{- end }}
+                </div>
+                <div class="service-info">
+                    <h3>{{ .name }}</h3>
+                    <p>{{ .description }}</p>
+                </div>
+                <div class="service-status checking"></div>
+            </a>
+            {{- end }}
+            
+            {{- /* AI Chat */ -}}
+            {{- with index $services.ai.items 1 }}
+            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
+            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+                <div class="service-icon">
+                    {{- if .icon }}
+                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
+                    {{- else }}
+                    {{ .fallback }}
+                    {{- end }}
+                </div>
+                <div class="service-info">
+                    <h3>{{ .name }}</h3>
+                    <p>{{ .description }}</p>
+                </div>
+                <div class="service-status checking"></div>
+            </a>
+            {{- end }}
+            
+            {{- /* File Browser */ -}}
+            {{- with index $services.files.items 0 }}
+            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
+            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+                <div class="service-icon">
+                    {{- if .icon }}
+                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
+                    {{- else }}
+                    {{ .fallback }}
+                    {{- end }}
+                </div>
+                <div class="service-info">
+                    <h3>{{ .name }}</h3>
+                    <p>{{ .description }}</p>
+                </div>
+                <div class="service-status checking"></div>
+            </a>
+            {{- end }}
+        </div>
+    </div>
+
+    <!-- Recently Used - Compact, dynamic section -->
     <div class="quick-start">
-        <h3 class="category-title"><img src="/images/icons/ui-star.svg" alt="" class="category-icon"> Recently Used</h3>
-        <p class="quick-start-subtitle">Your most used services — click any service to add it here</p>
+        <h3 class="category-title"><img src="/images/icons/stat-uptime.svg" alt="" class="category-icon"> Recently Used</h3>
+        <p class="quick-start-subtitle">Your recently accessed services</p>
         
         <!-- Empty state - shown when no recently used services -->
         <div class="recently-used-empty" id="recentlyUsedEmpty">
-            <p>Your recently used services will appear here.<br>Click any service below to get started!</p>
+            <p>Services you use will appear here for quick access</p>
         </div>
         
         <!-- Dynamic grid - populated by JavaScript -->
         <div class="service-grid quick-grid" id="recentlyUsedGrid" style="display: none;">
             <!-- Populated dynamically by RecentlyUsedManager -->
         </div>
-
-        <!-- Fallback Quick Start for first-time users (hidden once Recently Used has items) -->
-        <noscript>
-            <div class="service-grid quick-grid">
-                {{- $quickServices := slice 
-                    (index $services.knowledge.items 0)
-                    (index $services.knowledge.items 1)
-                    (index $services.ai.items 0)
-                    (index $services.ai.items 1)
-                    (index $services.files.items 0)
-                }}
-                {{- range $quickServices }}
-                {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-                {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-                <a href="{{ $linkUrl }}" target="_blank" class="service-card quick-card" data-service="{{ .service }}">
-                    <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                        {{- if .icon }}
-                        <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                        {{- else }}
-                        {{ .fallback }}
-                        {{- end }}
-                    </div>
-                    <div class="service-info">
-                        <h3>{{ .name }}</h3>
-                        <p title="{{ .description }}">{{ .description }}</p>
-                    </div>
-                    <div class="service-status checking"></div>
-                </a>
-                {{- end }}
-            </div>
-        </noscript>
     </div>
 
-    <!-- AI Services -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-ai.svg" alt="" class="category-icon"> 
-            {{ $services.ai.title }}
-            <span class="category-count">({{ len $services.ai.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.ai.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Knowledge -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-knowledge.svg" alt="" class="category-icon"> 
-            {{ $services.knowledge.title }}
-            <span class="category-count">({{ len $services.knowledge.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.knowledge.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Collaboration -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-collaboration.svg" alt="" class="category-icon"> 
-            {{ $services.collaboration.title }}
-            <span class="category-count">({{ len $services.collaboration.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.collaboration.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Security -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-security.svg" alt="" class="category-icon"> 
-            {{ $services.security.title }}
-            <span class="category-count">({{ len $services.security.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.security.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Files & Sync -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-files.svg" alt="" class="category-icon"> 
-            {{ $services.files.title }}
-            <span class="category-count">({{ len $services.files.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.files.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Communication -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-communication.svg" alt="" class="category-icon"> 
-            {{ $services.communication.title }}
-            <span class="category-count">({{ len $services.communication.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.communication.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
-
-    <!-- Tools -->
-    <div class="service-category">
-        <h3 class="category-title">
-            <img src="/images/icons/cat-tools.svg" alt="" class="category-icon"> 
-            {{ $services.tools.title }}
-            <span class="category-count">({{ len $services.tools.items }})</span>
-        </h3>
-        <div class="service-grid">
-            {{- range $services.tools.items }}
-            {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-            {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                    {{- if .icon }}
-                    <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                    {{- else }}
-                    {{ .fallback }}
-                    {{- end }}
-                </div>
-                <div class="service-info">
-                    <h3>{{ .name }}</h3>
-                    <p title="{{ .description }}">{{ .description }}</p>
-                </div>
-                <div class="service-status checking"></div>
-            </a>
-            {{- end }}
-        </div>
-    </div>
+    <!-- All Service Categories -->
+    {{ partial "service-category.html" (dict "category" $services.ai "icon" "/images/icons/cat-ai.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.knowledge "icon" "/images/icons/cat-knowledge.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.collaboration "icon" "/images/icons/cat-collaboration.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.security "icon" "/images/icons/cat-security.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.files "icon" "/images/icons/cat-files.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.communication "icon" "/images/icons/cat-communication.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.tools "icon" "/images/icons/cat-tools.svg") }}
 
     <!-- Advanced Section Toggle -->
     <div class="advanced-toggle">
@@ -310,63 +172,8 @@
     </div>
     
     <div class="advanced-section" id="advancedSection" style="display: none;">
-        <!-- Infrastructure -->
-        <div class="service-category">
-            <h3 class="category-title">
-                <img src="/images/icons/cat-infrastructure.svg" alt="" class="category-icon"> 
-                {{ $services.infrastructure.title }}
-                <span class="category-count">({{ len $services.infrastructure.items }})</span>
-            </h3>
-            <div class="service-grid">
-                {{- range $services.infrastructure.items }}
-                {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-                {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-                <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                    <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                        {{- if .icon }}
-                        <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                        {{- else }}
-                        {{ .fallback }}
-                        {{- end }}
-                    </div>
-                    <div class="service-info">
-                        <h3>{{ .name }}</h3>
-                        <p title="{{ .description }}">{{ .description }}</p>
-                    </div>
-                    <div class="service-status checking"></div>
-                </a>
-                {{- end }}
-            </div>
-        </div>
-
-        <!-- Control Panel -->
-        <div class="service-category">
-            <h3 class="category-title">
-                <img src="/images/icons/cat-admin.svg" alt="" class="category-icon"> 
-                {{ $services.admin.title }}
-                <span class="category-count">({{ len $services.admin.items }})</span>
-            </h3>
-            <div class="service-grid">
-                {{- range $services.admin.items }}
-                {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
-                {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-                <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
-                    <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
-                        {{- if .icon }}
-                        <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
-                        {{- else }}
-                        {{ .fallback }}
-                        {{- end }}
-                    </div>
-                    <div class="service-info">
-                        <h3>{{ .name }}</h3>
-                        <p title="{{ .description }}">{{ .description }}</p>
-                    </div>
-                    <div class="service-status checking"></div>
-                </a>
-                {{- end }}
-            </div>
-        </div>
+        {{ partial "service-category.html" (dict "category" $services.infrastructure "icon" "/images/icons/cat-infrastructure.svg") }}
+        {{ partial "service-category.html" (dict "category" $services.admin "icon" "/images/icons/cat-admin.svg") }}
     </div>
 
 </main>
