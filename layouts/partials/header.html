@@ -31,21 +31,20 @@
 <div class="stats-panel">
     <div class="stats-container">
         <div class="stats-group stats-primary">
-            <span class="stats-label">SYS</span>
-            <span class="stat-item"><span class="stat-val" id="cpuValue">--%</span></span>
-            <span class="stat-item"><span class="stat-val" id="memValue">--%</span></span>
-            <span class="stat-item"><span class="stat-val" id="diskValue">--%</span></span>
+            <span class="stat-item"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
+            <span class="stat-item"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
+            <span class="stat-item"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
         </div>
         
         <div class="stats-group stats-network">
-            <span class="stat-item">📶 <span class="stat-val" id="wifiValue">--</span></span>
-            <span class="stat-item" id="ethStatus">🔌 <span class="stat-val" id="ethValue">--</span></span>
+            <span class="stat-item"><span class="stat-label">WiFi</span> <span class="stat-val" id="wifiValue">--</span></span>
+            <span class="stat-item" id="ethStatus"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
         </div>
         
         <div class="stats-group stats-hardware">
-            <span class="stat-item">🌡️<span class="stat-val" id="tempValue">--°C</span></span>
+            <span class="stat-item">🌡️ <span class="stat-val" id="tempValue">--°C</span></span>
             <span class="stat-item" id="batteryContainer" style="display: none;">
-                <span id="batteryIcon">🔋</span><span class="stat-val" id="batteryValue">--%</span>
+                <span id="batteryIcon">🔋</span> <span class="stat-val" id="batteryValue">--%</span>
             </span>
         </div>
         
@@ -74,13 +73,13 @@
 </div>
 
 <style>
-/* Stats Panel - Compact and Responsive */
+/* Stats Panel - Compact and Readable */
 .stats-panel {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 6px 0;
-    font-size: 12px;
+    padding: 8px 0;
+    font-size: 13px;
 }
 
 .stats-container {
@@ -91,47 +90,66 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 8px 16px;
+    gap: 8px 20px;
 }
 
 .stats-group {
     display: flex;
     align-items: center;
-    gap: 8px;
-}
-
-.stats-label {
-    color: #22c55e;
-    font-weight: 600;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    gap: 12px;
 }
 
 .stat-item {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.9);
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-val {
     color: #22c55e;
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* Group separators */
-.stats-primary { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
-.stats-network { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
-.stats-hardware { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
+.stats-primary { 
+    padding-right: 16px; 
+    border-right: 1px solid rgba(255,255,255,0.2); 
+}
+
+.stats-network { 
+    padding-right: 16px; 
+    border-right: 1px solid rgba(255,255,255,0.2); 
+}
+
+.stats-hardware { 
+    padding-right: 16px; 
+    border-right: 1px solid rgba(255,255,255,0.2); 
+}
+
+.stats-controls {
+    padding-right: 16px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
 
 /* Power buttons */
 .power-btn {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 4px;
-    padding: 3px 6px;
+    padding: 4px 8px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     transition: all 0.2s ease;
     line-height: 1;
 }
@@ -151,23 +169,36 @@
     border-color: rgba(239, 68, 68, 0.5);
 }
 
-/* Responsive: hide less important items on smaller screens */
-@media (max-width: 900px) {
+/* Responsive adjustments */
+@media (max-width: 1000px) {
     .stats-info { display: none; }
-    .stats-primary .stats-label { display: none; }
-}
-
-@media (max-width: 700px) {
-    .stats-network { display: none; }
-    .stats-primary, .stats-hardware { 
+    .stats-controls { 
         border-right: none; 
         padding-right: 0; 
     }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
+    .stats-panel { padding: 6px 0; font-size: 12px; }
+    .stats-container { gap: 6px 12px; }
+    .stats-group { gap: 8px; }
+    .stats-primary, .stats-network, .stats-hardware, .stats-controls { 
+        padding-right: 10px; 
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-network { display: none; }
+    .stats-hardware { 
+        border-right: none; 
+        padding-right: 0; 
+    }
+}
+
+@media (max-width: 450px) {
     .stats-container { justify-content: space-between; }
-    .stats-group { gap: 6px; }
+    .stat-label { font-size: 10px; }
+    .stats-primary { border-right: none; padding-right: 0; }
 }
 
 /* Modal styles */
