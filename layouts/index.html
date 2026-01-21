@@ -63,7 +63,7 @@
             {{- range $quickServices }}
             {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
             {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}">
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card quick-card" data-service="{{ .service }}">
                 <div class="service-icon" style="background: linear-gradient(135deg, {{ .gradient }});">
                     {{- if .icon }}
                     <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
@@ -73,7 +73,7 @@
                 </div>
                 <div class="service-info">
                     <h3>{{ .name }}</h3>
-                    <p>{{ .description }}</p>
+                    <p title="{{ .description }}">{{ .description }}</p>
                 </div>
                 <div class="service-status checking"></div>
             </a>

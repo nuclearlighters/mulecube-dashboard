@@ -607,25 +607,6 @@ a:hover {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-.service-info {
-    position: relative;
-}
-
-.service-card:hover .service-info p {
-    white-space: normal;
-    overflow: visible;
-    position: absolute;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--border-radius);
-    z-index: 100;
-    min-width: 200px;
-    max-width: 300px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    top: 100%;
-    left: 0;
     margin-top: var(--space-xs);
 }
 
@@ -1021,3 +1002,30 @@ a:hover {
 
 [data-theme="light"] .logo-light { display: block; }
 [data-theme="light"] .logo-dark { display: none; }
+
+/* Quick Start - hide status indicator */
+.quick-card .service-status {
+    display: none;
+}
+
+/* Fix card alignment - consistent height */
+.service-card {
+    min-height: 72px;
+}
+
+.service-info p {
+    max-width: 150px;
+}
+
+/* Disable hover tooltip expansion - use title attribute instead */
+.service-card:hover .service-info p {
+    white-space: nowrap;
+    overflow: hidden;
+    position: static;
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    min-width: auto;
+    max-width: 150px;
+}
