@@ -159,7 +159,7 @@
         init() {
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
-            this.services = document.querySelectorAll('.service-card');
+            this.services = document.querySelectorAll('.service-category .service-card');
             
             if (ModeManager.isDemo) {
                 this.simulateOnline();
