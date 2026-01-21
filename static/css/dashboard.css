@@ -607,8 +607,6 @@ a:hover {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-    margin-top: var(--space-xs);
-}
 
 .service-status {
     width: 8px;
