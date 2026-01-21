@@ -136,12 +136,15 @@ a:hover {
     font-weight: 600;
     text-decoration: none;
 }
+
 .logo span {
     font-family: 'Exo 2', sans-serif;
     font-weight: 700;
     font-style: italic;
     letter-spacing: 0.5px;
+    font-variant: small-caps;
 }
+
 .logo:hover {
     color: var(--color-text);
 }
