@@ -26,47 +26,37 @@
         </ul>
     </nav>
 </header>
+
 <!-- System Stats Panel -->
 <div class="stats-panel">
-    <div class="container">
-        <span class="stats-label">System</span>
-        <div class="stat-item">
-            <span class="stat-label">CPU</span>
-            <span class="stat-value" id="cpuValue">--%</span>
+    <div class="stats-container">
+        <div class="stats-group stats-primary">
+            <span class="stats-label">SYS</span>
+            <span class="stat-item"><span class="stat-val" id="cpuValue">--%</span></span>
+            <span class="stat-item"><span class="stat-val" id="memValue">--%</span></span>
+            <span class="stat-item"><span class="stat-val" id="diskValue">--%</span></span>
         </div>
-        <div class="stat-item">
-            <span class="stat-label">Memory</span>
-            <span class="stat-value" id="memValue">--%</span>
+        
+        <div class="stats-group stats-network">
+            <span class="stat-item">📶 <span class="stat-val" id="wifiValue">--</span></span>
+            <span class="stat-item" id="ethStatus">🔌 <span class="stat-val" id="ethValue">--</span></span>
         </div>
-        <div class="stat-item">
-            <span class="stat-label">Disk</span>
-            <span class="stat-value" id="diskValue">--%</span>
+        
+        <div class="stats-group stats-hardware">
+            <span class="stat-item">🌡️<span class="stat-val" id="tempValue">--°C</span></span>
+            <span class="stat-item" id="batteryContainer" style="display: none;">
+                <span id="batteryIcon">🔋</span><span class="stat-val" id="batteryValue">--%</span>
+            </span>
         </div>
-        <div class="stat-item">
-            <span class="stat-label">WiFi</span>
-            <span class="stat-value" id="wifiValue">--</span>
+        
+        <div class="stats-group stats-controls">
+            <button class="power-btn" id="rebootBtn" title="Reboot">🔄</button>
+            <button class="power-btn" id="shutdownBtn" title="Shutdown">⏻</button>
         </div>
-        <div class="stat-item">
-            <span class="stat-label">Ethernet</span>
-            <span class="stat-value" id="ethValue">--</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-label">🌡️</span>
-            <span class="stat-value" id="tempValue">--°C</span>
-        </div>
-        <div class="stat-item" id="batteryContainer" style="display: none;">
-            <span class="stat-label" id="batteryIcon">🔋</span>
-            <span class="stat-value" id="batteryValue">--%</span>
-            <span id="batteryTime" style="font-size: 0.75em; opacity: 0.7; margin-left: 4px;"></span>
-        </div>
-        <!-- Power Controls -->
-        <div class="stat-item power-controls">
-            <button class="power-btn reboot-btn" id="rebootBtn" title="Reboot MuleCube">🔄</button>
-            <button class="power-btn shutdown-btn" id="shutdownBtn" title="Shut Down MuleCube">⏻</button>
-        </div>
-        <div class="stats-info">
-            <span>🖥️ <span id="hostname" class="hostname">mulecube</span></span>
-            <span>⏱️ <span id="uptime">--</span></span>
+        
+        <div class="stats-group stats-info">
+            <span class="stat-item">🖥️ <span id="hostname">mulecube</span></span>
+            <span class="stat-item">⏱️ <span id="uptime">--</span></span>
         </div>
     </div>
 </div>
@@ -84,43 +74,100 @@
 </div>
 
 <style>
-/* Power button styles */
-.power-controls {
-    display: flex;
-    gap: 8px;
-    margin-left: 8px;
-    padding-left: 8px;
-    border-left: 1px solid rgba(255,255,255,0.2);
+/* Stats Panel - Compact and Responsive */
+.stats-panel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 6px 0;
+    font-size: 12px;
 }
 
+.stats-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.stats-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-label {
+    color: #22c55e;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-item {
+    color: rgba(255,255,255,0.8);
+    white-space: nowrap;
+}
+
+.stat-val {
+    color: #22c55e;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+/* Group separators */
+.stats-primary { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
+.stats-network { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
+.stats-hardware { padding-right: 12px; border-right: 1px solid rgba(255,255,255,0.15); }
+
+/* Power buttons */
 .power-btn {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 3px 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.2s ease;
     line-height: 1;
 }
 
 .power-btn:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.15);
+    transform: scale(1.05);
 }
 
-.reboot-btn:hover {
+#rebootBtn:hover {
     background: rgba(59, 130, 246, 0.3);
     border-color: rgba(59, 130, 246, 0.5);
 }
 
-.shutdown-btn:hover {
+#shutdownBtn:hover {
     background: rgba(239, 68, 68, 0.3);
     border-color: rgba(239, 68, 68, 0.5);
 }
 
-.power-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* Responsive: hide less important items on smaller screens */
+@media (max-width: 900px) {
+    .stats-info { display: none; }
+    .stats-primary .stats-label { display: none; }
+}
+
+@media (max-width: 700px) {
+    .stats-network { display: none; }
+    .stats-primary, .stats-hardware { 
+        border-right: none; 
+        padding-right: 0; 
+    }
+}
+
+@media (max-width: 500px) {
+    .stats-container { justify-content: space-between; }
+    .stats-group { gap: 6px; }
 }
 
 /* Modal styles */
@@ -130,7 +177,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,8 +188,8 @@
     background: #1a1a2e;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    padding: 24px;
-    max-width: 400px;
+    padding: 24px 32px;
+    max-width: 380px;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
@@ -150,12 +197,14 @@
 .power-modal-content h3 {
     margin: 0 0 12px 0;
     color: #fff;
-    font-size: 1.25rem;
+    font-size: 1.2rem;
 }
 
 .power-modal-content p {
     margin: 0 0 20px 0;
     color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .power-modal-buttons {
@@ -203,7 +252,6 @@
 
 <script>
 (function() {
-    // Power control functionality
     const rebootBtn = document.getElementById('rebootBtn');
     const shutdownBtn = document.getElementById('shutdownBtn');
     const modal = document.getElementById('powerModal');
@@ -243,29 +291,19 @@
     
     if (rebootBtn) {
         rebootBtn.addEventListener('click', () => {
-            showModal(
-                'reboot',
-                '🔄 Reboot MuleCube?',
-                'The system will restart in 1 minute. All services will be briefly unavailable.',
-                true
-            );
+            showModal('reboot', '🔄 Reboot MuleCube?', 
+                'System will restart in 1 minute. Services will be briefly unavailable.', true);
         });
     }
     
     if (shutdownBtn) {
         shutdownBtn.addEventListener('click', () => {
-            showModal(
-                'shutdown',
-                '⏻ Shut Down MuleCube?',
-                'The system will power off in 1 minute. You will need physical access to turn it back on!',
-                false
-            );
+            showModal('shutdown', '⏻ Shut Down MuleCube?', 
+                'System will power off in 1 minute. Physical access needed to restart!', false);
         });
     }
     
-    if (modalCancel) {
-        modalCancel.addEventListener('click', hideModal);
-    }
+    if (modalCancel) modalCancel.addEventListener('click', hideModal);
     
     if (modalConfirm) {
         modalConfirm.addEventListener('click', async () => {
@@ -278,18 +316,7 @@
         });
     }
     
-    // Close modal on outside click
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) hideModal();
-        });
-    }
-    
-    // Close modal on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'flex') {
-            hideModal();
-        }
-    });
+    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') hideModal(); });
 })();
 </script>
