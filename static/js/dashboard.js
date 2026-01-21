@@ -327,7 +327,14 @@
             // In demo mode, all services appear online
             const total = this.services.length;
             
+            // Update status for category services
             this.services.forEach(card => {
+                const status = card.querySelector('.service-status');
+                if (status) status.className = 'service-status';
+            });
+            
+            // Also update Start Here and Recently Used cards
+            document.querySelectorAll('.start-here .service-card, .quick-start .service-card').forEach(card => {
                 const status = card.querySelector('.service-status');
                 if (status) status.className = 'service-status';
             });

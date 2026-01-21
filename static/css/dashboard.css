@@ -1083,6 +1083,17 @@ a:hover {
     font-family: var(--font-mono);
 }
 
+.footer-brand .footer-version a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.footer-brand .footer-version a:hover {
+    color: var(--color-primary);
+    opacity: 1;
+}
+
 .footer-links h4 {
     font-size: 0.75rem;
     font-weight: 600;
