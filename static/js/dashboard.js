@@ -1,6 +1,8 @@
 /**
  * MuleCube Dashboard - Unified JavaScript
  * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow, Recently Used
+ * 
+ * v0.4.1 - Fixed: Recently Used click tracking now uses event delegation
  */
 
 (function() {
@@ -50,6 +52,7 @@
 
     // ==========================================
     // Recently Used Manager
+    // FIX: Now uses event delegation for click tracking
     // ==========================================
     const RecentlyUsedManager = {
         storageKey: 'mulecube-recently-used',
@@ -62,14 +65,19 @@
             
             if (!this.container) return;
             
-            // Track clicks on all service cards
-            document.querySelectorAll('.service-card').forEach(card => {
-                card.addEventListener('click', (e) => {
+            // FIX: Use event delegation on document to catch ALL service card clicks
+            // This handles: Start Here, Recently Used, Categories, Admin sections
+            document.addEventListener('click', (e) => {
+                const card = e.target.closest('.service-card');
+                if (card) {
                     const serviceName = card.dataset.service;
                     if (serviceName) {
                         this.trackUsage(serviceName);
+                        // Re-render to update the Recently Used section
+                        // Use setTimeout to let the navigation happen first
+                        setTimeout(() => this.render(), 100);
                     }
-                });
+                }
             });
             
             // Render initial state
@@ -129,6 +137,17 @@
                     this.container.appendChild(clone);
                 }
             });
+            
+            // Update status dots on newly cloned cards
+            // Need to sync with ServiceManager's current status
+            if (typeof ServiceManager !== 'undefined' && ServiceManager.serviceStatus) {
+                recent.forEach(serviceName => {
+                    const status = ServiceManager.serviceStatus[serviceName];
+                    if (status) {
+                        ServiceManager.updateServiceStatus(serviceName, status);
+                    }
+                });
+            }
         }
     };
 
@@ -727,7 +746,7 @@
         CategoryToggle.init();
         HeroToggle.init();
         
-        console.log('MuleCube Dashboard initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
+        console.log('MuleCube Dashboard v0.4.1 initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
     });
 
 })();
