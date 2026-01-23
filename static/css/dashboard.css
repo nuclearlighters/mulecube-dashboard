@@ -842,14 +842,14 @@ a:hover {
     object-fit: contain;
     /* Grayscale + brightness for monochrome look */
     filter: grayscale(1) brightness(1.2) contrast(0.9);
-    opacity: 0.7;
+    opacity: 0.8;
     transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
 /* Light theme: darken icons instead of brighten */
 [data-theme="light"] .service-icon img {
-    filter: grayscale(1) brightness(0.4);
-    opacity: 0.6;
+    filter: grayscale(1) brightness(0.3) contrast(1.2);
+    opacity: 1;
 }
 
 /* Color reveals on hover - the delight moment */
@@ -861,7 +861,7 @@ a:hover {
 /* Fallback text icons also muted */
 .service-icon:not(:has(img)) {
     color: var(--color-text-muted);
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .service-card:hover .service-icon:not(:has(img)) {
@@ -1596,13 +1596,13 @@ a:hover {
 .sync-status-button {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 4px;
+    padding: 4px 8px;
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     color: var(--color-text);
     transition: all 0.2s;
 }
@@ -1650,12 +1650,12 @@ a:hover {
 }
 
 .sync-icon {
-    font-size: 1rem;
+    font-size: 0.75rem;
     line-height: 1;
 }
 
 .sync-text {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     white-space: nowrap;
 }
 
@@ -2350,8 +2350,16 @@ a:hover {
     border-color: rgba(245, 158, 11, 0.15);
 }
 
+[data-theme="light"] .system-card .service-icon svg {
+    stroke: #52525b;
+}
+
 [data-theme="light"] .system-card:hover .service-icon {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
+}
+
+[data-theme="light"] .system-card:hover .service-icon svg {
+    stroke: #f59e0b;
 }
 
 /* Reboot action - blue tint (matches header bar) */
