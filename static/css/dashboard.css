@@ -2731,174 +2731,88 @@ select:focus-visible {
     }
 }
 /* ========================================
-   SERVICE MANAGER - DISABLED STATE STYLES
-   Add these styles to dashboard.css
-   ======================================== */
-
-/* Disabled service cards */
-.service-card.disabled {
 /* ========================================
-   SERVICE MANAGER - DISABLED SERVICES SECTION
-   v2.0.0 - Collapsible section with enable/disable buttons
+   SERVICE MANAGER v4.0
+   - Status banner toggles disabled section
+   - Proper card styling with borders
+   - Grey status dots for disabled
+   - Clean enable button
    ======================================== */
 
 /* ==========================================
-   Disabled Services Section
+   Status Banner - Enhanced for toggle
    ========================================== */
-.disabled-services-section {
-    margin: var(--space-xl) 0;
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius-lg);
-    background: rgba(239, 68, 68, 0.03);
-}
-
-.disabled-services-toggle {
-    padding: 0;
-}
-
-.disabled-toggle-btn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    background: transparent;
-    border: none;
-    color: var(--color-text-muted);
+.status-banner {
     cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-}
-
-.disabled-toggle-btn:hover {
-    color: var(--color-text);
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.disabled-toggle-btn .toggle-icon {
-    width: 16px;
-    height: 16px;
-    transition: transform 0.2s ease;
-    filter: var(--icon-filter);
-    opacity: 0.6;
-}
-
-.disabled-toggle-btn.active .toggle-icon {
-    transform: rotate(90deg);
-}
-
-.disabled-count {
-    color: var(--color-danger);
-    font-weight: 500;
-    margin-left: auto;
-}
-
-.disabled-services-content {
-    padding: 0 var(--space-lg) var(--space-lg);
-}
-
-.disabled-services-subtitle {
-    color: var(--color-text-muted);
-    font-size: 0.85rem;
-    margin-bottom: var(--space-md);
-}
-
-.disabled-services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--space-md);
-}
-
-/* ==========================================
-   Disabled Service Card Styling
-   ========================================== */
-.disabled-service-card {
-    position: relative;
-    opacity: 0.7;
-    filter: grayscale(40%);
-    border: 1px dashed var(--color-border) !important;
-    background: var(--color-bg-card) !important;
-}
-
-.disabled-service-card:hover {
-    opacity: 0.9;
-    filter: grayscale(20%);
-}
-/* ========================================
-   SERVICE MANAGER v3.0
-   - Disabled services banner (replaces hero)
-   - Proper enable/disable buttons
-   - Fixed visibility and counts
-   ======================================== */
-
-/* ==========================================
-   Disabled Services Banner (Replaces Hero)
-   ========================================== */
-.disabled-services-banner {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
-    border-bottom: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.disabled-services-banner .container {
-    max-width: var(--container-max);
-    margin: 0 auto;
-    padding: 0;
-}
-
-.disabled-banner-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg);
-    background: transparent;
-    border: none;
-    color: var(--color-text);
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
     transition: background 0.2s ease;
 }
 
-.disabled-banner-toggle:hover {
-    background: rgba(255, 255, 255, 0.05);
+.status-banner.has-disabled {
+    background: linear-gradient(90deg, var(--color-bg-secondary) 0%, rgba(239, 68, 68, 0.1) 100%);
 }
 
-.disabled-banner-icon {
-    font-size: 1.2em;
-    color: var(--color-danger);
+.status-banner.has-disabled:hover {
+    background: linear-gradient(90deg, var(--color-bg-secondary) 0%, rgba(239, 68, 68, 0.15) 100%);
 }
 
-.disabled-banner-text {
-    flex: 1;
-    text-align: left;
+.status-banner.expanded {
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 
-.disabled-banner-count {
-    color: var(--color-danger);
-    font-weight: 600;
+.status-operational {
+    color: var(--color-primary);
 }
 
-.disabled-banner-chevron {
+.status-warning {
+    color: var(--color-warning);
+}
+
+.status-disabled {
+    color: var(--color-text-muted);
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-border);
+}
+
+.status-toggle-hint {
+    margin-left: 0.5rem;
     color: var(--color-text-muted);
     font-size: 0.8em;
     transition: transform 0.2s ease;
 }
 
-.disabled-banner-content {
-    padding: 0 var(--space-lg) var(--space-lg);
+/* ==========================================
+   Disabled Services Section
+   ========================================== */
+.disabled-services-section {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.02) 100%);
+    border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+    padding: var(--space-lg) 0;
 }
 
-.disabled-banner-subtitle {
+.disabled-services-section .container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.disabled-section-subtitle {
     color: var(--color-text-muted);
     font-size: 0.9rem;
     margin-bottom: var(--space-lg);
+    text-align: center;
 }
 
+/* ==========================================
+   Disabled Services Grid
+   ========================================== */
 .disabled-services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 /* ==========================================
@@ -2906,46 +2820,85 @@ select:focus-visible {
    ========================================== */
 .disabled-service-card {
     position: relative;
-    opacity: 0.85;
-    background: var(--color-bg-card) !important;
-    border: 1px dashed var(--color-border) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    opacity: 0.8;
+    transition: all 0.2s ease;
 }
 
 .disabled-service-card:hover {
     opacity: 1;
-    border-color: var(--color-primary) !important;
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.disabled-service-card .service-status.disabled {
+.disabled-service-card .service-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.disabled-service-card .service-icon img {
+    width: 32px;
+    height: 32px;
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+.disabled-service-card .service-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.disabled-service-card .service-info h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--color-text);
+}
+
+.disabled-service-card .service-info p {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.disabled-service-card .service-status {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     background: var(--color-text-muted);
 }
 
-/* Hidden class for disabled services in categories */
-.service-disabled-hidden {
-    display: none !important;
-}
-
 /* ==========================================
-   Action Buttons
+   Enable Button
    ========================================== */
-.service-action-btn {
-    position: absolute;
-    bottom: var(--space-sm);
-    right: var(--space-sm);
-    padding: 0.4rem 0.8rem;
+.service-enable-btn {
+    padding: 0.4rem 1rem;
+    background: var(--color-primary);
+    color: white;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    z-index: 10;
-}
-
-/* Enable button - always visible on disabled cards */
-.service-enable-btn {
-    background: var(--color-primary);
-    color: white;
+    flex-shrink: 0;
 }
 
 .service-enable-btn:hover {
@@ -2953,12 +2906,33 @@ select:focus-visible {
     transform: scale(1.05);
 }
 
-/* Disable button - shown on hover */
+/* ==========================================
+   Hidden class for disabled services in categories
+   ========================================== */
+.service-disabled-hidden {
+    display: none !important;
+}
+
+/* ==========================================
+   Disable Button (on hover for enabled cards)
+   ========================================== */
+.service-action-btn {
+    position: absolute;
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    padding: 0.3rem 0.5rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
 .service-disable-btn {
     opacity: 0;
     background: rgba(255, 255, 255, 0.1);
     color: var(--color-text-muted);
-    padding: 0.3rem 0.5rem;
 }
 
 .service-card:hover .service-disable-btn {
@@ -3046,26 +3020,23 @@ select:focus-visible {
 }
 
 /* ==========================================
-   Status Banner - Disabled count style
-   ========================================== */
-.status-count.muted {
-    color: var(--color-text-muted);
-    font-size: 0.9em;
-}
-
-/* ==========================================
    Light Theme
    ========================================== */
-[data-theme="light"] .disabled-services-banner {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.03) 100%);
+[data-theme="light"] .status-banner.has-disabled {
+    background: linear-gradient(90deg, #f8f8f8 0%, rgba(239, 68, 68, 0.08) 100%);
 }
 
-[data-theme="light"] .disabled-banner-toggle:hover {
-    background: rgba(0, 0, 0, 0.03);
+[data-theme="light"] .disabled-services-section {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, rgba(239, 68, 68, 0.01) 100%);
 }
 
 [data-theme="light"] .disabled-service-card {
-    background: #f9f9f9 !important;
+    background: white;
+    border-color: #e5e5e5;
+}
+
+[data-theme="light"] .disabled-service-card:hover {
+    border-color: var(--color-primary);
 }
 
 [data-theme="light"] .service-manager-toast {
@@ -3079,6 +3050,11 @@ select:focus-visible {
 @media (max-width: 768px) {
     .disabled-services-grid {
         grid-template-columns: 1fr;
+        padding: 0 var(--space-sm);
+    }
+    
+    .disabled-service-card {
+        padding: var(--space-sm) var(--space-md);
     }
     
     .service-disable-btn {
@@ -3091,8 +3067,8 @@ select:focus-visible {
         max-width: none;
     }
     
-    .disabled-banner-toggle {
-        padding: var(--space-sm) var(--space-md);
-        font-size: 0.9rem;
+    .status-disabled {
+        margin-left: 0.5rem;
+        padding-left: 0.5rem;
     }
 }

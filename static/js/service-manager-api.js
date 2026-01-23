@@ -1,14 +1,14 @@
 /**
  * MuleCube Service Manager API Integration
- * v3.0.0 - Disabled services banner (replaces hero), proper counting, fixed visibility
+ * v4.0.0 - Status banner toggles disabled section, proper counts, fixed styling
  */
 
 const ServiceManagerAPI = {
     endpoint: '/api/services',
-    services: {},           // Container name → service data
-    containerMap: {},       // service ID → container name mapping
-    reverseMap: {},         // container name → service ID mapping
-    disabledServices: [],   // List of disabled container names
+    services: {},
+    containerMap: {},
+    reverseMap: {},
+    disabledServices: [],
     pollInterval: 30000,
     initialized: false,
     isExpanded: false,
@@ -20,25 +20,16 @@ const ServiceManagerAPI = {
             return;
         }
         
-        // Build container mapping from data attributes
         this.buildContainerMap();
+        this.setupStatusBannerToggle();
         
-        // Setup banner toggle
-        this.setupBannerToggle();
-        
-        // Initial fetch
         await this.fetchServiceStatus();
-        
-        // Poll for updates
         setInterval(() => this.fetchServiceStatus(), this.pollInterval);
         
         this.initialized = true;
         console.log('ServiceManagerAPI: Initialized');
     },
     
-    /**
-     * Build mapping from service IDs to container names and vice versa
-     */
     buildContainerMap() {
         document.querySelectorAll('.service-card[data-service]').forEach(card => {
             const serviceId = card.dataset.service;
@@ -48,51 +39,49 @@ const ServiceManagerAPI = {
                 this.reverseMap[container] = serviceId;
             }
         });
-        console.log('ServiceManagerAPI: Mapped', Object.keys(this.containerMap).length, 'services');
     },
     
     /**
-     * Setup the disabled services banner toggle
+     * Setup status banner to toggle disabled services section
      */
-    setupBannerToggle() {
-        const toggleBtn = document.getElementById('disabledBannerToggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', () => this.toggleBanner());
+    setupStatusBannerToggle() {
+        const statusBanner = document.getElementById('statusBanner');
+        if (statusBanner) {
+            statusBanner.style.cursor = 'pointer';
+            statusBanner.addEventListener('click', () => this.toggleDisabledSection());
         }
     },
     
     /**
-     * Toggle disabled services banner
+     * Toggle disabled services section visibility
      */
-    toggleBanner() {
-        this.isExpanded = !this.isExpanded;
-        const content = document.getElementById('disabledBannerContent');
-        const toggleBtn = document.getElementById('disabledBannerToggle');
-        const chevron = toggleBtn?.querySelector('.disabled-banner-chevron');
+    toggleDisabledSection() {
+        // Only toggle if there are disabled services
+        if (this.disabledServices.length === 0) return;
         
-        if (content) {
-            content.style.display = this.isExpanded ? 'block' : 'none';
+        this.isExpanded = !this.isExpanded;
+        const section = document.getElementById('disabledServicesSection');
+        const hint = document.getElementById('statusToggleHint');
+        const statusBanner = document.getElementById('statusBanner');
+        
+        if (section) {
+            section.style.display = this.isExpanded ? 'block' : 'none';
         }
-        if (toggleBtn) {
-            toggleBtn.setAttribute('aria-expanded', this.isExpanded);
+        if (hint) {
+            hint.textContent = this.isExpanded ? '▲' : '▼';
         }
-        if (chevron) {
-            chevron.textContent = this.isExpanded ? '▲' : '▼';
+        if (statusBanner) {
+            statusBanner.classList.toggle('expanded', this.isExpanded);
         }
     },
     
-    /**
-     * Fetch service status from API
-     */
     async fetchServiceStatus() {
         try {
             const response = await fetch(this.endpoint, {
                 signal: AbortSignal.timeout(10000)
             });
             
-            if (!response.ok) {
-                throw new Error(`API returned ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`API returned ${response.status}`);
             
             const data = await response.json();
             
@@ -107,9 +96,8 @@ const ServiceManagerAPI = {
                     }
                 });
                 
-                // Update all UI components
                 this.updateAllCards();
-                this.updateDisabledBanner();
+                this.updateDisabledSection();
                 this.updateStatusBanner();
             }
         } catch (error) {
@@ -118,16 +106,18 @@ const ServiceManagerAPI = {
     },
     
     /**
-     * Update status banner with accurate counts from API
+     * Update status banner with correct counts from API
      */
     updateStatusBanner() {
         const statusBanner = document.getElementById('statusBanner');
         const statusText = document.getElementById('statusText');
+        const toggleHint = document.getElementById('statusToggleHint');
+        
         if (!statusBanner || !statusText) return;
         
-        let enabledCount = 0;
         let runningCount = 0;
-        let disabledCount = this.disabledServices.length;
+        let enabledCount = 0;
+        const disabledCount = this.disabledServices.length;
         
         Object.values(this.services).forEach(svc => {
             if (svc.enabled) {
@@ -140,27 +130,43 @@ const ServiceManagerAPI = {
         
         const offlineCount = enabledCount - runningCount;
         
-        // Remove all state classes
-        statusBanner.classList.remove('error', 'warning');
+        // Remove state classes
+        statusBanner.classList.remove('error', 'warning', 'has-disabled');
         
-        if (offlineCount === 0 && disabledCount === 0) {
-            statusText.innerHTML = `All ${runningCount} services operational`;
-        } else if (offlineCount === 0 && disabledCount > 0) {
-            statusText.innerHTML = `${runningCount} services operational <span class="status-count muted">${disabledCount} disabled</span>`;
-        } else if (offlineCount > 0) {
+        // Build status text
+        let html = '';
+        
+        if (offlineCount === 0) {
+            html = `<span class="status-operational">${runningCount} services operational</span>`;
+        } else {
             statusBanner.classList.add('warning');
-            statusText.innerHTML = `${runningCount}/${enabledCount} services online <span class="status-count offline">${offlineCount} offline</span>`;
-            if (disabledCount > 0) {
-                statusText.innerHTML += ` <span class="status-count muted">${disabledCount} disabled</span>`;
+            html = `<span class="status-warning">${runningCount}/${enabledCount} online</span>`;
+        }
+        
+        if (disabledCount > 0) {
+            statusBanner.classList.add('has-disabled');
+            html += `<span class="status-disabled">${disabledCount} disabled</span>`;
+            
+            // Show toggle hint
+            if (toggleHint) {
+                toggleHint.style.display = 'inline';
+                toggleHint.textContent = this.isExpanded ? '▲' : '▼';
+            }
+        } else {
+            if (toggleHint) toggleHint.style.display = 'none';
+            
+            // Close section if no disabled services
+            if (this.isExpanded) {
+                this.isExpanded = false;
+                const section = document.getElementById('disabledServicesSection');
+                if (section) section.style.display = 'none';
             }
         }
+        
+        statusText.innerHTML = html;
     },
     
-    /**
-     * Update all service cards based on current status
-     */
     updateAllCards() {
-        // Process all service cards in categories (not in disabled banner)
         document.querySelectorAll('.service-category .service-card[data-service], .start-here .service-card[data-service]').forEach(card => {
             const serviceId = card.dataset.service;
             const containerName = card.dataset.container || this.containerMap[serviceId] || serviceId;
@@ -172,14 +178,10 @@ const ServiceManagerAPI = {
         });
     },
     
-    /**
-     * Update a single card based on service data
-     */
     updateCard(card, serviceData) {
         const isEnabled = serviceData.enabled;
         const status = serviceData.status;
         
-        // Toggle visibility - hide disabled services from categories
         if (!isEnabled) {
             card.classList.add('service-disabled-hidden');
             card.style.display = 'none';
@@ -187,31 +189,25 @@ const ServiceManagerAPI = {
             card.classList.remove('service-disabled-hidden');
             card.style.display = '';
             
-            // Update status dot
             const statusDot = card.querySelector('.service-status');
             if (statusDot) {
                 statusDot.className = 'service-status ' + (status === 'running' ? 'online' : 'offline');
             }
             
-            // Add disable button on hover
-            this.addDisableButton(card, serviceData);
+            // Add disable button (not in start-here)
+            if (!card.closest('.start-here')) {
+                this.addDisableButton(card, serviceData);
+            }
         }
     },
     
-    /**
-     * Add disable button to enabled service cards
-     */
     addDisableButton(card, serviceData) {
-        // Skip if in start-here section (don't add disable buttons there)
-        if (card.closest('.start-here')) return;
-        
-        // Remove existing button first
-        const existingBtn = card.querySelector('.service-action-btn');
-        if (existingBtn) existingBtn.remove();
+        let btn = card.querySelector('.service-action-btn');
+        if (btn) btn.remove();
         
         if (!serviceData.enabled) return;
         
-        const btn = document.createElement('button');
+        btn = document.createElement('button');
         btn.className = 'service-action-btn service-disable-btn';
         btn.innerHTML = '⏸';
         btn.title = 'Disable this service';
@@ -220,29 +216,22 @@ const ServiceManagerAPI = {
             e.stopPropagation();
             this.disableService(serviceData.name);
         };
-        
         card.appendChild(btn);
     },
     
-    /**
-     * Update the disabled services banner
-     */
-    updateDisabledBanner() {
-        const banner = document.getElementById('disabledServicesBanner');
+    updateDisabledSection() {
+        const section = document.getElementById('disabledServicesSection');
         const grid = document.getElementById('disabledServicesGrid');
-        const countEl = document.getElementById('disabledBannerCount');
         
-        if (!banner || !grid) return;
+        if (!section || !grid) return;
         
         const count = this.disabledServices.length;
         
-        // Update count
-        if (countEl) {
-            countEl.textContent = `(${count})`;
+        // If no disabled services and section is showing, hide it
+        if (count === 0) {
+            section.style.display = 'none';
+            this.isExpanded = false;
         }
-        
-        // Show/hide banner
-        banner.style.display = count > 0 ? 'block' : 'none';
         
         // Clear and rebuild grid
         grid.innerHTML = '';
@@ -251,44 +240,40 @@ const ServiceManagerAPI = {
             const serviceData = this.services[containerName];
             if (!serviceData) return;
             
-            // Find original card in categories
             const serviceId = this.reverseMap[containerName] || containerName;
             const originalCard = document.querySelector(`.service-category .service-card[data-container="${containerName}"]`) ||
                                 document.querySelector(`.service-category .service-card[data-service="${serviceId}"]`);
             
             const card = originalCard 
-                ? this.createDisabledCardFromOriginal(originalCard, serviceData)
+                ? this.createDisabledCard(originalCard, serviceData)
                 : this.createDisabledCardFromData(serviceData);
             
             grid.appendChild(card);
         });
         
-        // Update category counts
         this.updateCategoryCounts();
     },
     
-    /**
-     * Create disabled card by cloning original
-     */
-    createDisabledCardFromOriginal(originalCard, serviceData) {
+    createDisabledCard(originalCard, serviceData) {
         const card = originalCard.cloneNode(true);
         card.className = 'service-card disabled-service-card';
         card.style.display = '';
+        card.dataset.container = serviceData.name;
         
-        // Update status dot
+        // Grey status dot
         const statusDot = card.querySelector('.service-status');
         if (statusDot) {
-            statusDot.className = 'service-status disabled';
+            statusDot.className = 'service-status';
+            statusDot.style.background = 'var(--color-text-muted)';
         }
         
-        // Remove any existing action buttons
+        // Remove existing buttons
         card.querySelectorAll('.service-action-btn').forEach(b => b.remove());
         
         // Add enable button
         const btn = document.createElement('button');
-        btn.className = 'service-action-btn service-enable-btn';
-        btn.innerHTML = '▶ Enable';
-        btn.title = 'Enable this service';
+        btn.className = 'service-enable-btn';
+        btn.textContent = 'Enable';
         btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -298,18 +283,14 @@ const ServiceManagerAPI = {
         
         // Prevent navigation
         card.onclick = (e) => {
-            if (!e.target.closest('.service-action-btn')) {
+            if (e.target.tagName !== 'BUTTON') {
                 e.preventDefault();
-                this.showToast(`${serviceData.display_name || serviceData.name} is disabled. Click "Enable" to start it.`, 'info');
             }
         };
         
         return card;
     },
     
-    /**
-     * Create disabled card from API data
-     */
     createDisabledCardFromData(serviceData) {
         const card = document.createElement('div');
         card.className = 'service-card disabled-service-card';
@@ -317,17 +298,17 @@ const ServiceManagerAPI = {
         card.dataset.container = serviceData.name;
         
         card.innerHTML = `
-            <div class="service-icon"><span>◆</span></div>
+            <div class="service-icon"><span style="font-size: 1.5rem; opacity: 0.5;">◆</span></div>
             <div class="service-info">
                 <h3>${serviceData.display_name || serviceData.name}</h3>
                 <p>${serviceData.description || ''}</p>
             </div>
-            <div class="service-status disabled"></div>
+            <div class="service-status" style="background: var(--color-text-muted);"></div>
         `;
         
         const btn = document.createElement('button');
-        btn.className = 'service-action-btn service-enable-btn';
-        btn.innerHTML = '▶ Enable';
+        btn.className = 'service-enable-btn';
+        btn.textContent = 'Enable';
         btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -338,12 +319,8 @@ const ServiceManagerAPI = {
         return card;
     },
     
-    /**
-     * Update category counts to reflect visible cards
-     */
     updateCategoryCounts() {
         document.querySelectorAll('.service-category').forEach(category => {
-            const allCards = category.querySelectorAll('.service-card');
             const visibleCards = category.querySelectorAll('.service-card:not(.service-disabled-hidden)');
             const countSpan = category.querySelector('.category-count');
             
@@ -351,14 +328,10 @@ const ServiceManagerAPI = {
                 countSpan.textContent = `(${visibleCards.length})`;
             }
             
-            // Hide category if no visible cards
             category.style.display = visibleCards.length === 0 ? 'none' : '';
         });
     },
     
-    /**
-     * Enable a service
-     */
     async enableService(containerName) {
         this.showToast(`Enabling ${containerName}...`, 'info');
         
@@ -385,9 +358,6 @@ const ServiceManagerAPI = {
         }
     },
     
-    /**
-     * Disable a service
-     */
     async disableService(containerName, force = false) {
         this.showToast(`Disabling ${containerName}...`, 'info');
         
@@ -416,9 +386,6 @@ const ServiceManagerAPI = {
         }
     },
     
-    /**
-     * Show toast notification
-     */
     showToast(message, type = 'info') {
         const existing = document.querySelector('.service-manager-toast');
         if (existing) existing.remove();

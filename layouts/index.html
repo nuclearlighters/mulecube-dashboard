@@ -1,30 +1,21 @@
 {{ define "main" }}
 
-<!-- Disabled Services Banner - Replaces Hero when services are disabled -->
-<!-- Collapsed by default, shown only when there are disabled services -->
-<section class="disabled-services-banner" id="disabledServicesBanner" style="display: none;">
-    <div class="container">
-        <button class="disabled-banner-toggle" id="disabledBannerToggle" aria-expanded="false">
-            <span class="disabled-banner-icon">⚠</span>
-            <span class="disabled-banner-text">Disabled Services</span>
-            <span class="disabled-banner-count" id="disabledBannerCount">(0)</span>
-            <span class="disabled-banner-chevron">▼</span>
-        </button>
-        
-        <div class="disabled-banner-content" id="disabledBannerContent" style="display: none;">
-            <p class="disabled-banner-subtitle">These services are turned off to save resources. Click "Enable" to start them.</p>
-            <div class="service-grid disabled-services-grid" id="disabledServicesGrid">
-                <!-- Populated dynamically by ServiceManagerAPI -->
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Status Banner -->
+<!-- Status Banner - Clickable to toggle disabled services -->
 <div class="status-banner" id="statusBanner">
     <span class="status-dot"></span>
     <span id="statusText">Checking services...</span>
+    <span class="status-toggle-hint" id="statusToggleHint" style="display: none;">▼</span>
 </div>
+
+<!-- Disabled Services Section - Hidden by default, shown when services disabled -->
+<section class="disabled-services-section" id="disabledServicesSection" style="display: none;">
+    <div class="container">
+        <p class="disabled-section-subtitle">These services are turned off to save resources. Click "Enable" to start them.</p>
+        <div class="disabled-services-grid" id="disabledServicesGrid">
+            <!-- Populated dynamically by ServiceManagerAPI -->
+        </div>
+    </div>
+</section>
 
 <!-- Services Section -->
 <main class="services-section container" id="services">
