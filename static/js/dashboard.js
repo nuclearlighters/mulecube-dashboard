@@ -1538,9 +1538,38 @@
         },
         
         skip() {
-            if (confirm('Skip the setup wizard? You can run it again from Admin Tools → Settings.')) {
-                this.complete();
-            }
+            this.showSkipConfirmation();
+        },
+        
+        showSkipConfirmation() {
+            const overlay = document.createElement('div');
+            overlay.className = 'system-modal-overlay';
+            overlay.innerHTML = `
+                <div class="system-modal">
+                    <div class="system-modal-title">Skip Setup?</div>
+                    <div class="system-modal-content">
+                        You can run the setup wizard again from Admin Tools → Settings.
+                    </div>
+                    <div class="system-modal-actions">
+                        <button class="system-btn" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
+                        <button class="system-btn system-btn-primary" onclick="OnboardingWizard.confirmSkip()">Skip</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            // Close on overlay click
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.remove();
+            });
+        },
+        
+        confirmSkip() {
+            // Remove confirmation modal
+            const modal = document.querySelector('.system-modal-overlay');
+            if (modal) modal.remove();
+            
+            this.complete();
         },
         
         complete() {
