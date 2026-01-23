@@ -1,28 +1,21 @@
 {{ define "main" }}
 
-<!-- Hero Section with Slideshow -->
-<section class="hero">
-    <div class="hero-slideshow">
-        {{- range $i, $img := .Site.Params.heroImages }}
-        <div class="hero-slide{{ if eq $i 0 }} active{{ end }}" style="background-image: url('/images/hero/{{ $img }}.jpg')"></div>
-        {{- end }}
-    </div>
-    
+<!-- Disabled Services Banner - Replaces Hero when services are disabled -->
+<!-- Collapsed by default, shown only when there are disabled services -->
+<section class="disabled-services-banner" id="disabledServicesBanner" style="display: none;">
     <div class="container">
-        <div class="hero-content">
-            <h1>The <span class="highlight">*internet,</span><br>in your backpack</h1>
-            <p class="subtitle">
-                When there's no signal, no power grid, no cell towers — MuleCube still works.
-                Wikipedia. Maps. AI. Emergency messaging. All offline. All private.
-            </p>
-            <div class="hero-cta">
-                <a href="#services" class="btn btn-primary">Browse Services</a>
-                <a href="/docs/" class="btn btn-secondary">Documentation</a>
-            </div>
-        </div>
+        <button class="disabled-banner-toggle" id="disabledBannerToggle" aria-expanded="false">
+            <span class="disabled-banner-icon">⚠</span>
+            <span class="disabled-banner-text">Disabled Services</span>
+            <span class="disabled-banner-count" id="disabledBannerCount">(0)</span>
+            <span class="disabled-banner-chevron">▼</span>
+        </button>
         
-        <div class="hero-image">
-            <img src="/images/product-base.png" alt="MuleCube Device">
+        <div class="disabled-banner-content" id="disabledBannerContent" style="display: none;">
+            <p class="disabled-banner-subtitle">These services are turned off to save resources. Click "Enable" to start them.</p>
+            <div class="service-grid disabled-services-grid" id="disabledServicesGrid">
+                <!-- Populated dynamically by ServiceManagerAPI -->
+            </div>
         </div>
     </div>
 </section>
@@ -152,23 +145,6 @@
         <!-- Dynamic grid - populated by JavaScript -->
         <div class="service-grid quick-grid" id="recentlyUsedGrid" style="display: none;">
             <!-- Populated dynamically by RecentlyUsedManager -->
-        </div>
-    </div>
-
-    <!-- Disabled Services Section - Collapsed by default -->
-    <div class="disabled-services-section" id="disabledServicesSection" style="display: none;">
-        <div class="disabled-services-toggle">
-            <button id="disabledServicesToggle" class="toggle-btn disabled-toggle-btn">
-                <img src="/images/icons/ui-chevron.svg" alt="" class="toggle-icon">
-                <span>Disabled Services</span>
-                <span class="disabled-count" id="disabledCount">(0)</span>
-            </button>
-        </div>
-        <div class="disabled-services-content" id="disabledServicesContent" style="display: none;">
-            <p class="disabled-services-subtitle">These services are turned off to save resources. Click "Enable" to start them.</p>
-            <div class="service-grid disabled-services-grid" id="disabledServicesGrid">
-                <!-- Populated dynamically by ServiceManagerAPI -->
-            </div>
         </div>
     </div>
 
