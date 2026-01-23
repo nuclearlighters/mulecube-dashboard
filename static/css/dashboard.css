@@ -1435,7 +1435,7 @@ a:hover {
 }
 
 /* ========================================
-   DISPLAY MODES (Day/Night/Sunlight)
+   DISPLAY MODES (Day/Night)
    ======================================== */
 
 /* Day mode - default, no special styles needed */
@@ -1443,64 +1443,9 @@ a:hover {
     /* Uses theme default colors */
 }
 
-/* Night mode - amber/sepia tones for night vision */
+/* Night mode - dark theme */
 [data-display-mode="night"] {
-    --color-text: #c9b896;
-    --color-text-secondary: #9a8b70;
-    --color-bg: #0d0d0d;
-    --color-bg-secondary: #141410;
-    --color-bg-card: #1a1a15;
-    --color-primary: #cc9933;
-    --color-primary-hover: #e6ac3d;
-    --color-border: #2a2a20;
-    --color-success: #8b9a40;
-    --color-warning: #cc9933;
-}
-
-[data-display-mode="night"] body {
-    filter: brightness(0.85);
-}
-
-[data-display-mode="night"] .service-card:hover {
-    background: #22221a;
-    border-color: #3a3a30;
-}
-
-[data-display-mode="night"] .status-banner {
-    background: rgba(20, 20, 15, 0.95);
-}
-
-/* Sunlight mode - maximum contrast */
-[data-display-mode="sunlight"] {
-    --color-text: #ffffff;
-    --color-text-secondary: #e0e0e0;
-    --color-bg: #000000;
-    --color-bg-secondary: #0a0a0a;
-    --color-bg-card: #1a1a1a;
-    --color-primary: #00ff88;
-    --color-primary-hover: #00cc6a;
-    --color-border: #333333;
-    --color-success: #00ff00;
-    --color-warning: #ffff00;
-    --color-danger: #ff0000;
-}
-
-[data-display-mode="sunlight"] body {
-    font-weight: 500;
-}
-
-[data-display-mode="sunlight"] .service-card {
-    border-width: 2px;
-}
-
-[data-display-mode="sunlight"] .status-dot {
-    width: 14px;
-    height: 14px;
-}
-
-[data-display-mode="sunlight"] .status-banner {
-    background: rgba(0, 0, 0, 0.98);
-    border-bottom: 2px solid var(--color-primary);
+    /* Uses dark theme colors */
 }
 
 /* Display Mode Toggle Button */
