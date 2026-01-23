@@ -1674,43 +1674,24 @@
         },
         
         showRebootDialog() {
-            if (ModeManager.isDemo) {
-                this.showDialog(
-                    'Reboot',
-                    '<p>Reboot is disabled in demo mode.</p><p>On a real MuleCube, this would safely restart the device.</p>',
-                    '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
-                );
-                return;
-            }
-            
             this.showDialog(
-                'Reboot MuleCube',
-                `<p>Are you sure you want to reboot?</p>
-                 <p class="system-warning">All services will be temporarily unavailable.</p>
-                 <p>The device will restart in approximately 30 seconds.</p>`,
+                'Reboot MuleCube?',
+                '<p>System will restart in 1 minute. Services will be briefly unavailable.</p>',
                 `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
-                 <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeReboot()">Reboot Now</button>`
+                 <button class="system-btn system-btn-primary" onclick="SystemFunctions.executeReboot()">Confirm</button>`
             );
         },
         
+        
         showShutdownDialog() {
-            if (ModeManager.isDemo) {
-                this.showDialog(
-                    'Shutdown',
-                    '<p>Shutdown is disabled in demo mode.</p><p>On a real MuleCube, this would safely power off the device.</p>',
-                    '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
-                );
-                return;
-            }
-            
             this.showDialog(
-                'Shutdown MuleCube',
-                `<p>Are you sure you want to shut down?</p>
-                 <p class="system-warning">You will need physical access to turn the device back on.</p>`,
+                'Shut Down MuleCube?',
+                '<p>System will power off in 1 minute. Physical access needed to restart!</p>',
                 `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
-                 <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeShutdown()">Shutdown</button>`
+                 <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeShutdown()">Confirm</button>`
             );
         },
+        
         
         showBackupDialog() {
             const config = this.gatherConfig();
