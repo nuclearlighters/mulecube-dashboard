@@ -39,6 +39,12 @@
     --container-max: 1200px;
     --border-radius: 8px;
     --border-radius-lg: 12px;
+    
+    /* Border Radius Aliases */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-full: 9999px;
 }
 
 /* Reset & Base */
@@ -427,13 +433,13 @@ a:hover {
 .status-banner {
     background: rgba(34, 197, 94, 0.1);
     border-bottom: 1px solid rgba(34, 197, 94, 0.2);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-sm);
-    font-size: 0.85rem;
+    gap: var(--space-xs);
+    font-size: 0.75rem;
     /* Make status banner clickable */
     cursor: pointer;
     user-select: none;
@@ -458,8 +464,8 @@ a:hover {
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background: var(--color-primary);
     border-radius: 50%;
     animation: pulse 2s infinite;
@@ -2300,7 +2306,7 @@ a:hover {
     width: 26px;
     height: 26px;
     stroke: var(--color-text-secondary);
-    opacity: 0.7;
+    opacity: 1;
     transition: all 0.2s ease;
 }
 
@@ -2346,25 +2352,41 @@ a:hover {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
 }
 
-/* Danger actions (Reboot, Shutdown) - subtle red tint */
-.system-card[onclick*="Reboot"] .service-icon,
+/* Reboot action - blue tint (matches header bar) */
+.system-card[onclick*="Reboot"] .service-icon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.system-card[onclick*="Reboot"]:hover .service-icon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.system-card[onclick*="Reboot"]:hover .service-icon svg {
+    stroke: #3b82f6;
+}
+
+.system-card[onclick*="Reboot"]:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+}
+
+/* Shutdown action - red tint (danger) */
 .system-card[onclick*="Shutdown"] .service-icon {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
     border-color: rgba(239, 68, 68, 0.2);
 }
 
-.system-card[onclick*="Reboot"]:hover .service-icon,
 .system-card[onclick*="Shutdown"]:hover .service-icon {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
     border-color: rgba(239, 68, 68, 0.4);
 }
 
-.system-card[onclick*="Reboot"]:hover .service-icon svg,
 .system-card[onclick*="Shutdown"]:hover .service-icon svg {
     stroke: #ef4444;
 }
 
-.system-card[onclick*="Reboot"]:hover,
 .system-card[onclick*="Shutdown"]:hover {
     border-color: rgba(239, 68, 68, 0.5);
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
