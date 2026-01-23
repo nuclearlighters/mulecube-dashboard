@@ -1784,20 +1784,80 @@
         },
         
         async executeReboot() {
+            const modalContent = document.querySelector('.system-modal-content');
+            const modalActions = document.querySelector('.system-modal-actions');
+            
             try {
-                document.querySelector('.system-modal-content').innerHTML = '<p>Rebooting...</p><div class="system-spinner"></div>';
-                await fetch('/api/system/reboot', { method: 'POST' });
-            } catch {
-                document.querySelector('.system-modal-content').innerHTML = '<p class="system-error">Reboot API not available. Please reboot manually.</p>';
+                modalContent.innerHTML = '<p>Initiating reboot...</p><div class="system-spinner"></div>';
+                if (modalActions) modalActions.style.display = 'none';
+                
+                // Demo mode - just redirect to reboot page
+                if (ModeManager.isDemo) {
+                    setTimeout(() => {
+                        window.location.href = '/reboot.html?action=reboot';
+                    }, 1000);
+                    return;
+                }
+                
+                // Real mode - call the hw-monitor API
+                const response = await fetch('/api/reboot', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    modalContent.innerHTML = '<p>Reboot initiated! Redirecting...</p><div class="system-spinner"></div>';
+                    setTimeout(() => {
+                        window.location.href = '/reboot.html?action=reboot';
+                    }, 1500);
+                } else {
+                    throw new Error('API returned error');
+                }
+            } catch (error) {
+                modalContent.innerHTML = '<p class="system-error">Could not initiate reboot. The system API may not be available.</p><p class="system-note">Try using the Terminal to run: sudo reboot</p>';
+                if (modalActions) {
+                    modalActions.style.display = 'flex';
+                    modalActions.innerHTML = '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">Close</button>';
+                }
             }
         },
         
         async executeShutdown() {
+            const modalContent = document.querySelector('.system-modal-content');
+            const modalActions = document.querySelector('.system-modal-actions');
+            
             try {
-                document.querySelector('.system-modal-content').innerHTML = '<p>Shutting down...</p><div class="system-spinner"></div>';
-                await fetch('/api/system/shutdown', { method: 'POST' });
-            } catch {
-                document.querySelector('.system-modal-content').innerHTML = '<p class="system-error">Shutdown API not available. Please shutdown manually.</p>';
+                modalContent.innerHTML = '<p>Initiating shutdown...</p><div class="system-spinner"></div>';
+                if (modalActions) modalActions.style.display = 'none';
+                
+                // Demo mode - just redirect to reboot page in shutdown mode
+                if (ModeManager.isDemo) {
+                    setTimeout(() => {
+                        window.location.href = '/reboot.html?action=shutdown';
+                    }, 1000);
+                    return;
+                }
+                
+                // Real mode - call the hw-monitor API
+                const response = await fetch('/api/shutdown', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    modalContent.innerHTML = '<p>Shutdown initiated! Redirecting...</p><div class="system-spinner"></div>';
+                    setTimeout(() => {
+                        window.location.href = '/reboot.html?action=shutdown';
+                    }, 1500);
+                } else {
+                    throw new Error('API returned error');
+                }
+            } catch (error) {
+                modalContent.innerHTML = '<p class="system-error">Could not initiate shutdown. The system API may not be available.</p><p class="system-note">Try using the Terminal to run: sudo shutdown -h now</p>';
+                if (modalActions) {
+                    modalActions.style.display = 'flex';
+                    modalActions.innerHTML = '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">Close</button>';
+                }
             }
         },
         

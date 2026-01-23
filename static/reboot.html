@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuleCube - Restarting...</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0a0a0b;
+            --color-surface: #18181b;
+            --color-text: #e4e4e7;
+            --color-text-muted: #71717a;
+            --color-primary: #22c55e;
+            --color-primary-dim: rgba(34, 197, 94, 0.2);
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background watermark logo */
+        .background-logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50vmin;
+            height: 50vmin;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .background-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Main content */
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            max-width: 480px;
+        }
+
+        /* Top logo */
+        .header-logo {
+            margin-bottom: 3rem;
+        }
+
+        .header-logo img {
+            height: 42px;
+            width: auto;
+        }
+
+        /* Status section */
+        .status-section {
+            margin-bottom: 2rem;
+        }
+
+        .status-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        /* Spinning loader ring */
+        .spinner {
+            width: 100px;
+            height: 100px;
+            border: 3px solid var(--color-primary-dim);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Checkmark for success */
+        .checkmark {
+            display: none;
+            width: 100px;
+            height: 100px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 40px;
+            border: solid white;
+            border-width: 0 5px 5px 0;
+            transform: translate(-50%, -60%) rotate(45deg);
+        }
+
+        /* Power off icon for shutdown */
+        .power-off {
+            display: none;
+            width: 100px;
+            height: 100px;
+            background: var(--color-surface);
+            border: 3px solid var(--color-text-muted);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .power-off::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 36px;
+            height: 36px;
+            border: 4px solid var(--color-text-muted);
+            border-radius: 50%;
+            transform: translate(-50%, -45%);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 35%, 42% 35%, 42% 0, 58% 0, 58% 35%, 100% 35%, 100% 100%, 0 100%);
+        }
+
+        .power-off::after {
+            content: '';
+            position: absolute;
+            top: 28%;
+            left: 50%;
+            width: 4px;
+            height: 24px;
+            background: var(--color-text-muted);
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .status-message {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 360px;
+        }
+
+        /* Countdown timer */
+        .countdown-section {
+            margin: 2.5rem 0;
+        }
+
+        .countdown-timer {
+            font-size: 4.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--color-primary);
+            letter-spacing: 0.02em;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        /* Progress section */
+        .progress-section {
+            width: 100%;
+            max-width: 320px;
+            margin: 2rem auto 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 2px;
+            transition: width 0.5s ease-out;
+            width: 0%;
+        }
+
+        /* Phase dots */
+        .phase-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .phase-dot {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        .phase-dot::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .phase-dot.active::before {
+            background: var(--color-primary);
+            box-shadow: 0 0 8px var(--color-primary-dim);
+        }
+
+        .phase-dot.complete::before {
+            background: var(--color-primary);
+        }
+
+        /* State variations */
+        .reconnecting .countdown-timer {
+            font-size: 1.75rem;
+            color: var(--color-warning);
+        }
+
+        .reconnecting .spinner {
+            border-color: rgba(245, 158, 11, 0.2);
+            border-top-color: var(--color-warning);
+        }
+
+        .success .spinner { display: none; }
+        .success .checkmark {
+            display: block;
+            animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success .countdown-timer {
+            color: var(--color-primary);
+            font-size: 1.5rem;
+        }
+
+        .shutdown .spinner {
+            border-color: rgba(239, 68, 68, 0.2);
+            border-top-color: var(--color-danger);
+        }
+
+        .shutdown .countdown-timer {
+            color: var(--color-danger);
+        }
+
+        .shutdown-complete .spinner { display: none; }
+        .shutdown-complete .power-off { display: block; }
+
+        /* Retry button */
+        .retry-button {
+            display: none;
+            margin-top: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-primary);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--color-primary-dim);
+        }
+
+        .show-retry .retry-button {
+            display: inline-block;
+        }
+
+        /* Footer hint */
+        .footer-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .footer-hint a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .footer-hint a:hover {
+            text-decoration: underline;
+        }
+
+        /* Demo banner */
+        .demo-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            z-index: 100;
+        }
+
+        /* Pulse animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background watermark -->
+    <div class="background-logo">
+        <img src="/images/logo.png" alt="" aria-hidden="true">
+    </div>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Header logo -->
+        <div class="header-logo">
+            <img src="/images/logo_mulecube_trans_white.png" alt="MuleCube">
+        </div>
+
+        <!-- Status section -->
+        <div class="status-section">
+            <div class="status-icon">
+                <div class="spinner"></div>
+                <div class="checkmark"></div>
+                <div class="power-off"></div>
+            </div>
+            <h1 class="status-title" id="statusTitle">Restarting MuleCube</h1>
+            <p class="status-message" id="statusMessage">Please wait while the system restarts. This usually takes about a minute.</p>
+        </div>
+
+        <!-- Countdown section -->
+        <div class="countdown-section">
+            <div class="countdown-timer" id="countdownTimer">1:00</div>
+            <div class="countdown-label" id="countdownLabel">Shutting down services</div>
+        </div>
+
+        <!-- Progress section -->
+        <div class="progress-section">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="phase-dots">
+                <div class="phase-dot active" id="phase1"><span>Shutdown</span></div>
+                <div class="phase-dot" id="phase2"><span>Restart</span></div>
+                <div class="phase-dot" id="phase3"><span>Ready</span></div>
+            </div>
+        </div>
+
+        <!-- Retry button (hidden until needed) -->
+        <button class="retry-button" id="retryButton" onclick="location.reload()">
+            Try Again
+        </button>
+    </div>
+
+    <!-- Footer hint -->
+    <div class="footer-hint" id="footerHint">
+        This page will automatically reconnect when MuleCube is ready.
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ==========================================
+            // Configuration
+            // ==========================================
+            const CONFIG = {
+                // Detect demo mode from hostname
+                isDemo: window.location.hostname === 'demo.mulecube.com' || 
+                        window.location.hostname.includes('demo.'),
+                
+                // Countdown times
+                countdownSeconds: 60,           // Real mode: 60 seconds
+                demoCountdownSeconds: 10,       // Demo mode: 10 seconds
+                
+                // Polling settings
+                pollInterval: 3000,             // Check every 3 seconds
+                pollTimeout: 5000,              // Timeout per request
+                maxPollAttempts: 40,            // Max attempts (2 mins at 3s)
+                graceBeforePolling: 5000,       // Wait before first poll
+                
+                // Endpoints
+                healthEndpoint: '/health',      // Health check endpoint
+                hwMonitorHealth: ':9001/health', // HW monitor health
+                dashboardUrl: '/',              // Redirect destination
+                
+                // URL params
+                isShutdown: false
+            };
+
+            // Parse URL parameters
+            const params = new URLSearchParams(window.location.search);
+            CONFIG.isShutdown = params.get('action') === 'shutdown';
+            
+            if (params.get('countdown')) {
+                CONFIG.countdownSeconds = parseInt(params.get('countdown')) || 60;
+            }
+
+            // Use demo countdown if in demo mode
+            if (CONFIG.isDemo) {
+                CONFIG.countdownSeconds = CONFIG.demoCountdownSeconds;
+            }
+
+            // ==========================================
+            // DOM Elements
+            // ==========================================
+            const elements = {
+                body: document.body,
+                statusTitle: document.getElementById('statusTitle'),
+                statusMessage: document.getElementById('statusMessage'),
+                countdownTimer: document.getElementById('countdownTimer'),
+                countdownLabel: document.getElementById('countdownLabel'),
+                progressFill: document.getElementById('progressFill'),
+                footerHint: document.getElementById('footerHint'),
+                retryButton: document.getElementById('retryButton'),
+                phase1: document.getElementById('phase1'),
+                phase2: document.getElementById('phase2'),
+                phase3: document.getElementById('phase3')
+            };
+
+            // ==========================================
+            // State
+            // ==========================================
+            const state = {
+                phase: 'countdown',     // countdown, restarting, reconnecting, success, timeout
+                secondsRemaining: CONFIG.countdownSeconds,
+                pollAttempts: 0
+            };
+
+            // ==========================================
+            // Utility Functions
+            // ==========================================
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            function updateProgress(percent) {
+                elements.progressFill.style.width = `${Math.min(100, percent)}%`;
+            }
+
+            // ==========================================
+            // Initialize
+            // ==========================================
+            function init() {
+                // Add demo banner if in demo mode
+                if (CONFIG.isDemo) {
+                    const banner = document.createElement('div');
+                    banner.className = 'demo-banner';
+                    banner.textContent = '🎭 Demo Mode — This is a simulation';
+                    document.body.insertBefore(banner, document.body.firstChild);
+                }
+
+                // Set up for shutdown mode if applicable
+                if (CONFIG.isShutdown) {
+                    elements.body.classList.add('shutdown');
+                    elements.statusTitle.textContent = 'Shutting Down MuleCube';
+                    elements.statusMessage.textContent = 'Please wait while the system powers off safely.';
+                    elements.footerHint.textContent = 'You can disconnect power once shutdown is complete.';
+                    elements.phase1.innerHTML = '<span>Shutdown</span>';
+                    elements.phase2.innerHTML = '<span>Power Off</span>';
+                    elements.phase3.innerHTML = '<span>Complete</span>';
+                }
+
+                // Start the countdown
+                startCountdown();
+            }
+
+            // ==========================================
+            // Phase 1: Countdown
+            // ==========================================
+            function startCountdown() {
+                state.phase = 'countdown';
+                elements.phase1.classList.add('active');
+
+                const totalSeconds = CONFIG.countdownSeconds;
+                
+                const interval = setInterval(() => {
+                    state.secondsRemaining--;
+                    
+                    // Update display
+                    elements.countdownTimer.textContent = formatTime(state.secondsRemaining);
+                    
+                    // Update progress (0-40% during countdown)
+                    const progress = ((totalSeconds - state.secondsRemaining) / totalSeconds) * 40;
+                    updateProgress(progress);
+
+                    // Update label based on progress
+                    if (state.secondsRemaining > totalSeconds * 0.6) {
+                        elements.countdownLabel.textContent = 'Shutting down services';
+                    } else if (state.secondsRemaining > totalSeconds * 0.3) {
+                        elements.countdownLabel.textContent = 'Stopping containers';
+                    } else {
+                        elements.countdownLabel.textContent = 'Finalizing shutdown';
+                    }
+
+                    // Countdown complete
+                    if (state.secondsRemaining <= 0) {
+                        clearInterval(interval);
+                        
+                        if (CONFIG.isShutdown) {
+                            showShutdownComplete();
+                        } else {
+                            startRestarting();
+                        }
+                    }
+                }, 1000);
+            }
+
+            // ==========================================
+            // Phase 2: Restarting
+            // ==========================================
+            function startRestarting() {
+                state.phase = 'restarting';
+                elements.phase1.classList.remove('active');
+                elements.phase1.classList.add('complete');
+                elements.phase2.classList.add('active');
+                
+                elements.statusTitle.textContent = 'System Restarting';
+                elements.statusMessage.textContent = 'MuleCube is now restarting. This may take a moment...';
+                elements.countdownTimer.textContent = '...';
+                elements.countdownLabel.textContent = 'Waiting for system';
+                
+                updateProgress(45);
+
+                // Brief pause then start checking
+                setTimeout(() => {
+                    startReconnecting();
+                }, CONFIG.graceBeforePolling);
+            }
+
+            // ==========================================
+            // Phase 3: Reconnecting (Polling)
+            // ==========================================
+            function startReconnecting() {
+                state.phase = 'reconnecting';
+                elements.body.classList.add('reconnecting');
+                elements.phase2.classList.remove('active');
+                elements.phase2.classList.add('complete');
+                elements.phase3.classList.add('active');
+                
+                elements.statusTitle.textContent = 'Reconnecting...';
+                elements.statusMessage.textContent = 'Waiting for MuleCube to come back online...';
+                elements.countdownLabel.textContent = 'Checking connection';
+                elements.countdownTimer.classList.add('pulse');
+                
+                updateProgress(60);
+
+                // Start polling
+                if (CONFIG.isDemo) {
+                    // Demo mode: simulate success after brief delay
+                    setTimeout(() => {
+                        elements.countdownTimer.textContent = 'Attempt 1';
+                        updateProgress(75);
+                        setTimeout(() => {
+                            elements.countdownTimer.textContent = 'Attempt 2';
+                            updateProgress(90);
+                            setTimeout(() => {
+                                showSuccess();
+                            }, 1500);
+                        }, 1500);
+                    }, 1000);
+                } else {
+                    pollForConnection();
+                }
+            }
+
+            // ==========================================
+            // Polling Logic
+            // ==========================================
+            function pollForConnection() {
+                state.pollAttempts++;
+                
+                elements.countdownTimer.textContent = `Attempt ${state.pollAttempts}`;
+                
+                // Update progress (60-95% during polling)
+                const pollProgress = Math.min(state.pollAttempts / CONFIG.maxPollAttempts, 1);
+                updateProgress(60 + (pollProgress * 35));
+
+                // Create abort controller for timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.pollTimeout);
+
+                // Try the main health endpoint first
+                fetch(CONFIG.healthEndpoint, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    cache: 'no-store'
+                })
+                .then(response => {
+                    clearTimeout(timeoutId);
+                    if (response.ok) {
+                        showSuccess();
+                    } else {
+                        scheduleNextPoll();
+                    }
+                })
+                .catch(() => {
+                    clearTimeout(timeoutId);
+                    // Also try hw-monitor endpoint as fallback
+                    tryHwMonitorHealth();
+                });
+            }
+
+            function tryHwMonitorHealth() {
+                const hwUrl = window.location.protocol + '//' + 
+                             window.location.hostname + CONFIG.hwMonitorHealth;
+                
+                fetch(hwUrl, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    signal: AbortSignal.timeout(CONFIG.pollTimeout)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showSuccess();
+                    } else {
+                        scheduleNextPoll();
+                    }
+                })
+                .catch(() => {
+                    scheduleNextPoll();
+                });
+            }
+
+            function scheduleNextPoll() {
+                if (state.pollAttempts >= CONFIG.maxPollAttempts) {
+                    showTimeout();
+                    return;
+                }
+                
+                // Exponential backoff with jitter after 10 attempts
+                let delay = CONFIG.pollInterval;
+                if (state.pollAttempts > 10) {
+                    const backoff = Math.min(state.pollAttempts - 10, 5);
+                    delay = CONFIG.pollInterval * (1 + backoff * 0.5);
+                    delay += Math.random() * 1000; // Jitter
+                }
+                
+                setTimeout(pollForConnection, delay);
+            }
+
+            // ==========================================
+            // Final States
+            // ==========================================
+            function showSuccess() {
+                state.phase = 'success';
+                elements.body.classList.remove('reconnecting');
+                elements.body.classList.add('success');
+                elements.phase3.classList.remove('active');
+                elements.phase3.classList.add('complete');
+                
+                elements.statusTitle.textContent = 'MuleCube is Ready!';
+                elements.statusMessage.textContent = 'System restart complete. Redirecting to dashboard...';
+                elements.countdownTimer.textContent = '✓';
+                elements.countdownTimer.classList.remove('pulse');
+                elements.countdownLabel.textContent = 'Connected';
+                elements.footerHint.textContent = 'Redirecting in 2 seconds...';
+                
+                updateProgress(100);
+
+                // Redirect after brief delay
+                setTimeout(() => {
+                    window.location.href = CONFIG.dashboardUrl;
+                }, 2000);
+            }
+
+            function showTimeout() {
+                state.phase = 'timeout';
+                elements.body.classList.remove('reconnecting');
+                elements.body.classList.add('show-retry');
+                
+                elements.statusTitle.textContent = 'Connection Timeout';
+                elements.statusMessage.textContent = 'Could not reconnect to MuleCube. The system may still be starting up.';
+                elements.countdownTimer.textContent = '!';
+                elements.countdownTimer.classList.remove('pulse');
+                elements.countdownLabel.textContent = 'Retry recommended';
+                elements.footerHint.innerHTML = 'Click the button above to try again, or <a href="/">go to dashboard</a> manually.';
+            }
+
+            function showShutdownComplete() {
+                state.phase = 'shutdown-complete';
+                elements.body.classList.remove('shutdown');
+                elements.body.classList.add('shutdown-complete');
+                elements.phase1.classList.remove('active');
+                elements.phase1.classList.add('complete');
+                elements.phase2.classList.add('complete');
+                elements.phase3.classList.add('complete');
+                
+                elements.statusTitle.textContent = 'Shutdown Complete';
+                elements.statusMessage.textContent = 'MuleCube has been safely powered off. You can now disconnect the power.';
+                elements.countdownTimer.textContent = '⏻';
+                elements.countdownLabel.textContent = 'System is off';
+                elements.footerHint.textContent = 'Press the power button to start MuleCube again.';
+                
+                updateProgress(100);
+            }
+
+            // ==========================================
+            // Start
+            // ==========================================
+            init();
+        })();
+    </script>
+</body>
+</html>
