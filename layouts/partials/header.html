@@ -327,18 +327,9 @@
         pendingAction = null;
     }
     
-    async function executeAction(endpoint, successMessage) {
-        try {
-            const response = await fetch(endpoint, { method: 'POST' });
-            const data = await response.json();
-            if (response.ok) {
-                alert(successMessage + '\n\n' + (data.message || ''));
-            } else {
-                alert('Error: ' + (data.detail || 'Unknown error'));
-            }
-        } catch (error) {
-            alert('Failed to connect: ' + error.message);
-        }
+    function executeAction(action) {
+        // Navigate to reboot page - it will trigger the API call
+        window.location.href = '/reboot.html?action=' + action + '&trigger=true';
     }
     
     if (rebootBtn) {
@@ -358,11 +349,9 @@
     if (modalCancel) modalCancel.addEventListener('click', hideModal);
     
     if (modalConfirm) {
-        modalConfirm.addEventListener('click', async () => {
-            if (pendingAction === 'reboot') {
-                await executeAction('http://192.168.42.1:9001/api/reboot', '✅ Reboot scheduled!');
-            } else if (pendingAction === 'shutdown') {
-                await executeAction('http://192.168.42.1:9001/api/shutdown', '✅ Shutdown scheduled!');
+        modalConfirm.addEventListener('click', () => {
+            if (pendingAction) {
+                executeAction(pendingAction);
             }
             hideModal();
         });
