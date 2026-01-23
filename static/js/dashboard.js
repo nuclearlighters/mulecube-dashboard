@@ -1416,7 +1416,7 @@
                             <div class="wizard-setup-options">
                                 <button class="wizard-setup-card ${this.setupType === 'quick' ? 'selected' : ''}" 
                                         data-type="quick">
-                                    <span class="setup-icon">⚡</span>
+                                    <span class="setup-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
                                     <span class="setup-name">Quick Setup</span>
                                     <span class="setup-time">~2 minutes</span>
                                     <span class="setup-desc">Get started immediately with recommended settings for your profile</span>
@@ -1424,7 +1424,7 @@
                                 
                                 <button class="wizard-setup-card ${this.setupType === 'advanced' ? 'selected' : ''}" 
                                         data-type="advanced">
-                                    <span class="setup-icon">⚙️</span>
+                                    <span class="setup-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
                                     <span class="setup-name">Advanced Setup</span>
                                     <span class="setup-time">~10 minutes</span>
                                     <span class="setup-desc">Customize network settings, enable/disable services, configure security</span>
@@ -1600,13 +1600,13 @@
             systemCategory.className = 'service-category system-functions';
             systemCategory.innerHTML = `
                 <h3 class="category-title">
-                    <span class="category-icon">⚙️</span>
+                    <span class="category-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
                     System
                     <span class="category-toggle-indicator">▼</span>
                 </h3>
                 <div class="service-grid" id="systemFunctionsGrid">
                     <div class="service-card system-card" onclick="SystemFunctions.showRebootDialog()">
-                        <div class="service-icon">🔄</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Reboot</div>
                             <div class="service-desc">Restart MuleCube safely</div>
@@ -1614,7 +1614,7 @@
                     </div>
                     
                     <div class="service-card system-card" onclick="SystemFunctions.showShutdownDialog()">
-                        <div class="service-icon">⏻</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Shutdown</div>
                             <div class="service-desc">Power off MuleCube</div>
@@ -1622,7 +1622,7 @@
                     </div>
                     
                     <div class="service-card system-card" onclick="SystemFunctions.showBackupDialog()">
-                        <div class="service-icon">💾</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m16 6-4 4-4-4"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Backup Config</div>
                             <div class="service-desc">Export all settings</div>
@@ -1630,7 +1630,7 @@
                     </div>
                     
                     <div class="service-card system-card" onclick="SystemFunctions.showRestoreDialog()">
-                        <div class="service-icon">📥</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6-4-4-4 4"/><path d="M12 2v8"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 18h.01"/><path d="M10 18h.01"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Restore Config</div>
                             <div class="service-desc">Import settings backup</div>
@@ -1638,7 +1638,7 @@
                     </div>
                     
                     <div class="service-card system-card" onclick="SystemFunctions.showServicesDialog()">
-                        <div class="service-icon">📋</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h8"/><path d="M4 18h8"/><path d="M4 6h8"/><path d="m14 6 2 2 4-4"/><path d="m14 12 2 2 4-4"/><path d="m14 18 2 2 4-4"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Manage Services</div>
                             <div class="service-desc">Enable/disable services</div>
@@ -1646,7 +1646,7 @@
                     </div>
                     
                     <div class="service-card system-card" onclick="OnboardingWizard.reset()">
-                        <div class="service-icon">🧙</div>
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Setup Wizard</div>
                             <div class="service-desc">Re-run first-time setup</div>
@@ -1678,7 +1678,7 @@
         showRebootDialog() {
             if (ModeManager.isDemo) {
                 this.showDialog(
-                    '🔄 Reboot',
+                    'Reboot',
                     '<p>Reboot is disabled in demo mode.</p><p>On a real MuleCube, this would safely restart the device.</p>',
                     '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
                 );
@@ -1686,7 +1686,7 @@
             }
             
             this.showDialog(
-                '🔄 Reboot MuleCube',
+                'Reboot MuleCube',
                 `<p>Are you sure you want to reboot?</p>
                  <p class="system-warning">All services will be temporarily unavailable.</p>
                  <p>The device will restart in approximately 30 seconds.</p>`,
@@ -1698,7 +1698,7 @@
         showShutdownDialog() {
             if (ModeManager.isDemo) {
                 this.showDialog(
-                    '⏻ Shutdown',
+                    'Shutdown',
                     '<p>Shutdown is disabled in demo mode.</p><p>On a real MuleCube, this would safely power off the device.</p>',
                     '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
                 );
@@ -1706,7 +1706,7 @@
             }
             
             this.showDialog(
-                '⏻ Shutdown MuleCube',
+                'Shutdown MuleCube',
                 `<p>Are you sure you want to shut down?</p>
                  <p class="system-warning">You will need physical access to turn the device back on.</p>`,
                 `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
@@ -1721,7 +1721,7 @@
             const filename = `mulecube-backup-${new Date().toISOString().split('T')[0]}.json`;
             
             this.showDialog(
-                '💾 Backup Configuration',
+                'Backup Configuration',
                 `<p>Your configuration backup is ready.</p>
                  <p>This includes:</p>
                  <ul>
@@ -1737,7 +1737,7 @@
         
         showRestoreDialog() {
             this.showDialog(
-                '📥 Restore Configuration',
+                'Restore Configuration',
                 `<p>Select a backup file to restore your settings.</p>
                  <input type="file" id="restoreFileInput" accept=".json" class="system-file-input">
                  <p class="system-note">This will replace your current dashboard settings.</p>`,
@@ -1748,7 +1748,7 @@
         
         showServicesDialog() {
             this.showDialog(
-                '📋 Manage Services',
+                'Manage Services',
                 `<p>Service management allows you to enable or disable services to conserve system resources.</p>
                  <p class="system-note">This feature requires backend API integration and is not available in the current version.</p>
                  <p>In a future update, you'll be able to:</p>
