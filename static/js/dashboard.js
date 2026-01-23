@@ -32,19 +32,38 @@
     const DisplayModeManager = {
         modes: ['day', 'night', 'sunlight'],
         currentMode: 'day',
+        toggle: null,
+        
+        // SVG icons for each mode (inline for reliability)
+        icons: {
+            day: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+            night: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>',
+            sunlight: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>'
+        },
         
         init() {
+            // Use the existing theme toggle button
+            this.toggle = document.getElementById('themeToggle');
+            
             // Load saved mode or detect from time
             const saved = localStorage.getItem(CONFIG.displayModeKey);
             if (saved && this.modes.includes(saved)) {
                 this.currentMode = saved;
             } else {
-                // Auto-detect based on time
                 this.currentMode = this.detectModeFromTime();
             }
             
             this.applyMode(this.currentMode);
-            this.createModeToggle();
+            
+            // Replace existing click handler by cloning
+            if (this.toggle) {
+                const newToggle = this.toggle.cloneNode(true);
+                this.toggle.parentNode.replaceChild(newToggle, this.toggle);
+                this.toggle = newToggle;
+                
+                this.toggle.addEventListener('click', () => this.cycleMode());
+                this.updateToggleIcon();
+            }
         },
         
         detectModeFromTime() {
@@ -56,6 +75,12 @@
         applyMode(mode) {
             this.currentMode = mode;
             document.documentElement.setAttribute('data-display-mode', mode);
+            
+            // Also set the base theme
+            const theme = (mode === 'day') ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
             localStorage.setItem(CONFIG.displayModeKey, mode);
             this.updateToggleIcon();
         },
@@ -72,45 +97,18 @@
             }
         },
         
-        createModeToggle() {
-            // Find or create mode toggle button
-            let toggle = document.getElementById('displayModeToggle');
-            if (!toggle) {
-                const themeToggle = document.getElementById('themeToggle');
-                if (themeToggle) {
-                    toggle = document.createElement('button');
-                    toggle.id = 'displayModeToggle';
-                    toggle.className = 'display-mode-toggle';
-                    toggle.setAttribute('aria-label', 'Cycle display mode');
-                    toggle.title = 'Cycle display mode (Day/Night/Sunlight)';
-                    themeToggle.parentNode.insertBefore(toggle, themeToggle.nextSibling);
-                }
-            }
-            
-            if (toggle) {
-                toggle.addEventListener('click', () => this.cycleMode());
-                this.updateToggleIcon();
-            }
-        },
-        
         updateToggleIcon() {
-            const toggle = document.getElementById('displayModeToggle');
-            if (!toggle) return;
-            
-            const icons = {
-                day: '☀️',
-                night: '🌙',
-                sunlight: '🔆'
-            };
+            if (!this.toggle) return;
             
             const labels = {
-                day: 'Day mode',
-                night: 'Night mode',
-                sunlight: 'Sunlight mode'
+                day: 'Day mode (click for Night)',
+                night: 'Night mode (click for Sunlight)',
+                sunlight: 'Sunlight mode (click for Day)'
             };
             
-            toggle.textContent = icons[this.currentMode];
-            toggle.title = `${labels[this.currentMode]} - Click to change`;
+            this.toggle.innerHTML = this.icons[this.currentMode];
+            this.toggle.title = labels[this.currentMode];
+            this.toggle.setAttribute('aria-label', labels[this.currentMode]);
         }
     };
 
@@ -126,7 +124,7 @@
                 '/': () => this.focusSearch(),
                 'Escape': () => this.handleEscape(),
                 '?': () => this.toggleHelp(),
-                't': () => ThemeManager.toggleTheme(),
+                't': () => DisplayModeManager.cycleMode(), // Theme toggle now cycles display modes
                 'm': () => DisplayModeManager.cycleMode(),
                 'h': () => window.scrollTo({ top: 0, behavior: 'smooth' }),
                 's': () => SyncStatusManager.togglePanel()
@@ -219,7 +217,7 @@
             modal.innerHTML = `
                 <div class="shortcuts-overlay" onclick="this.parentElement.remove()"></div>
                 <div class="shortcuts-content">
-                    <h3 id="shortcuts-title">⌨️ Keyboard Shortcuts</h3>
+                    <h3 id="shortcuts-title">Keyboard Shortcuts</h3>
                     <div class="shortcuts-grid">
                         <div class="shortcut-item">
                             <kbd>/</kbd>
@@ -1453,28 +1451,28 @@
                             
                             <div class="wizard-tour-items">
                                 <div class="tour-item">
-                                    <div class="tour-icon">🔍</div>
+                                    <div class="tour-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
                                     <div class="tour-content">
                                         <strong>Search Services</strong>
                                         <p>Press <kbd>/</kbd> to quickly find any service</p>
                                     </div>
                                 </div>
                                 <div class="tour-item">
-                                    <div class="tour-icon">📊</div>
+                                    <div class="tour-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
                                     <div class="tour-content">
                                         <strong>Status Bar</strong>
                                         <p>Monitor system health, battery, and connectivity</p>
                                     </div>
                                 </div>
                                 <div class="tour-item">
-                                    <div class="tour-icon">🌙</div>
+                                    <div class="tour-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg></div>
                                     <div class="tour-content">
                                         <strong>Display Modes</strong>
                                         <p>Switch between Day, Night, and Sunlight modes</p>
                                     </div>
                                 </div>
                                 <div class="tour-item">
-                                    <div class="tour-icon">⌨️</div>
+                                    <div class="tour-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg></div>
                                     <div class="tour-content">
                                         <strong>Keyboard Shortcuts</strong>
                                         <p>Press <kbd>?</kbd> anytime to see all shortcuts</p>
@@ -1926,7 +1924,7 @@
         RecentlyUsedManager.init();
         ServiceManager.init();
         SearchManager.init();
-        ThemeManager.init();
+        // ThemeManager.init(); // Handled by DisplayModeManager
         Slideshow.init();
         MobileMenu.init();
         SmoothScroll.init();
