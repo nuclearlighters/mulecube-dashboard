@@ -37,25 +37,26 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
         }
 
         /* Background watermark logo */
         .background-logo {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50vmin;
-            height: 50vmin;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0.04;
             pointer-events: none;
             z-index: 0;
         }
 
         .background-logo img {
-            width: 100%;
-            height: 100%;
+            width: 50vmin;
+            height: 50vmin;
             object-fit: contain;
         }
 
@@ -387,12 +388,12 @@
                 <div class="power-off"></div>
             </div>
             <h1 class="status-title" id="statusTitle">Restarting MuleCube</h1>
-            <p class="status-message" id="statusMessage">Please wait while the system restarts. This usually takes about a minute.</p>
+            <p class="status-message" id="statusMessage">Please wait while the system restarts. This usually takes about 90 seconds.</p>
         </div>
 
         <!-- Countdown section -->
         <div class="countdown-section">
-            <div class="countdown-timer" id="countdownTimer">1:00</div>
+            <div class="countdown-timer" id="countdownTimer">1:30</div>
             <div class="countdown-label" id="countdownLabel">Shutting down services</div>
         </div>
 
@@ -432,7 +433,7 @@
                         window.location.hostname.includes('demo.'),
                 
                 // Countdown times
-                countdownSeconds: 60,           // Real mode: 60 seconds
+                countdownSeconds: 90,           // Real mode: 90 seconds (1:30)
                 demoCountdownSeconds: 10,       // Demo mode: 10 seconds
                 
                 // Polling settings
@@ -663,49 +664,46 @@
                 const pollProgress = Math.min(state.pollAttempts / CONFIG.maxPollAttempts, 1);
                 updateProgress(60 + (pollProgress * 35));
 
-                // Create abort controller for timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), CONFIG.pollTimeout);
-
-                // Try the main health endpoint first
-                fetch(CONFIG.healthEndpoint, {
-                    method: 'GET',
-                    signal: controller.signal,
-                    cache: 'no-store'
-                })
-                .then(response => {
-                    clearTimeout(timeoutId);
-                    if (response.ok) {
+                // Try endpoints in sequence - first success wins
+                tryEndpoint('/')
+                    .catch(() => tryEndpoint('/health'))
+                    .catch(() => {
+                        const hwUrl = window.location.protocol + '//' + 
+                                     window.location.hostname + ':9001/health';
+                        return tryEndpoint(hwUrl);
+                    })
+                    .then(() => {
+                        // Any endpoint succeeded
                         showSuccess();
-                    } else {
+                    })
+                    .catch(() => {
+                        // All endpoints failed
                         scheduleNextPoll();
-                    }
-                })
-                .catch(() => {
-                    clearTimeout(timeoutId);
-                    // Also try hw-monitor endpoint as fallback
-                    tryHwMonitorHealth();
-                });
+                    });
             }
 
-            function tryHwMonitorHealth() {
-                const hwUrl = window.location.protocol + '//' + 
-                             window.location.hostname + CONFIG.hwMonitorHealth;
-                
-                fetch(hwUrl, {
-                    method: 'GET',
-                    cache: 'no-store',
-                    signal: AbortSignal.timeout(CONFIG.pollTimeout)
-                })
-                .then(response => {
-                    if (response.ok) {
-                        showSuccess();
-                    } else {
-                        scheduleNextPoll();
-                    }
-                })
-                .catch(() => {
-                    scheduleNextPoll();
+            function tryEndpoint(url) {
+                return new Promise((resolve, reject) => {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), CONFIG.pollTimeout);
+                    
+                    fetch(url, {
+                        method: 'GET',
+                        signal: controller.signal,
+                        cache: 'no-store'
+                    })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        if (response.ok || response.type === 'opaque') {
+                            resolve();
+                        } else {
+                            reject();
+                        }
+                    })
+                    .catch(() => {
+                        clearTimeout(timeoutId);
+                        reject();
+                    });
                 });
             }
 
