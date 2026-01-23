@@ -1,8 +1,10 @@
 /**
  * MuleCube Dashboard - Unified JavaScript
- * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow, Recently Used
+ * Handles: Stats polling, Service status, Search, Theme toggle, Slideshow, Recently Used,
+ *          Display Modes, Keyboard Shortcuts, Sync Status, Onboarding Wizard, System Functions
  * 
- * v0.4.1 - Fixed: Recently Used click tracking now uses event delegation
+ * v0.5.0 - Major Update: Added display modes, keyboard shortcuts, sync status, onboarding wizard,
+ *          accessibility improvements, system functions UI, contextual help
  */
 
 (function() {
@@ -13,11 +15,512 @@
     // ==========================================
     const CONFIG = {
         statsEndpoint: '/stats.json',
+        syncEndpoint: '/api/sync/status',
         statsPollInterval: 5000,
         serviceCheckTimeout: 3000,
         slideshowInterval: 5000,
-        recentlyUsedMax: 5
+        recentlyUsedMax: 5,
+        wizardStorageKey: 'mulecube-wizard-completed',
+        profileStorageKey: 'mulecube-user-profile',
+        displayModeKey: 'mulecube-display-mode',
+        version: '0.5.0'
     };
+
+    // ==========================================
+    // Display Mode Manager (Day/Night/Sunlight)
+    // ==========================================
+    const DisplayModeManager = {
+        modes: ['day', 'night', 'sunlight'],
+        currentMode: 'day',
+        
+        init() {
+            // Load saved mode or detect from time
+            const saved = localStorage.getItem(CONFIG.displayModeKey);
+            if (saved && this.modes.includes(saved)) {
+                this.currentMode = saved;
+            } else {
+                // Auto-detect based on time
+                this.currentMode = this.detectModeFromTime();
+            }
+            
+            this.applyMode(this.currentMode);
+            this.createModeToggle();
+        },
+        
+        detectModeFromTime() {
+            const hour = new Date().getHours();
+            if (hour >= 6 && hour < 20) return 'day';
+            return 'night';
+        },
+        
+        applyMode(mode) {
+            this.currentMode = mode;
+            document.documentElement.setAttribute('data-display-mode', mode);
+            localStorage.setItem(CONFIG.displayModeKey, mode);
+            this.updateToggleIcon();
+        },
+        
+        cycleMode() {
+            const currentIndex = this.modes.indexOf(this.currentMode);
+            const nextIndex = (currentIndex + 1) % this.modes.length;
+            this.applyMode(this.modes[nextIndex]);
+        },
+        
+        setMode(mode) {
+            if (this.modes.includes(mode)) {
+                this.applyMode(mode);
+            }
+        },
+        
+        createModeToggle() {
+            // Find or create mode toggle button
+            let toggle = document.getElementById('displayModeToggle');
+            if (!toggle) {
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    toggle = document.createElement('button');
+                    toggle.id = 'displayModeToggle';
+                    toggle.className = 'display-mode-toggle';
+                    toggle.setAttribute('aria-label', 'Cycle display mode');
+                    toggle.title = 'Cycle display mode (Day/Night/Sunlight)';
+                    themeToggle.parentNode.insertBefore(toggle, themeToggle.nextSibling);
+                }
+            }
+            
+            if (toggle) {
+                toggle.addEventListener('click', () => this.cycleMode());
+                this.updateToggleIcon();
+            }
+        },
+        
+        updateToggleIcon() {
+            const toggle = document.getElementById('displayModeToggle');
+            if (!toggle) return;
+            
+            const icons = {
+                day: '☀️',
+                night: '🌙',
+                sunlight: '🔆'
+            };
+            
+            const labels = {
+                day: 'Day mode',
+                night: 'Night mode',
+                sunlight: 'Sunlight mode'
+            };
+            
+            toggle.textContent = icons[this.currentMode];
+            toggle.title = `${labels[this.currentMode]} - Click to change`;
+        }
+    };
+
+    // ==========================================
+    // Keyboard Shortcuts Manager
+    // ==========================================
+    const KeyboardShortcuts = {
+        shortcuts: {},
+        helpVisible: false,
+        
+        init() {
+            this.shortcuts = {
+                '/': () => this.focusSearch(),
+                'Escape': () => this.handleEscape(),
+                '?': () => this.toggleHelp(),
+                't': () => ThemeManager.toggleTheme(),
+                'm': () => DisplayModeManager.cycleMode(),
+                'h': () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+                's': () => SyncStatusManager.togglePanel()
+            };
+            
+            document.addEventListener('keydown', (e) => this.handleKeydown(e));
+        },
+        
+        handleKeydown(e) {
+            // Ignore if typing in input/textarea
+            const isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName);
+            
+            if (isTyping) {
+                // Only handle Escape while typing
+                if (e.key === 'Escape') {
+                    this.handleEscape();
+                    e.target.blur();
+                }
+                return;
+            }
+            
+            // Number keys 1-9 for quick launch
+            if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+                this.quickLaunch(parseInt(e.key) - 1);
+                return;
+            }
+            
+            // Other shortcuts
+            const handler = this.shortcuts[e.key];
+            if (handler && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+                handler();
+            }
+        },
+        
+        focusSearch() {
+            const search = document.getElementById('serviceSearch');
+            if (search) {
+                search.focus();
+                search.select();
+            }
+        },
+        
+        handleEscape() {
+            // Close help overlay if open
+            if (this.helpVisible) {
+                this.toggleHelp();
+                return;
+            }
+            
+            // Close any open modals
+            const modals = document.querySelectorAll('.modal-overlay, .wizard-overlay, .shortcuts-modal');
+            modals.forEach(m => m.remove());
+            
+            // Clear search
+            const search = document.getElementById('serviceSearch');
+            if (search && search.value) {
+                search.value = '';
+                SearchManager.filter('');
+            }
+            
+            // Close sync panel if open
+            SyncStatusManager.closePanel();
+        },
+        
+        quickLaunch(index) {
+            const startHereCards = document.querySelectorAll('.start-here .service-card');
+            if (startHereCards[index]) {
+                startHereCards[index].click();
+            }
+        },
+        
+        toggleHelp() {
+            if (this.helpVisible) {
+                const modal = document.querySelector('.shortcuts-modal');
+                if (modal) modal.remove();
+                this.helpVisible = false;
+                return;
+            }
+            
+            this.showHelp();
+        },
+        
+        showHelp() {
+            const modal = document.createElement('div');
+            modal.className = 'shortcuts-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-labelledby', 'shortcuts-title');
+            modal.innerHTML = `
+                <div class="shortcuts-overlay" onclick="this.parentElement.remove()"></div>
+                <div class="shortcuts-content">
+                    <h3 id="shortcuts-title">⌨️ Keyboard Shortcuts</h3>
+                    <div class="shortcuts-grid">
+                        <div class="shortcut-item">
+                            <kbd>/</kbd>
+                            <span>Focus search</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span>Clear/Close</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>1</kbd>-<kbd>9</kbd>
+                            <span>Quick launch services</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>?</kbd>
+                            <span>Show/hide this help</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>t</kbd>
+                            <span>Toggle theme</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>m</kbd>
+                            <span>Cycle display mode</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>h</kbd>
+                            <span>Scroll to top</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>s</kbd>
+                            <span>Toggle sync status</span>
+                        </div>
+                    </div>
+                    <button class="shortcuts-close" onclick="this.closest('.shortcuts-modal').remove()">
+                        Close <span class="key-hint">Esc</span>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            this.helpVisible = true;
+            
+            // Focus the close button for accessibility
+            modal.querySelector('.shortcuts-close').focus();
+        }
+    };
+
+    // ==========================================
+    // Sync Status Manager
+    // ==========================================
+    const SyncStatusManager = {
+        container: null,
+        panelOpen: false,
+        status: {
+            state: 'unknown', // synced, syncing, offline, error
+            lastSync: null,
+            pending: 0,
+            services: []
+        },
+        
+        init() {
+            this.createWidget();
+            this.updateStatus();
+            
+            // Poll for sync status every 30 seconds
+            setInterval(() => this.updateStatus(), 30000);
+        },
+        
+        createWidget() {
+            // Find the status banner to add sync widget
+            const statusBanner = document.getElementById('statusBanner');
+            if (!statusBanner) return;
+            
+            // Create sync status widget
+            this.container = document.createElement('div');
+            this.container.className = 'sync-status-widget';
+            this.container.id = 'syncStatusWidget';
+            this.container.setAttribute('role', 'status');
+            this.container.setAttribute('aria-live', 'polite');
+            this.container.innerHTML = `
+                <button class="sync-status-button" onclick="SyncStatusManager.togglePanel()" aria-expanded="false">
+                    <span class="sync-icon">↻</span>
+                    <span class="sync-text">Checking...</span>
+                </button>
+                <div class="sync-panel" id="syncPanel" hidden>
+                    <div class="sync-panel-header">
+                        <h4>Sync Status</h4>
+                        <button class="sync-now-btn" onclick="SyncStatusManager.triggerSync()">Sync Now</button>
+                    </div>
+                    <div class="sync-panel-content">
+                        <div class="sync-detail">
+                            <span class="sync-label">Last sync:</span>
+                            <span class="sync-value" id="lastSyncTime">Never</span>
+                        </div>
+                        <div class="sync-detail">
+                            <span class="sync-label">Connection:</span>
+                            <span class="sync-value" id="syncConnection">Checking...</span>
+                        </div>
+                        <div class="sync-detail" id="pendingContainer" hidden>
+                            <span class="sync-label">Pending:</span>
+                            <span class="sync-value" id="pendingCount">0 items</span>
+                        </div>
+                        <div class="sync-services" id="syncServices"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert before status text
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                statusText.parentNode.insertBefore(this.container, statusText);
+            }
+        },
+        
+        async updateStatus() {
+            if (ModeManager.isDemo) {
+                this.simulateStatus();
+                return;
+            }
+            
+            try {
+                // Check if we have network connectivity to services
+                const online = navigator.onLine;
+                
+                if (!online) {
+                    this.setStatus('offline', null, 0);
+                    return;
+                }
+                
+                // Try to fetch sync status from API
+                try {
+                    const response = await fetch(CONFIG.syncEndpoint, {
+                        signal: AbortSignal.timeout(3000)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.setStatus(data.state, data.lastSync, data.pending, data.services);
+                    } else {
+                        // API exists but returned error
+                        this.setStatus('synced', new Date().toISOString(), 0);
+                    }
+                } catch {
+                    // No sync API - assume local operation (synced state)
+                    this.setStatus('synced', new Date().toISOString(), 0);
+                }
+            } catch (error) {
+                console.warn('Sync status check failed:', error);
+                this.setStatus('offline', null, 0);
+            }
+        },
+        
+        setStatus(state, lastSync, pending, services = []) {
+            this.status = { state, lastSync, pending, services };
+            this.render();
+        },
+        
+        simulateStatus() {
+            // Demo mode simulation
+            const states = ['synced', 'syncing', 'offline'];
+            const state = states[Math.floor(Math.random() * 10) < 8 ? 0 : (Math.random() < 0.5 ? 1 : 2)];
+            const pending = state === 'offline' ? Math.floor(Math.random() * 10) : 0;
+            const lastSync = state !== 'offline' ? new Date(Date.now() - Math.random() * 600000).toISOString() : null;
+            
+            this.setStatus(state, lastSync, pending, [
+                { name: 'Syncthing', status: state === 'offline' ? 'paused' : 'running' },
+                { name: 'Vaultwarden', status: 'running' }
+            ]);
+        },
+        
+        render() {
+            const button = this.container?.querySelector('.sync-status-button');
+            const iconEl = this.container?.querySelector('.sync-icon');
+            const textEl = this.container?.querySelector('.sync-text');
+            
+            if (!button || !iconEl || !textEl) return;
+            
+            const { state, lastSync, pending } = this.status;
+            
+            // Update icon and text
+            const configs = {
+                synced: { icon: '✓', text: this.formatLastSync(lastSync), class: 'synced' },
+                syncing: { icon: '↻', text: 'Syncing...', class: 'syncing' },
+                offline: { icon: '⚠', text: pending > 0 ? `${pending} pending` : 'Offline', class: 'offline' },
+                error: { icon: '✕', text: 'Sync error', class: 'error' },
+                unknown: { icon: '?', text: 'Checking...', class: 'unknown' }
+            };
+            
+            const config = configs[state] || configs.unknown;
+            iconEl.textContent = config.icon;
+            textEl.textContent = config.text;
+            button.className = `sync-status-button ${config.class}`;
+            
+            // Update panel details
+            const lastSyncEl = document.getElementById('lastSyncTime');
+            const connectionEl = document.getElementById('syncConnection');
+            const pendingContainer = document.getElementById('pendingContainer');
+            const pendingCountEl = document.getElementById('pendingCount');
+            
+            if (lastSyncEl) {
+                lastSyncEl.textContent = lastSync ? new Date(lastSync).toLocaleString() : 'Never';
+            }
+            
+            if (connectionEl) {
+                connectionEl.textContent = state === 'offline' ? 'Offline (WiFi only)' : 'Local network';
+                connectionEl.className = `sync-value ${state === 'offline' ? 'offline' : 'online'}`;
+            }
+            
+            if (pendingContainer && pendingCountEl) {
+                if (pending > 0) {
+                    pendingContainer.hidden = false;
+                    pendingCountEl.textContent = `${pending} item${pending !== 1 ? 's' : ''}`;
+                } else {
+                    pendingContainer.hidden = true;
+                }
+            }
+            
+            // Update services list
+            this.renderServices();
+        },
+        
+        renderServices() {
+            const container = document.getElementById('syncServices');
+            if (!container) return;
+            
+            if (this.status.services.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="sync-services-title">Services:</div>
+                ${this.status.services.map(s => `
+                    <div class="sync-service-item">
+                        <span class="sync-service-dot ${s.status}"></span>
+                        <span>${s.name}</span>
+                    </div>
+                `).join('')}
+            `;
+        },
+        
+        formatLastSync(isoString) {
+            if (!isoString) return 'Never';
+            
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            
+            return date.toLocaleDateString();
+        },
+        
+        togglePanel() {
+            this.panelOpen = !this.panelOpen;
+            const panel = document.getElementById('syncPanel');
+            const button = this.container?.querySelector('.sync-status-button');
+            
+            if (panel) {
+                panel.hidden = !this.panelOpen;
+            }
+            if (button) {
+                button.setAttribute('aria-expanded', this.panelOpen);
+            }
+        },
+        
+        closePanel() {
+            this.panelOpen = false;
+            const panel = document.getElementById('syncPanel');
+            const button = this.container?.querySelector('.sync-status-button');
+            
+            if (panel) panel.hidden = true;
+            if (button) button.setAttribute('aria-expanded', 'false');
+        },
+        
+        async triggerSync() {
+            this.setStatus('syncing', this.status.lastSync, this.status.pending);
+            
+            // Simulate sync for demo, or trigger real sync
+            if (ModeManager.isDemo) {
+                setTimeout(() => {
+                    this.setStatus('synced', new Date().toISOString(), 0);
+                }, 2000);
+            } else {
+                try {
+                    await fetch('/api/sync/trigger', { method: 'POST' });
+                    setTimeout(() => this.updateStatus(), 2000);
+                } catch {
+                    this.setStatus('synced', new Date().toISOString(), 0);
+                }
+            }
+        }
+    };
+    
+    // Make SyncStatusManager globally accessible for onclick handlers
+    window.SyncStatusManager = SyncStatusManager;
 
     // ==========================================
     // Mode Detection
@@ -730,13 +1233,698 @@
     };
 
     // ==========================================
+    // Onboarding Wizard
+    // ==========================================
+    const OnboardingWizard = {
+        profiles: {
+            sailor: {
+                name: 'Sailor / Maritime',
+                icon: '⛵',
+                description: 'Navigation, weather, emergency communications',
+                services: ['kiwix', 'maps', 'meshtastic', 'openwebui', 'calibre', 'filebrowser']
+            },
+            expedition: {
+                name: 'Expedition / Outdoor',
+                icon: '🏔️',
+                description: 'Offline maps, mesh networks, survival info',
+                services: ['kiwix', 'maps', 'meshtastic', 'openwebui', 'filebrowser', 'excalidraw']
+            },
+            prepper: {
+                name: 'Emergency Preparedness',
+                icon: '🔦',
+                description: 'Document storage, emergency comms, offline reference',
+                services: ['kiwix', 'maps', 'meshtastic', 'vaultwarden', 'filebrowser', 'syncthing']
+            },
+            remote: {
+                name: 'Remote Work',
+                icon: '💼',
+                description: 'Productivity tools, document collaboration, AI assistant',
+                services: ['openwebui', 'cryptpad', 'excalidraw', 'filebrowser', 'libretranslate', 'calibre']
+            },
+            general: {
+                name: 'Privacy / General',
+                icon: '🔒',
+                description: 'Explore all features at your own pace',
+                services: [] // All services enabled
+            }
+        },
+        
+        currentStep: 0,
+        selectedProfile: null,
+        setupType: 'quick', // quick or advanced
+        
+        init() {
+            // Check if wizard should show
+            const completed = localStorage.getItem(CONFIG.wizardStorageKey);
+            if (!completed) {
+                // Small delay to let page render first
+                setTimeout(() => this.show(), 500);
+            }
+            
+            // Add settings link to re-run wizard
+            this.addSettingsLink();
+        },
+        
+        show() {
+            this.currentStep = 0;
+            this.createOverlay();
+            this.renderStep();
+        },
+        
+        createOverlay() {
+            // Remove any existing overlay
+            const existing = document.querySelector('.wizard-overlay');
+            if (existing) existing.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'wizard-overlay';
+            overlay.innerHTML = `
+                <div class="wizard-container" role="dialog" aria-labelledby="wizard-title" aria-modal="true">
+                    <div class="wizard-progress">
+                        <div class="wizard-progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="wizard-content" id="wizardContent">
+                        <!-- Content rendered dynamically -->
+                    </div>
+                    <div class="wizard-footer">
+                        <button class="wizard-btn wizard-btn-skip" onclick="OnboardingWizard.skip()">Skip Setup</button>
+                        <div class="wizard-nav">
+                            <button class="wizard-btn wizard-btn-back" onclick="OnboardingWizard.prevStep()" disabled>Back</button>
+                            <button class="wizard-btn wizard-btn-next" onclick="OnboardingWizard.nextStep()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            // Prevent background scroll
+            document.body.style.overflow = 'hidden';
+        },
+        
+        renderStep() {
+            const content = document.getElementById('wizardContent');
+            const progressBar = document.querySelector('.wizard-progress-bar');
+            const backBtn = document.querySelector('.wizard-btn-back');
+            const nextBtn = document.querySelector('.wizard-btn-next');
+            
+            if (!content) return;
+            
+            const steps = this.getSteps();
+            const totalSteps = steps.length;
+            const progress = ((this.currentStep + 1) / totalSteps) * 100;
+            
+            if (progressBar) progressBar.style.width = `${progress}%`;
+            if (backBtn) backBtn.disabled = this.currentStep === 0;
+            if (nextBtn) {
+                nextBtn.textContent = this.currentStep === totalSteps - 1 ? 'Finish' : 'Next';
+            }
+            
+            content.innerHTML = steps[this.currentStep].render();
+            
+            // Add event listeners for interactive elements
+            steps[this.currentStep].afterRender?.();
+        },
+        
+        getSteps() {
+            return [
+                // Step 1: Welcome
+                {
+                    render: () => `
+                        <div class="wizard-step wizard-welcome">
+                            <div class="wizard-icon-large">📦</div>
+                            <h2 id="wizard-title">Welcome to MuleCube</h2>
+                            <p class="wizard-subtitle">Your portable offline knowledge server</p>
+                            
+                            <div class="wizard-concept-box">
+                                <h3>📶 How MuleCube Works</h3>
+                                <div class="wizard-concept-diagram">
+                                    <div class="concept-item">📱<span>Your Device</span></div>
+                                    <div class="concept-arrow">→ WiFi →</div>
+                                    <div class="concept-item concept-mulecube">📦<span>MuleCube</span></div>
+                                    <div class="concept-arrow">→</div>
+                                    <div class="concept-item">📚<span>30+ Services</span></div>
+                                </div>
+                                <p class="wizard-concept-text">
+                                    Your devices connect to MuleCube's WiFi network.<br>
+                                    <strong>No internet needed</strong> — everything runs locally.
+                                </p>
+                            </div>
+                            
+                            <div class="wizard-features">
+                                <div class="wizard-feature">✓ Works in remote locations</div>
+                                <div class="wizard-feature">✓ Private by design</div>
+                                <div class="wizard-feature">✓ No data leaves the device</div>
+                                <div class="wizard-feature">✓ Available 24/7</div>
+                            </div>
+                        </div>
+                    `
+                },
+                // Step 2: Profile Selection
+                {
+                    render: () => `
+                        <div class="wizard-step wizard-profile">
+                            <h2>How will you use MuleCube?</h2>
+                            <p class="wizard-subtitle">We'll customize your experience based on your needs</p>
+                            
+                            <div class="wizard-profile-grid">
+                                ${Object.entries(this.profiles).map(([key, profile]) => `
+                                    <button class="wizard-profile-card ${this.selectedProfile === key ? 'selected' : ''}" 
+                                            data-profile="${key}">
+                                        <span class="profile-icon">${profile.icon}</span>
+                                        <span class="profile-name">${profile.name}</span>
+                                        <span class="profile-desc">${profile.description}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `,
+                    afterRender: () => {
+                        document.querySelectorAll('.wizard-profile-card').forEach(card => {
+                            card.addEventListener('click', () => {
+                                document.querySelectorAll('.wizard-profile-card').forEach(c => c.classList.remove('selected'));
+                                card.classList.add('selected');
+                                this.selectedProfile = card.dataset.profile;
+                            });
+                        });
+                    }
+                },
+                // Step 3: Setup Type
+                {
+                    render: () => `
+                        <div class="wizard-step wizard-setup-type">
+                            <h2>Choose Setup Type</h2>
+                            <p class="wizard-subtitle">How much control do you want?</p>
+                            
+                            <div class="wizard-setup-options">
+                                <button class="wizard-setup-card ${this.setupType === 'quick' ? 'selected' : ''}" 
+                                        data-type="quick">
+                                    <span class="setup-icon">⚡</span>
+                                    <span class="setup-name">Quick Setup</span>
+                                    <span class="setup-time">~2 minutes</span>
+                                    <span class="setup-desc">Get started immediately with recommended settings for your profile</span>
+                                </button>
+                                
+                                <button class="wizard-setup-card ${this.setupType === 'advanced' ? 'selected' : ''}" 
+                                        data-type="advanced">
+                                    <span class="setup-icon">⚙️</span>
+                                    <span class="setup-name">Advanced Setup</span>
+                                    <span class="setup-time">~10 minutes</span>
+                                    <span class="setup-desc">Customize network settings, enable/disable services, configure security</span>
+                                </button>
+                            </div>
+                        </div>
+                    `,
+                    afterRender: () => {
+                        document.querySelectorAll('.wizard-setup-card').forEach(card => {
+                            card.addEventListener('click', () => {
+                                document.querySelectorAll('.wizard-setup-card').forEach(c => c.classList.remove('selected'));
+                                card.classList.add('selected');
+                                this.setupType = card.dataset.type;
+                            });
+                        });
+                    }
+                },
+                // Step 4: Feature Tour
+                {
+                    render: () => `
+                        <div class="wizard-step wizard-tour">
+                            <h2>Quick Tour</h2>
+                            <p class="wizard-subtitle">Here's what you can do with MuleCube</p>
+                            
+                            <div class="wizard-tour-items">
+                                <div class="tour-item">
+                                    <div class="tour-icon">🔍</div>
+                                    <div class="tour-content">
+                                        <strong>Search Services</strong>
+                                        <p>Press <kbd>/</kbd> to quickly find any service</p>
+                                    </div>
+                                </div>
+                                <div class="tour-item">
+                                    <div class="tour-icon">📊</div>
+                                    <div class="tour-content">
+                                        <strong>Status Bar</strong>
+                                        <p>Monitor system health, battery, and connectivity</p>
+                                    </div>
+                                </div>
+                                <div class="tour-item">
+                                    <div class="tour-icon">🌙</div>
+                                    <div class="tour-content">
+                                        <strong>Display Modes</strong>
+                                        <p>Switch between Day, Night, and Sunlight modes</p>
+                                    </div>
+                                </div>
+                                <div class="tour-item">
+                                    <div class="tour-icon">⌨️</div>
+                                    <div class="tour-content">
+                                        <strong>Keyboard Shortcuts</strong>
+                                        <p>Press <kbd>?</kbd> anytime to see all shortcuts</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                // Step 5: Completion
+                {
+                    render: () => {
+                        const profile = this.profiles[this.selectedProfile] || this.profiles.general;
+                        return `
+                            <div class="wizard-step wizard-complete">
+                                <div class="wizard-icon-large">🎉</div>
+                                <h2>You're All Set!</h2>
+                                <p class="wizard-subtitle">Your MuleCube is ready to use</p>
+                                
+                                <div class="wizard-complete-profile">
+                                    <span class="profile-icon">${profile.icon}</span>
+                                    <span>Profile: <strong>${profile.name}</strong></span>
+                                </div>
+                                
+                                <div class="wizard-quick-actions">
+                                    <p>Suggested first steps:</p>
+                                    <div class="quick-action-list">
+                                        <a href="#knowledge" class="quick-action">📚 Browse Knowledge Base</a>
+                                        <a href="#ai" class="quick-action">🤖 Try AI Assistant</a>
+                                        <a href="#tools" class="quick-action">🛠️ Explore Tools</a>
+                                    </div>
+                                </div>
+                                
+                                <p class="wizard-settings-note">
+                                    💡 You can re-run this wizard anytime from Admin Tools → Settings
+                                </p>
+                            </div>
+                        `;
+                    }
+                }
+            ];
+        },
+        
+        nextStep() {
+            const steps = this.getSteps();
+            
+            // Validate current step
+            if (this.currentStep === 1 && !this.selectedProfile) {
+                alert('Please select a profile to continue');
+                return;
+            }
+            
+            if (this.currentStep < steps.length - 1) {
+                this.currentStep++;
+                this.renderStep();
+            } else {
+                this.complete();
+            }
+        },
+        
+        prevStep() {
+            if (this.currentStep > 0) {
+                this.currentStep--;
+                this.renderStep();
+            }
+        },
+        
+        skip() {
+            if (confirm('Skip the setup wizard? You can run it again from Admin Tools → Settings.')) {
+                this.complete();
+            }
+        },
+        
+        complete() {
+            // Save completion state
+            localStorage.setItem(CONFIG.wizardStorageKey, 'true');
+            localStorage.setItem(CONFIG.profileStorageKey, this.selectedProfile || 'general');
+            
+            // Remove overlay
+            const overlay = document.querySelector('.wizard-overlay');
+            if (overlay) overlay.remove();
+            
+            // Restore scroll
+            document.body.style.overflow = '';
+            
+            console.log('Onboarding wizard completed. Profile:', this.selectedProfile);
+        },
+        
+        reset() {
+            localStorage.removeItem(CONFIG.wizardStorageKey);
+            localStorage.removeItem(CONFIG.profileStorageKey);
+            this.selectedProfile = null;
+            this.setupType = 'quick';
+            this.currentStep = 0;
+            this.show();
+        },
+        
+        addSettingsLink() {
+            // This will be called by templates to add "Re-run Setup Wizard" link
+            window.resetOnboardingWizard = () => this.reset();
+        }
+    };
+    
+    // Make globally accessible
+    window.OnboardingWizard = OnboardingWizard;
+
+    // ==========================================
+    // System Functions UI
+    // ==========================================
+    const SystemFunctions = {
+        init() {
+            // Add system functions to admin section if not already present
+            this.injectSystemSection();
+        },
+        
+        injectSystemSection() {
+            const adminSection = document.getElementById('advancedSection');
+            if (!adminSection) return;
+            
+            // Check if system functions already exist
+            if (document.getElementById('systemFunctionsGrid')) return;
+            
+            // Create system functions category
+            const systemCategory = document.createElement('div');
+            systemCategory.className = 'service-category system-functions';
+            systemCategory.innerHTML = `
+                <h3 class="category-title">
+                    <span class="category-icon">⚙️</span>
+                    System
+                    <span class="category-toggle-indicator">▼</span>
+                </h3>
+                <div class="service-grid" id="systemFunctionsGrid">
+                    <div class="service-card system-card" onclick="SystemFunctions.showRebootDialog()">
+                        <div class="service-icon">🔄</div>
+                        <div class="service-info">
+                            <div class="service-name">Reboot</div>
+                            <div class="service-desc">Restart MuleCube safely</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card system-card" onclick="SystemFunctions.showShutdownDialog()">
+                        <div class="service-icon">⏻</div>
+                        <div class="service-info">
+                            <div class="service-name">Shutdown</div>
+                            <div class="service-desc">Power off MuleCube</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card system-card" onclick="SystemFunctions.showBackupDialog()">
+                        <div class="service-icon">💾</div>
+                        <div class="service-info">
+                            <div class="service-name">Backup Config</div>
+                            <div class="service-desc">Export all settings</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card system-card" onclick="SystemFunctions.showRestoreDialog()">
+                        <div class="service-icon">📥</div>
+                        <div class="service-info">
+                            <div class="service-name">Restore Config</div>
+                            <div class="service-desc">Import settings backup</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card system-card" onclick="SystemFunctions.showServicesDialog()">
+                        <div class="service-icon">📋</div>
+                        <div class="service-info">
+                            <div class="service-name">Manage Services</div>
+                            <div class="service-desc">Enable/disable services</div>
+                        </div>
+                    </div>
+                    
+                    <div class="service-card system-card" onclick="OnboardingWizard.reset()">
+                        <div class="service-icon">🧙</div>
+                        <div class="service-info">
+                            <div class="service-name">Setup Wizard</div>
+                            <div class="service-desc">Re-run first-time setup</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the beginning of admin section
+            adminSection.insertBefore(systemCategory, adminSection.firstChild);
+        },
+        
+        showDialog(title, content, actions) {
+            const modal = document.createElement('div');
+            modal.className = 'system-modal-overlay';
+            modal.innerHTML = `
+                <div class="system-modal">
+                    <div class="system-modal-header">
+                        <h3>${title}</h3>
+                        <button class="system-modal-close" onclick="this.closest('.system-modal-overlay').remove()">×</button>
+                    </div>
+                    <div class="system-modal-content">${content}</div>
+                    <div class="system-modal-actions">${actions}</div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        },
+        
+        showRebootDialog() {
+            if (ModeManager.isDemo) {
+                this.showDialog(
+                    '🔄 Reboot',
+                    '<p>Reboot is disabled in demo mode.</p><p>On a real MuleCube, this would safely restart the device.</p>',
+                    '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
+                );
+                return;
+            }
+            
+            this.showDialog(
+                '🔄 Reboot MuleCube',
+                `<p>Are you sure you want to reboot?</p>
+                 <p class="system-warning">All services will be temporarily unavailable.</p>
+                 <p>The device will restart in approximately 30 seconds.</p>`,
+                `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
+                 <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeReboot()">Reboot Now</button>`
+            );
+        },
+        
+        showShutdownDialog() {
+            if (ModeManager.isDemo) {
+                this.showDialog(
+                    '⏻ Shutdown',
+                    '<p>Shutdown is disabled in demo mode.</p><p>On a real MuleCube, this would safely power off the device.</p>',
+                    '<button class="system-btn" onclick="this.closest(\'.system-modal-overlay\').remove()">OK</button>'
+                );
+                return;
+            }
+            
+            this.showDialog(
+                '⏻ Shutdown MuleCube',
+                `<p>Are you sure you want to shut down?</p>
+                 <p class="system-warning">You will need physical access to turn the device back on.</p>`,
+                `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
+                 <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeShutdown()">Shutdown</button>`
+            );
+        },
+        
+        showBackupDialog() {
+            const config = this.gatherConfig();
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const filename = `mulecube-backup-${new Date().toISOString().split('T')[0]}.json`;
+            
+            this.showDialog(
+                '💾 Backup Configuration',
+                `<p>Your configuration backup is ready.</p>
+                 <p>This includes:</p>
+                 <ul>
+                     <li>Dashboard preferences</li>
+                     <li>Display mode settings</li>
+                     <li>Recently used services</li>
+                     <li>Collapsed categories</li>
+                 </ul>`,
+                `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
+                 <a href="${url}" download="${filename}" class="system-btn system-btn-primary" onclick="setTimeout(() => this.closest('.system-modal-overlay').remove(), 100)">Download Backup</a>`
+            );
+        },
+        
+        showRestoreDialog() {
+            this.showDialog(
+                '📥 Restore Configuration',
+                `<p>Select a backup file to restore your settings.</p>
+                 <input type="file" id="restoreFileInput" accept=".json" class="system-file-input">
+                 <p class="system-note">This will replace your current dashboard settings.</p>`,
+                `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
+                 <button class="system-btn system-btn-primary" onclick="SystemFunctions.executeRestore()">Restore</button>`
+            );
+        },
+        
+        showServicesDialog() {
+            this.showDialog(
+                '📋 Manage Services',
+                `<p>Service management allows you to enable or disable services to conserve system resources.</p>
+                 <p class="system-note">This feature requires backend API integration and is not available in the current version.</p>
+                 <p>In a future update, you'll be able to:</p>
+                 <ul>
+                     <li>Toggle services on/off</li>
+                     <li>See RAM/CPU usage per service</li>
+                     <li>Set services to auto-start</li>
+                 </ul>`,
+                `<button class="system-btn" onclick="this.closest('.system-modal-overlay').remove()">OK</button>`
+            );
+        },
+        
+        gatherConfig() {
+            return {
+                version: CONFIG.version,
+                created: new Date().toISOString(),
+                device: 'mulecube',
+                settings: {
+                    theme: localStorage.getItem('theme') || 'dark',
+                    displayMode: localStorage.getItem(CONFIG.displayModeKey) || 'day',
+                    wizardCompleted: localStorage.getItem(CONFIG.wizardStorageKey) === 'true',
+                    userProfile: localStorage.getItem(CONFIG.profileStorageKey) || 'general',
+                    heroCollapsed: localStorage.getItem('heroCollapsed') === 'true',
+                    recentlyUsed: JSON.parse(localStorage.getItem('mulecube-recently-used') || '[]'),
+                    collapsedCategories: JSON.parse(localStorage.getItem('mulecube-collapsed-categories') || '[]')
+                }
+            };
+        },
+        
+        async executeReboot() {
+            try {
+                document.querySelector('.system-modal-content').innerHTML = '<p>Rebooting...</p><div class="system-spinner"></div>';
+                await fetch('/api/system/reboot', { method: 'POST' });
+            } catch {
+                document.querySelector('.system-modal-content').innerHTML = '<p class="system-error">Reboot API not available. Please reboot manually.</p>';
+            }
+        },
+        
+        async executeShutdown() {
+            try {
+                document.querySelector('.system-modal-content').innerHTML = '<p>Shutting down...</p><div class="system-spinner"></div>';
+                await fetch('/api/system/shutdown', { method: 'POST' });
+            } catch {
+                document.querySelector('.system-modal-content').innerHTML = '<p class="system-error">Shutdown API not available. Please shutdown manually.</p>';
+            }
+        },
+        
+        executeRestore() {
+            const input = document.getElementById('restoreFileInput');
+            if (!input?.files?.length) {
+                alert('Please select a backup file');
+                return;
+            }
+            
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    
+                    if (!config.version || !config.settings) {
+                        throw new Error('Invalid backup file format');
+                    }
+                    
+                    // Restore settings
+                    const s = config.settings;
+                    if (s.theme) localStorage.setItem('theme', s.theme);
+                    if (s.displayMode) localStorage.setItem(CONFIG.displayModeKey, s.displayMode);
+                    if (s.userProfile) localStorage.setItem(CONFIG.profileStorageKey, s.userProfile);
+                    if (s.heroCollapsed !== undefined) localStorage.setItem('heroCollapsed', s.heroCollapsed);
+                    if (s.recentlyUsed) localStorage.setItem('mulecube-recently-used', JSON.stringify(s.recentlyUsed));
+                    if (s.collapsedCategories) localStorage.setItem('mulecube-collapsed-categories', JSON.stringify(s.collapsedCategories));
+                    
+                    alert('Configuration restored! The page will now reload.');
+                    window.location.reload();
+                } catch (err) {
+                    alert('Error restoring backup: ' + err.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+    };
+    
+    // Make globally accessible
+    window.SystemFunctions = SystemFunctions;
+
+    // ==========================================
+    // Accessibility Improvements
+    // ==========================================
+    const AccessibilityManager = {
+        init() {
+            this.addSkipLink();
+            this.enhanceFocusIndicators();
+            this.addAriaLabels();
+            this.setupReducedMotion();
+        },
+        
+        addSkipLink() {
+            const skipLink = document.createElement('a');
+            skipLink.href = '#main-content';
+            skipLink.className = 'skip-link';
+            skipLink.textContent = 'Skip to main content';
+            document.body.insertBefore(skipLink, document.body.firstChild);
+            
+            // Add main content landmark if missing
+            const main = document.querySelector('main') || document.querySelector('.services');
+            if (main && !main.id) {
+                main.id = 'main-content';
+            }
+        },
+        
+        enhanceFocusIndicators() {
+            // Add focus-visible class to body for CSS styling
+            document.body.classList.add('js-focus-visible');
+        },
+        
+        addAriaLabels() {
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle && !themeToggle.getAttribute('aria-label')) {
+                themeToggle.setAttribute('aria-label', 'Toggle light/dark theme');
+            }
+            
+            // Search input
+            const searchInput = document.getElementById('serviceSearch');
+            if (searchInput && !searchInput.getAttribute('aria-label')) {
+                searchInput.setAttribute('aria-label', 'Search services');
+            }
+            
+            // Menu toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (menuToggle && !menuToggle.getAttribute('aria-label')) {
+                menuToggle.setAttribute('aria-label', 'Toggle navigation menu');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        },
+        
+        setupReducedMotion() {
+            // Check for reduced motion preference
+            const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+            
+            const handleReducedMotion = (e) => {
+                document.body.classList.toggle('reduce-motion', e.matches);
+            };
+            
+            handleReducedMotion(mediaQuery);
+            mediaQuery.addEventListener('change', handleReducedMotion);
+        }
+    };
+
+    // ==========================================
+    // Service Worker Registration
+    // ==========================================
+    const ServiceWorkerManager = {
+        init() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered:', reg.scope))
+                    .catch(err => console.warn('Service Worker registration failed:', err));
+            }
+        }
+    };
+
+    // ==========================================
     // Initialize
     // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
+        // Core functionality
         ModeManager.init();
         StatsManager.init();
-        RecentlyUsedManager.init();  // Must run before ServiceManager to populate cards
-        ServiceManager.init();       // Then update all status dots including Recently Used
+        RecentlyUsedManager.init();
+        ServiceManager.init();
         SearchManager.init();
         ThemeManager.init();
         Slideshow.init();
@@ -746,7 +1934,16 @@
         CategoryToggle.init();
         HeroToggle.init();
         
-        console.log('MuleCube Dashboard v0.4.1 initialized', ModeManager.isDemo ? '(Demo Mode)' : '');
+        // New features
+        DisplayModeManager.init();
+        KeyboardShortcuts.init();
+        SyncStatusManager.init();
+        OnboardingWizard.init();
+        SystemFunctions.init();
+        AccessibilityManager.init();
+        ServiceWorkerManager.init();
+        
+        console.log(`MuleCube Dashboard v${CONFIG.version} initialized`, ModeManager.isDemo ? '(Demo Mode)' : '');
     });
 
 })();

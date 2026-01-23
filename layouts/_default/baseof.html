@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-display-mode="day">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,6 +36,16 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/docs.css">
+    
+    <!-- Restore display mode from localStorage before render to prevent flash -->
+    <script>
+        (function() {
+            var mode = localStorage.getItem('mulecube-display-mode');
+            if (mode) document.documentElement.setAttribute('data-display-mode', mode);
+            var theme = localStorage.getItem('theme');
+            if (theme) document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 <body>
     {{- partial "header.html" . -}}
