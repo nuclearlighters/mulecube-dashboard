@@ -31,7 +31,7 @@
     // ==========================================
     const DisplayModeManager = {
         modes: ['day', 'night'],
-        currentMode: 'day',
+        currentMode: 'night',
         toggle: null,
         
         // SVG icons for each mode (inline for reliability)
@@ -66,8 +66,7 @@
         },
         
         detectModeFromTime() {
-            const hour = new Date().getHours();
-            if (hour >= 6 && hour < 20) return 'day';
+            // Default to night (dark) mode
             return 'night';
         },
         

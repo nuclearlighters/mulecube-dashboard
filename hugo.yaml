@@ -86,7 +86,7 @@ params:
           demo_url: "https://docs.cryptpad.org/en/"
           description: "Create secure documents"
           service: cryptpad
-          icon: "/images/icons/cryptpad.ico"
+          icon: "/images/icons/fb-file.svg"
           fallback: "◆"
           gradient: "#8b5cf6, #7c3aed"
         - name: Excalidraw
@@ -126,7 +126,7 @@ params:
           demo_url: "https://filebrowser.org/"
           description: "Browse & share files"
           service: filebrowser
-          icon: "/images/icons/filebrowser.svg"
+          icon: "/images/icons/fb-folder.svg"
           fallback: "◆"
           gradient: "#f97316, #ea580c"
         - name: Syncthing
@@ -162,7 +162,7 @@ params:
           demo_url: "https://element.io/en/user-guide"
           description: "Chat with your team"
           service: element
-          icon: "/images/icons/element.ico"
+          icon: "/images/icons/fb-phone.svg"
           fallback: "◆"
           gradient: "#0dbd8b, #0a9d74"
         - name: Meshtastic
@@ -170,7 +170,7 @@ params:
           demo_url: "https://meshtastic.org/"
           description: "Message without internet"
           service: meshtastic
-          icon: "/images/icons/meshtastic.ico"
+          icon: "/images/icons/meshtastic.png"
           fallback: "◆"
           gradient: "#67e8f9, #22d3ee"
         - name: Conduit
