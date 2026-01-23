@@ -370,7 +370,7 @@
 <body>
     <!-- Background watermark -->
     <div class="background-logo">
-        <img src="/images/logo.png" alt="" aria-hidden="true">
+        <img src="/images/mulecube-logo-bg.png" alt="" aria-hidden="true">
     </div>
 
     <!-- Main content -->
@@ -388,12 +388,12 @@
                 <div class="power-off"></div>
             </div>
             <h1 class="status-title" id="statusTitle">Restarting MuleCube</h1>
-            <p class="status-message" id="statusMessage">Please wait while the system restarts. This usually takes about 90 seconds.</p>
+            <p class="status-message" id="statusMessage">Please wait while the system restarts. This usually takes about 2 minutes.</p>
         </div>
 
         <!-- Countdown section -->
         <div class="countdown-section">
-            <div class="countdown-timer" id="countdownTimer">1:30</div>
+            <div class="countdown-timer" id="countdownTimer">2:00</div>
             <div class="countdown-label" id="countdownLabel">Shutting down services</div>
         </div>
 
@@ -433,7 +433,7 @@
                         window.location.hostname.includes('demo.'),
                 
                 // Countdown times
-                countdownSeconds: 90,           // Real mode: 90 seconds (1:30)
+                countdownSeconds: 120,          // Real mode: 120 seconds (2:00)
                 demoCountdownSeconds: 10,       // Demo mode: 10 seconds
                 
                 // Polling settings
