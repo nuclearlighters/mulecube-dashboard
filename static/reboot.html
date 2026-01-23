@@ -447,12 +447,14 @@
                 dashboardUrl: '/',              // Redirect destination
                 
                 // URL params
-                isShutdown: false
+                isShutdown: false,
+                shouldTrigger: false            // Whether to trigger API on load
             };
 
             // Parse URL parameters
             const params = new URLSearchParams(window.location.search);
             CONFIG.isShutdown = params.get('action') === 'shutdown';
+            CONFIG.shouldTrigger = params.get('trigger') === 'true';
             
             if (params.get('countdown')) {
                 CONFIG.countdownSeconds = parseInt(params.get('countdown')) || 60;
@@ -525,8 +527,29 @@
                     elements.phase3.innerHTML = '<span>Complete</span>';
                 }
 
+                // Trigger the API call if requested (and not in demo mode)
+                if (CONFIG.shouldTrigger && !CONFIG.isDemo) {
+                    triggerSystemAction();
+                }
+
                 // Start the countdown
                 startCountdown();
+            }
+
+            // ==========================================
+            // Trigger System Action (Reboot/Shutdown)
+            // ==========================================
+            function triggerSystemAction() {
+                const endpoint = CONFIG.isShutdown ? '/api/shutdown' : '/api/reboot';
+                
+                // Fire and forget - we don't care about the response
+                // The system will go down shortly after this
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                }).catch(() => {
+                    // Ignore errors - system might already be going down
+                });
             }
 
             // ==========================================
