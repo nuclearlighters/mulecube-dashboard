@@ -2737,77 +2737,219 @@ select:focus-visible {
 
 /* Disabled service cards */
 .service-card.disabled {
-    opacity: 0.4;
-    filter: grayscale(80%);
-    pointer-events: none;
-    position: relative;
+/* ========================================
+   SERVICE MANAGER - DISABLED SERVICES SECTION
+   v2.0.0 - Collapsible section with enable/disable buttons
+   ======================================== */
+
+/* ==========================================
+   Disabled Services Section
+   ========================================== */
+.disabled-services-section {
+    margin: var(--space-xl) 0;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: rgba(239, 68, 68, 0.03);
 }
 
-.service-card.disabled::after {
-    content: 'Disabled';
+.disabled-services-toggle {
+    padding: 0;
+}
+
+.disabled-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.disabled-toggle-btn:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.disabled-toggle-btn .toggle-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+    filter: var(--icon-filter);
+    opacity: 0.6;
+}
+
+.disabled-toggle-btn.active .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.disabled-count {
+    color: var(--color-danger);
+    font-weight: 500;
+    margin-left: auto;
+}
+
+.disabled-services-content {
+    padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.disabled-services-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    margin-bottom: var(--space-md);
+}
+
+.disabled-services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+/* ==========================================
+   Disabled Service Card Styling
+   ========================================== */
+.disabled-service-card {
+    position: relative;
+    opacity: 0.7;
+    filter: grayscale(40%);
+    border: 1px dashed var(--color-border) !important;
+    background: var(--color-bg-card) !important;
+}
+
+.disabled-service-card:hover {
+    opacity: 0.9;
+    filter: grayscale(20%);
+}
+
+.disabled-service-card .service-status.disabled {
+    background: var(--color-text-muted);
+}
+
+/* ==========================================
+   Service Action Buttons (Enable/Disable)
+   ========================================== */
+.service-action-btn {
+    position: absolute;
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    padding: 0.35rem 0.75rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(4px);
+}
+
+.service-card:hover .service-action-btn,
+.service-card:focus-within .service-action-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enable button - Green */
+.service-enable-btn {
+    background: var(--color-primary);
+    color: white;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.service-enable-btn:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Disable button - Gray/subtle */
+.service-disable-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.service-disable-btn:hover {
+    background: var(--color-danger);
+    color: white;
+}
+
+/* ==========================================
+   Loading State
+   ========================================== */
+.service-card.service-loading {
+    pointer-events: none;
+}
+
+.service-card.service-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-card.service-loading::before {
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: var(--color-text-muted);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    z-index: 10;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid transparent;
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    z-index: 20;
 }
 
-.service-card.disabled .service-status {
-    background: var(--color-text-muted) !important;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-.service-card.disabled:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-/* Light theme adjustments */
-[data-theme="light"] .service-card.disabled::after {
-    background: rgba(255, 255, 255, 0.9);
-    color: #666;
-}
-
-/* Service manager loading state */
-.service-card.service-loading {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-
-/* Service manager error toast */
+/* ==========================================
+   Toast Notifications
+   ========================================== */
 .service-manager-toast {
     position: fixed;
     bottom: 20px;
     right: 20px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    padding: 1rem 1.5rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    padding: var(--space-md) var(--space-lg);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
     z-index: 9999;
-    animation: slideIn 0.3s ease-out;
+    animation: slideInToast 0.3s ease-out;
+    max-width: 400px;
 }
 
-.service-manager-toast.error {
-    border-color: var(--color-danger);
+.service-manager-toast.info {
+    border-left: 3px solid var(--color-accent);
 }
 
 .service-manager-toast.success {
-    border-color: var(--color-primary);
+    border-left: 3px solid var(--color-primary);
 }
 
-@keyframes slideIn {
+.service-manager-toast.error {
+    border-left: 3px solid var(--color-danger);
+}
+
+@keyframes slideInToast {
     from {
         transform: translateX(100%);
         opacity: 0;
@@ -2815,5 +2957,50 @@ select:focus-visible {
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+/* ==========================================
+   Light Theme Adjustments
+   ========================================== */
+[data-theme="light"] .disabled-services-section {
+    background: rgba(239, 68, 68, 0.05);
+}
+
+[data-theme="light"] .disabled-toggle-btn .toggle-icon {
+    filter: none;
+}
+
+[data-theme="light"] .disabled-service-card {
+    background: #f5f5f5 !important;
+}
+
+[data-theme="light"] .service-disable-btn {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .service-manager-toast {
+    background: white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================
+   Mobile Responsiveness
+   ========================================== */
+@media (max-width: 768px) {
+    .disabled-services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .service-action-btn {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .service-manager-toast {
+        left: 20px;
+        right: 20px;
+        bottom: 10px;
+        max-width: none;
     }
 }

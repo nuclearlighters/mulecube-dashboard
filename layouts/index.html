@@ -61,7 +61,7 @@
             {{- with index $services.knowledge.items 0 }}
             {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
             {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-container="{{ .container | default .service }}" data-tooltip="{{ .description }}">
                 <div class="service-icon">
                     {{- if .icon }}
                     <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
@@ -81,7 +81,7 @@
             {{- with index $services.knowledge.items 1 }}
             {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
             {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-container="{{ .container | default .service }}" data-tooltip="{{ .description }}">
                 <div class="service-icon">
                     {{- if .icon }}
                     <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
@@ -101,7 +101,7 @@
             {{- with index $services.ai.items 1 }}
             {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
             {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-container="{{ .container | default .service }}" data-tooltip="{{ .description }}">
                 <div class="service-icon">
                     {{- if .icon }}
                     <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
@@ -121,7 +121,7 @@
             {{- with index $services.files.items 0 }}
             {{- $isDemo := hasPrefix site.BaseURL "https://demo." }}
             {{- $linkUrl := cond (and $isDemo .demo_url) .demo_url .url }}
-            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-tooltip="{{ .description }}">
+            <a href="{{ $linkUrl }}" target="_blank" class="service-card" data-service="{{ .service }}" data-container="{{ .container | default .service }}" data-tooltip="{{ .description }}">
                 <div class="service-icon">
                     {{- if .icon }}
                     <img src="{{ .icon }}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='{{ .fallback }}';">
@@ -152,6 +152,23 @@
         <!-- Dynamic grid - populated by JavaScript -->
         <div class="service-grid quick-grid" id="recentlyUsedGrid" style="display: none;">
             <!-- Populated dynamically by RecentlyUsedManager -->
+        </div>
+    </div>
+
+    <!-- Disabled Services Section - Collapsed by default -->
+    <div class="disabled-services-section" id="disabledServicesSection" style="display: none;">
+        <div class="disabled-services-toggle">
+            <button id="disabledServicesToggle" class="toggle-btn disabled-toggle-btn">
+                <img src="/images/icons/ui-chevron.svg" alt="" class="toggle-icon">
+                <span>Disabled Services</span>
+                <span class="disabled-count" id="disabledCount">(0)</span>
+            </button>
+        </div>
+        <div class="disabled-services-content" id="disabledServicesContent" style="display: none;">
+            <p class="disabled-services-subtitle">These services are turned off to save resources. Click "Enable" to start them.</p>
+            <div class="service-grid disabled-services-grid" id="disabledServicesGrid">
+                <!-- Populated dynamically by ServiceManagerAPI -->
+            </div>
         </div>
     </div>
 
