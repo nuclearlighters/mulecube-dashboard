@@ -1685,7 +1685,7 @@
         
         showShutdownDialog() {
             this.showDialog(
-                'Shut Down MuleCube?',
+                '⏻ Shut Down MuleCube?',
                 '<p>System will power off in 1 minute. Physical access needed to restart!</p>',
                 `<button class="system-btn system-btn-cancel" onclick="this.closest('.system-modal-overlay').remove()">Cancel</button>
                  <button class="system-btn system-btn-danger" onclick="SystemFunctions.executeShutdown()">Confirm</button>`

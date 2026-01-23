@@ -2342,29 +2342,29 @@ a:hover {
 .system-modal {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: 20px;
+    border-radius: 12px;
     width: 90%;
-    max-width: 400px;
-    padding: 28px 32px;
+    max-width: 380px;
+    padding: 24px 32px;
     text-align: center;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .system-modal-title {
-    margin: 0 0 16px 0;
-    font-size: 1.15rem;
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--color-text);
 }
 
 .system-modal-content {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .system-modal-content p {
     margin: 0 0 12px;
     color: var(--color-text-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     line-height: 1.5;
 }
 
@@ -2398,30 +2398,28 @@ a:hover {
 
 .system-modal-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
-    border-top: 1px solid var(--color-border);
-    background: var(--color-bg-secondary);
+    justify-content: center;
+    gap: 12px;
 }
 
 .system-btn {
-    padding: var(--space-sm) var(--space-lg);
+    padding: 10px 24px;
+    border-radius: 8px;
     border: none;
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
-    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
 }
 
 .system-btn-cancel {
-    background: var(--color-bg);
-    color: var(--color-text);
+    background: var(--color-bg-secondary, #111113);
     border: 1px solid var(--color-border);
+    color: var(--color-text);
 }
 
 .system-btn-cancel:hover {
@@ -2429,21 +2427,21 @@ a:hover {
 }
 
 .system-btn-primary {
-    background: var(--color-primary);
-    color: var(--color-bg);
+    background: #3b82f6;
+    color: #fff;
 }
 
 .system-btn-primary:hover {
-    background: var(--color-primary-hover);
+    background: #2563eb;
 }
 
 .system-btn-danger {
-    background: var(--color-danger);
-    color: white;
+    background: #ef4444;
+    color: #fff;
 }
 
 .system-btn-danger:hover {
-    background: #dc2020;
+    background: #dc2626;
 }
 
 .system-file-input {
