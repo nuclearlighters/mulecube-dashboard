@@ -1605,19 +1605,19 @@
                     <span class="category-toggle-indicator">▼</span>
                 </h3>
                 <div class="service-grid" id="systemFunctionsGrid">
-                    <div class="service-card system-card" onclick="SystemFunctions.showRebootDialog()">
-                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></div>
+                    <div class="service-card system-card" onclick="OnboardingWizard.reset()">
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg></div>
                         <div class="service-info">
-                            <div class="service-name">Reboot</div>
-                            <div class="service-desc">Restart MuleCube safely</div>
+                            <div class="service-name">Setup Wizard</div>
+                            <div class="service-desc">Re-run first-time setup</div>
                         </div>
                     </div>
                     
-                    <div class="service-card system-card" onclick="SystemFunctions.showShutdownDialog()">
-                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>
+                    <div class="service-card system-card" onclick="SystemFunctions.showServicesDialog()">
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h8"/><path d="M4 18h8"/><path d="M4 6h8"/><path d="m14 6 2 2 4-4"/><path d="m14 12 2 2 4-4"/><path d="m14 18 2 2 4-4"/></svg></div>
                         <div class="service-info">
-                            <div class="service-name">Shutdown</div>
-                            <div class="service-desc">Power off MuleCube</div>
+                            <div class="service-name">Manage Services</div>
+                            <div class="service-desc">Enable/disable services</div>
                         </div>
                     </div>
                     
@@ -1637,19 +1637,19 @@
                         </div>
                     </div>
                     
-                    <div class="service-card system-card" onclick="SystemFunctions.showServicesDialog()">
-                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h8"/><path d="M4 18h8"/><path d="M4 6h8"/><path d="m14 6 2 2 4-4"/><path d="m14 12 2 2 4-4"/><path d="m14 18 2 2 4-4"/></svg></div>
+                    <div class="service-card system-card" onclick="SystemFunctions.showRebootDialog()">
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></div>
                         <div class="service-info">
-                            <div class="service-name">Manage Services</div>
-                            <div class="service-desc">Enable/disable services</div>
+                            <div class="service-name">Reboot</div>
+                            <div class="service-desc">Restart MuleCube safely</div>
                         </div>
                     </div>
                     
-                    <div class="service-card system-card" onclick="OnboardingWizard.reset()">
-                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg></div>
+                    <div class="service-card system-card" onclick="SystemFunctions.showShutdownDialog()">
+                        <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></div>
                         <div class="service-info">
-                            <div class="service-name">Setup Wizard</div>
-                            <div class="service-desc">Re-run first-time setup</div>
+                            <div class="service-name">Shutdown</div>
+                            <div class="service-desc">Power off MuleCube</div>
                         </div>
                     </div>
                 </div>
@@ -1662,12 +1662,10 @@
         showDialog(title, content, actions) {
             const modal = document.createElement('div');
             modal.className = 'system-modal-overlay';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
             modal.innerHTML = `
                 <div class="system-modal">
-                    <div class="system-modal-header">
-                        <h3>${title}</h3>
-                        <button class="system-modal-close" onclick="this.closest('.system-modal-overlay').remove()">×</button>
-                    </div>
+                    <h3 class="system-modal-title">${title}</h3>
                     <div class="system-modal-content">${content}</div>
                     <div class="system-modal-actions">${actions}</div>
                 </div>
