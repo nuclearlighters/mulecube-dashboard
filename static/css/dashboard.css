@@ -13,12 +13,14 @@
     --color-bg-card: #161618;
     --color-text: #e4e4e7;
     --color-text-muted: #a1a1aa;
+    --color-text-secondary: #a1a1aa;
     --color-primary: #22c55e;
     --color-primary-hover: #16a34a;
     --color-accent: #3b82f6;
     --color-border: #27272a;
     --color-border-light: #3f3f46;
     --color-warning: #f59e0b;
+    --color-amber: #f59e0b;
     --icon-filter: invert(1);
     --color-danger: #ef4444;
     
@@ -2305,7 +2307,7 @@ a:hover {
 .system-card .service-icon svg {
     width: 26px;
     height: 26px;
-    stroke: var(--color-text-secondary);
+    stroke: #a1a1aa;
     opacity: 1;
     transition: all 0.2s ease;
 }
