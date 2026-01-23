@@ -2012,6 +2012,23 @@ a:hover {
 
 .profile-icon {
     font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 32px;
+    margin-bottom: var(--space-xs);
+}
+
+.profile-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--color-text-secondary);
+    transition: stroke 0.2s ease;
+}
+
+.wizard-profile-card:hover .profile-icon svg,
+.wizard-profile-card.selected .profile-icon svg {
+    stroke: var(--color-primary);
 }
 
 .profile-name {
