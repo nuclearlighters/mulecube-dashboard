@@ -1,4 +1,4 @@
-baseURL: "http://mulecube.local/"
+baseURL: "http://mulecube.net/"
 languageCode: "en-us"
 title: "MuleCube Dashboard"
 theme: []
@@ -13,23 +13,28 @@ params:
   description: "Your offline world in a cube"
   tagline: "The *internet, in your backpack."
   
+  # Service Manager API endpoint for enable/disable status
+  serviceManagerEndpoint: "/api/services"
+  
   services:
     ai:
       title: "AI Services"
       items:
         - name: LibreTranslate
-          url: "http://translate.mulecube.local"
+          url: "http://libretranslate.mulecube.net"
           demo_url: "https://docs.libretranslate.com/"
           description: "Translate text between languages"
           service: libretranslate
+          container: libretranslate
           icon: "/images/icons/libretranslate.ico"
           fallback: "◆"
           gradient: "#3b82f6, #1d4ed8"
         - name: Open WebUI
-          url: "http://ai.mulecube.local"
+          url: "http://openwebui.mulecube.net"
           demo_url: "https://docs.openwebui.com/"
           description: "Chat with AI assistant"
           service: openwebui
+          container: open-webui
           icon: "/images/icons/openwebui.png"
           fallback: "◆"
           gradient: "#6366f1, #4f46e5"
@@ -38,42 +43,47 @@ params:
       title: "Knowledge"
       items:
         - name: Kiwix
-          url: "http://wiki.mulecube.local"
+          url: "http://kiwix.mulecube.net"
           demo_url: "https://kiwix.org/"
           description: "Browse Wikipedia offline"
           service: kiwix
+          container: kiwix
           icon: "/images/icons/kiwix.ico"
           fallback: "◆"
           gradient: "#22c55e, #16a34a"
         - name: Maps
-          url: "http://maps.mulecube.local"
+          url: "http://tileservergl.mulecube.net"
           demo_url: "https://docs.maptiler.com/guides/self-hosting/map-server/"
           description: "View maps & plan routes"
-          service: maps
+          service: tileservergl
+          container: tileserver
           icon: "/images/icons/openstreetmap.png"
           fallback: "◆"
           gradient: "#f59e0b, #d97706"
         - name: Navigation
-          url: "http://navigation.mulecube.local/@signalk/freeboard-sk/"
+          url: "http://signalk.mulecube.net/@signalk/freeboard-sk/"
           demo_url: "https://signalk.org/about/"
           description: "Navigate with nautical charts"
           service: signalk
+          container: signalk-server
           icon: "/images/icons/fb-map.svg"
           fallback: "⚓"
           gradient: "#0077be, #005a8c"
         - name: Calibre
-          url: "http://books.mulecube.local"
+          url: "http://calibreweb.mulecube.net"
           demo_url: "https://github.com/janeczku/calibre-web?tab=readme-ov-file#calibre-web"
           description: "Read & manage your books"
-          service: calibre
+          service: calibreweb
+          container: calibre-web
           icon: "/images/icons/calibre.ico"
           fallback: "◆"
           gradient: "#8b4513, #a0522d"
         - name: Emergency
-          url: "http://emergency.mulecube.local"
+          url: "http://emergency.mulecube.net"
           demo_url: "https://wiki.radioreference.com/index.php/Main_Page"
           description: "Look up radio frequencies"
           service: emergency
+          container: emergency-ref
           icon: "/images/icons/fb-phone.svg"
           fallback: "◆"
           gradient: "#dc2626, #b91c1c"
@@ -82,26 +92,29 @@ params:
       title: "Collaboration"
       items:
         - name: CryptPad
-          url: "http://pad.mulecube.local"
+          url: "http://cryptpad.mulecube.net"
           demo_url: "https://docs.cryptpad.org/en/"
           description: "Create secure documents"
           service: cryptpad
+          container: cryptpad
           icon: "/images/icons/fb-file.svg"
           fallback: "◆"
           gradient: "#8b5cf6, #7c3aed"
         - name: Excalidraw
-          url: "http://draw.mulecube.local"
+          url: "http://excalidraw.mulecube.net"
           demo_url: "https://plus.excalidraw.com/how-to-start"
           description: "Sketch diagrams together"
           service: excalidraw
+          container: excalidraw
           icon: "/images/icons/excalidraw.ico"
           fallback: "✏️"
           gradient: "#ec4899, #db2777"
         - name: BentoPDF
-          url: "http://pdf.mulecube.local"
+          url: "http://bentopdf.mulecube.net"
           demo_url: "https://www.bentopdf.com/about.html"
           description: "Edit & convert PDFs"
           service: bentopdf
+          container: bentopdf
           icon: "/images/icons/fb-file.svg"
           fallback: "◆"
           gradient: "#f43f5e, #e11d48"
@@ -110,10 +123,11 @@ params:
       title: "Security"
       items:
         - name: Vaultwarden
-          url: "https://vault.mulecube.local"
+          url: "https://vaultwarden.mulecube.net"
           demo_url: "https://bitwarden.com/help/getting-started-webvault/"
           description: "Store passwords securely"
           service: vaultwarden
+          container: vaultwarden
           icon: "/images/icons/vaultwarden.svg"
           fallback: "◆"
           gradient: "#14b8a6, #0d9488"
@@ -122,34 +136,38 @@ params:
       title: "Files & Sync"
       items:
         - name: File Browser
-          url: "http://files.mulecube.local"
+          url: "http://filebrowser.mulecube.net"
           demo_url: "https://filebrowser.org/"
           description: "Browse & share files"
           service: filebrowser
+          container: filebrowser
           icon: "/images/icons/fb-folder.svg"
           fallback: "◆"
           gradient: "#f97316, #ea580c"
         - name: Syncthing
-          url: "http://sync.mulecube.local"
+          url: "http://syncthing.mulecube.net"
           demo_url: "https://docs.syncthing.net/intro/getting-started.html"
           description: "Sync files across devices"
           service: syncthing
+          container: syncthing
           icon: "/images/icons/syncthing.png"
           fallback: "◆"
           gradient: "#06b6d4, #0891b2"
         - name: Linkwarden
-          url: "http://links.mulecube.local"
+          url: "http://linkwarden.mulecube.net"
           demo_url: "https://linkwarden.app/#features"
           description: "Save & organize links"
           service: linkwarden
+          container: linkwarden
           icon: "/images/icons/linkwarden.ico"
           fallback: "◆"
           gradient: "#6366f1, #4f46e5"
         - name: Open Archiver
-          url: "http://archive.mulecube.local"
+          url: "http://openarchiver.mulecube.net"
           demo_url: "https://openarchiver.com/"
           description: "Archive your emails"
           service: openarchiver
+          container: open-archiver
           icon: "/images/icons/openarchiver.png"
           fallback: "◆"
           gradient: "#0ea5e9, #0284c7"
@@ -158,26 +176,29 @@ params:
       title: "Communication"
       items:
         - name: Element Chat
-          url: "http://chat.mulecube.local"
+          url: "http://element.mulecube.net"
           demo_url: "https://element.io/en/user-guide"
           description: "Chat with your team"
           service: element
+          container: element
           icon: "/images/icons/fb-phone.svg"
           fallback: "◆"
           gradient: "#0dbd8b, #0a9d74"
         - name: Meshtastic
-          url: "http://mesh.mulecube.local"
+          url: "http://meshtastic.mulecube.net"
           demo_url: "https://meshtastic.org/"
           description: "Message without internet"
           service: meshtastic
+          container: meshtastic-web
           icon: "/images/icons/meshtastic.png"
           fallback: "◆"
           gradient: "#67e8f9, #22d3ee"
         - name: Conduit
-          url: "http://matrix.mulecube.local"
+          url: "http://conduit.mulecube.net"
           demo_url: "https://docs.conduit.rs/"
           description: "Host private chat rooms"
           service: conduit
+          container: conduit
           icon: "/images/icons/fb-phone.svg"
           fallback: "◆"
           gradient: "#a855f7, #9333ea"
@@ -186,108 +207,118 @@ params:
       title: "Tools"
       items:
         - name: App Store
-          url: "http://apps.mulecube.local"
+          url: "http://apkrepo.mulecube.net"
           demo_url: "https://f-droid.org/en/about/"
           description: "Download apps offline"
           service: apkrepo
+          container: apkrepo-nginx
           icon: "/images/icons/fb-folder.svg"
           fallback: "◆"
           gradient: "#22c55e, #16a34a"
         - name: IT-Tools
-          url: "http://tools.mulecube.local"
+          url: "http://ittools.mulecube.net"
           demo_url: "https://it-tools.tech/about"
           description: "Handy dev tools"
-          service: it-tools
+          service: ittools
+          container: it-tools
           icon: "/images/icons/ittools.ico"
           fallback: "◆"
           gradient: "#6366f1, #4f46e5"
         - name: Network Tools
-          url: "http://network.mulecube.local"
+          url: "http://networktools.mulecube.net"
           demo_url: "https://networkingtoolbox.net/about"
           description: "Test your network"
-          service: network-tools
+          service: networktools
+          container: networking-toolbox
           icon: "/images/icons/doc-network.svg"
           fallback: "◆"
           gradient: "#06b6d4, #0891b2"
     
-    # RENAMED: Infrastructure → Monitoring
     infrastructure:
       title: "Monitoring"
       items:
         - name: Beszel
-          url: "http://monitor.mulecube.local"
+          url: "http://beszel.mulecube.net"
           demo_url: "https://beszel.dev/guide/what-is-beszel"
           description: "Monitor system resources"
           service: beszel
+          container: beszel
           icon: "/images/icons/docker.png"
           fallback: "◆"
           gradient: "#3b82f6, #2563eb"
         - name: Uptime Kuma
-          url: "http://status.mulecube.local"
+          url: "http://uptimekuma.mulecube.net"
           demo_url: "https://github.com/louislam/uptime-kuma/wiki"
           description: "Check service health"
-          service: uptime-kuma
+          service: uptimekuma
+          container: uptime-kuma
           icon: "/images/icons/uptimekuma.svg"
           fallback: "◆"
           gradient: "#84cc16, #65a30d"
         - name: Pi-hole
-          url: "http://dns.mulecube.local/admin"
+          url: "http://pihole.mulecube.net/admin"
           demo_url: "https://docs.pi-hole.net/"
           description: "Block ads & trackers"
           service: pihole
+          container: pihole
           icon: "/images/icons/pihole.png"
           fallback: "◆"
           gradient: "#ef4444, #dc2626"
         - name: Ollama
-          url: "http://ollama.mulecube.local"
+          url: "http://ollama.mulecube.net"
           demo_url: "https://docs.ollama.com/"
           description: "Run AI models locally"
           service: ollama
+          container: ollama
           icon: "/images/icons/ollama.png"
           fallback: "◆"
           gradient: "#1e1e1e, #333"
     
-    # RENAMED: Control Panel → Admin
     admin:
       title: "Admin"
       items:
         - name: Containers
-          url: "http://dockge.mulecube.local:5001"
+          url: "http://dockge.mulecube.net"
           demo_url: "https://dockge.kuma.pet/"
           description: "Manage containers"
           service: dockge
+          container: mulecube-dockge
           icon: "/images/icons/dockge.svg"
           fallback: "◆"
           gradient: "#22c55e, #16a34a"
         - name: Logs
-          url: "http://logs.mulecube.local:9999"
+          url: "http://dozzle.mulecube.net"
           demo_url: "https://dozzle.dev/"
           description: "View container logs"
           service: dozzle
+          container: mulecube-logs
           icon: "/images/icons/dozzle.ico"
           fallback: "◆"
           gradient: "#3b82f6, #1d4ed8"
         - name: Terminal
-          url: "http://terminal.mulecube.local:7681"
+          url: "http://terminal.mulecube.net"
           demo_url: "https://tsl0922.github.io/ttyd/"
           description: "Access terminal remotely"
-          service: ttyd
+          service: terminal
+          container: mulecube-terminal
           icon: "/images/icons/fb-plug.svg"
           fallback: "◆"
           gradient: "#1f2937, #374151"
         - name: Diagnostics
-          url: "http://diagnostics.mulecube.local:9007/api/full"
+          url: "http://diagnostics.mulecube.net/api/full"
           demo_url: "#"
           description: "View system diagnostics"
           service: diagnostics
+          container: mulecube-diagnostics
           icon: "/images/icons/fb-chart.svg"
           fallback: "🩺"
           gradient: "#8b5cf6, #7c3aed"
         - name: Backup
-          url: "http://backup.mulecube.local:9005/api/backups"
+          url: "http://diagnostics.mulecube.net/api/backups"
           demo_url: "#"
           description: "Backup & restore your data"
           service: backup
+          container: mulecube-backup
           icon: "/images/icons/fb-save.svg"
           fallback: "◆"
           gradient: "#06b6d4, #0891b2"
