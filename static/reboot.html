@@ -139,6 +139,12 @@
             border: 3px solid var(--color-text-muted);
             border-radius: 50%;
             position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .power-off::before {
@@ -772,12 +778,22 @@
                 elements.phase3.classList.add('complete');
                 
                 elements.statusTitle.textContent = 'Shutdown Complete';
-                elements.statusMessage.textContent = 'MuleCube has been safely powered off. You can now disconnect the power.';
                 elements.countdownTimer.textContent = '⏻';
                 elements.countdownLabel.textContent = 'System is off';
-                elements.footerHint.textContent = 'Press the power button to start MuleCube again.';
                 
                 updateProgress(100);
+
+                // Demo mode: redirect back to dashboard after 3 seconds
+                if (CONFIG.isDemo) {
+                    elements.statusMessage.textContent = 'Demo complete! Redirecting back to dashboard...';
+                    elements.footerHint.textContent = 'Redirecting in 3 seconds...';
+                    setTimeout(() => {
+                        window.location.href = CONFIG.dashboardUrl;
+                    }, 3000);
+                } else {
+                    elements.statusMessage.textContent = 'MuleCube has been safely powered off. You can now disconnect the power.';
+                    elements.footerHint.textContent = 'Press the power button to start MuleCube again.';
+                }
             }
 
             // ==========================================
