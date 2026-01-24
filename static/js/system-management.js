@@ -300,10 +300,38 @@
                 apiCall('/api/system/stats')
             ]);
             
-            const cpuPercent = stats.cpu?.percent || 0;
-            const memPercent = stats.memory?.percent || 0;
-            const temp = stats.temperature?.current || 0;
+            // Debug: log the actual response structure
+            console.log('System Info API response:', info);
+            console.log('System Stats API response:', stats);
+            
+            // Handle different possible response structures for CPU
+            const cpuPercent = stats.cpu?.percent || stats.cpu_percent || stats.cpu?.usage || 0;
+            const cpuCores = stats.cpu?.cores || stats.cpu?.count || stats.cores || 4;
+            const cpuFreqCurrent = stats.cpu?.freq_current || stats.cpu?.frequency || stats.cpu_freq || 0;
+            const cpuFreqMax = stats.cpu?.freq_max || stats.cpu?.max_frequency || cpuFreqCurrent || 0;
+            
+            // Handle different possible response structures for Memory
+            const memPercent = stats.memory?.percent || stats.memory_percent || stats.mem?.percent || 0;
+            // Memory values could be in bytes or MB - detect and convert
+            let memUsed = stats.memory?.used || stats.mem?.used || stats.memory_used || 0;
+            let memTotal = stats.memory?.total || stats.mem?.total || stats.memory_total || 0;
+            let memAvailable = stats.memory?.available || stats.mem?.available || stats.memory_available || 0;
+            
+            // If values look like they're already in bytes (> 100000), use directly
+            // Otherwise assume they're in MB and convert
+            if (memTotal > 0 && memTotal < 100000) {
+                memUsed = memUsed * 1024 * 1024;
+                memTotal = memTotal * 1024 * 1024;
+                memAvailable = memAvailable * 1024 * 1024;
+            }
+            
+            // Handle different possible response structures for Temperature
+            const temp = stats.temperature?.current || stats.temperature?.cpu || stats.temp || stats.cpu_temp || 0;
             const tempStatus = temp > 80 ? 'danger' : temp > 70 ? 'warning' : 'normal';
+            
+            // Handle frequency - could be in MHz or Hz
+            const freqCurrent = cpuFreqCurrent > 10000 ? cpuFreqCurrent / 1000000 : cpuFreqCurrent / 1000;
+            const freqMax = cpuFreqMax > 10000 ? cpuFreqMax / 1000000 : cpuFreqMax / 1000;
             
             container.innerHTML = `
                 <div class="overview-grid">
@@ -320,19 +348,19 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Model</span>
-                                <span class="info-value">${escapeHtml(info.model || 'Raspberry Pi')}</span>
+                                <span class="info-value">${escapeHtml(info.model || info.hardware || 'Raspberry Pi')}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Serial</span>
-                                <span class="info-value mono">${escapeHtml(info.serial || 'N/A')}</span>
+                                <span class="info-value mono">${escapeHtml(info.serial || info.serial_number || 'N/A')}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Uptime</span>
-                                <span class="info-value">${formatUptime(info.uptime_seconds || 0)}</span>
+                                <span class="info-value">${formatUptime(info.uptime_seconds || info.uptime || 0)}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Boot Time</span>
-                                <span class="info-value">${formatDateTime(info.boot_time)}</span>
+                                <span class="info-value">${formatDateTime(info.boot_time || info.boot_timestamp)}</span>
                             </div>
                         </div>
                     </div>
@@ -351,15 +379,15 @@
                             <div class="stats-row">
                                 <div class="stat-item">
                                     <span class="stat-label">Cores</span>
-                                    <span class="stat-value">${stats.cpu?.cores || 4}</span>
+                                    <span class="stat-value">${cpuCores}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Frequency</span>
-                                    <span class="stat-value">${((stats.cpu?.freq_current || 0) / 1000).toFixed(1)} GHz</span>
+                                    <span class="stat-value">${freqCurrent > 0 ? freqCurrent.toFixed(1) + ' GHz' : 'N/A'}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Max Freq</span>
-                                    <span class="stat-value">${((stats.cpu?.freq_max || 0) / 1000).toFixed(1)} GHz</span>
+                                    <span class="stat-value">${freqMax > 0 ? freqMax.toFixed(1) + ' GHz' : 'N/A'}</span>
                                 </div>
                             </div>
                         </div>
@@ -379,15 +407,15 @@
                             <div class="stats-row">
                                 <div class="stat-item">
                                     <span class="stat-label">Used</span>
-                                    <span class="stat-value">${formatBytes((stats.memory?.used || 0) * 1024 * 1024)}</span>
+                                    <span class="stat-value">${memUsed > 0 ? formatBytes(memUsed) : 'N/A'}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Total</span>
-                                    <span class="stat-value">${formatBytes((stats.memory?.total || 0) * 1024 * 1024)}</span>
+                                    <span class="stat-value">${memTotal > 0 ? formatBytes(memTotal) : 'N/A'}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Available</span>
-                                    <span class="stat-value">${formatBytes((stats.memory?.available || 0) * 1024 * 1024)}</span>
+                                    <span class="stat-value">${memAvailable > 0 ? formatBytes(memAvailable) : 'N/A'}</span>
                                 </div>
                             </div>
                         </div>
@@ -398,11 +426,11 @@
                         <div class="card-header">
                             ${ICONS.temp}
                             <h3>Temperature</h3>
-                            <span class="card-value ${tempStatus}">${temp.toFixed(1)}°C</span>
+                            <span class="card-value ${tempStatus}">${temp > 0 ? temp.toFixed(1) + '°C' : 'N/A'}</span>
                         </div>
                         <div class="card-body">
                             <div class="temp-gauge">
-                                <div class="temp-bar ${tempStatus}" style="width: ${Math.min(temp, 100)}%"></div>
+                                <div class="temp-bar ${tempStatus}" style="width: ${temp > 0 ? Math.min(temp, 100) : 0}%"></div>
                                 <div class="temp-markers">
                                     <span>0°C</span>
                                     <span>50°C</span>
@@ -410,7 +438,7 @@
                                 </div>
                             </div>
                             <div class="temp-status ${tempStatus}">
-                                ${temp > 80 ? 'Throttling may occur' : temp > 70 ? 'Running warm' : 'Normal operating temperature'}
+                                ${temp > 80 ? 'Throttling may occur' : temp > 70 ? 'Running warm' : temp > 0 ? 'Normal operating temperature' : 'Temperature sensor unavailable'}
                             </div>
                         </div>
                     </div>
@@ -430,41 +458,54 @@
                 </div>
             `;
             
-            // Auto-refresh stats
-            this.refreshIntervals.overview = setInterval(async () => {
-                try {
-                    const newStats = await apiCall('/api/system/stats');
-                    this.updateOverviewStats(newStats);
-                } catch (e) {
-                    console.warn('Stats refresh failed:', e);
-                }
-            }, CONFIG.pollInterval);
+            // Auto-refresh stats - only if still on overview tab
+            if (!this.refreshIntervals.overview) {
+                this.refreshIntervals.overview = setInterval(async () => {
+                    if (this.activeTab !== 'overview' || !this.isOpen) return;
+                    try {
+                        const newStats = await apiCall('/api/system/stats');
+                        this.updateOverviewStats(newStats);
+                    } catch (e) {
+                        console.warn('Stats refresh failed:', e);
+                    }
+                }, CONFIG.pollInterval);
+            }
         },
         
         updateOverviewStats(stats) {
-            // Update CPU
-            const cpuPercent = stats.cpu?.percent || 0;
-            const cpuCard = document.querySelector('.info-card:nth-child(2)');
+            // Guard against running on wrong tab
+            if (this.activeTab !== 'overview') return;
+            
+            // Update CPU - handle different field names
+            const cpuPercent = stats.cpu?.percent || stats.cpu_percent || stats.cpu?.usage || 0;
+            const cpuCard = document.querySelector('.overview-grid .info-card:nth-child(2)');
             if (cpuCard) {
-                cpuCard.querySelector('.card-value').textContent = `${cpuPercent.toFixed(1)}%`;
-                cpuCard.querySelector('.progress-bar').style.width = `${cpuPercent}%`;
+                const valueEl = cpuCard.querySelector('.card-value');
+                const barEl = cpuCard.querySelector('.progress-bar');
+                if (valueEl) valueEl.textContent = `${cpuPercent.toFixed(1)}%`;
+                if (barEl) barEl.style.width = `${cpuPercent}%`;
             }
             
-            // Update Memory
-            const memPercent = stats.memory?.percent || 0;
-            const memCard = document.querySelector('.info-card:nth-child(3)');
+            // Update Memory - handle different field names
+            const memPercent = stats.memory?.percent || stats.memory_percent || stats.mem?.percent || 0;
+            const memCard = document.querySelector('.overview-grid .info-card:nth-child(3)');
             if (memCard) {
-                memCard.querySelector('.card-value').textContent = `${memPercent.toFixed(1)}%`;
-                memCard.querySelector('.progress-bar').style.width = `${memPercent}%`;
+                const valueEl = memCard.querySelector('.card-value');
+                const barEl = memCard.querySelector('.progress-bar');
+                if (valueEl) valueEl.textContent = `${memPercent.toFixed(1)}%`;
+                if (barEl) barEl.style.width = `${memPercent}%`;
             }
             
-            // Update Temperature
-            const temp = stats.temperature?.current || 0;
-            const tempCard = document.querySelector('.info-card:nth-child(4)');
+            // Update Temperature - handle different field names
+            const temp = stats.temperature?.current || stats.temperature?.cpu || stats.temp || stats.cpu_temp || 0;
+            const tempCard = document.querySelector('.overview-grid .info-card:nth-child(4)');
             if (tempCard) {
                 const tempStatus = temp > 80 ? 'danger' : temp > 70 ? 'warning' : 'normal';
-                tempCard.querySelector('.card-value').textContent = `${temp.toFixed(1)}°C`;
-                tempCard.querySelector('.card-value').className = `card-value ${tempStatus}`;
+                const valueEl = tempCard.querySelector('.card-value');
+                if (valueEl) {
+                    valueEl.textContent = temp > 0 ? `${temp.toFixed(1)}°C` : 'N/A';
+                    valueEl.className = `card-value ${tempStatus}`;
+                }
             }
         },
         
@@ -507,14 +548,23 @@
                 apiCall('/api/network/interfaces').catch(() => ({ interfaces: [] }))
             ]);
             
-            const wifiClients = clients.clients || [];
-            const netInterfaces = interfaces.interfaces || [];
+            // Debug: log the actual response structure
+            console.log('Clients API response:', clients);
+            console.log('Interfaces API response:', interfaces);
             
-            // Filter to main interfaces
-            const mainInterfaces = netInterfaces.filter(i => 
-                ['eth0', 'wlan0', 'wlan1', 'ap0', 'br0'].includes(i.name) ||
-                i.name.startsWith('wlan')
-            );
+            // Handle different response structures for clients
+            const wifiClients = clients.clients || clients.devices || clients.connected || (Array.isArray(clients) ? clients : []);
+            
+            // Handle different response structures for interfaces
+            let netInterfaces = interfaces.interfaces || interfaces.network || (Array.isArray(interfaces) ? interfaces : []);
+            
+            // Filter to main interfaces (if we have any)
+            const mainInterfaces = netInterfaces.length > 0 ? netInterfaces.filter(i => 
+                ['eth0', 'wlan0', 'wlan1', 'ap0', 'br0', 'docker0', 'end0'].includes(i.name) ||
+                i.name?.startsWith('wlan') ||
+                i.name?.startsWith('eth') ||
+                i.name?.startsWith('en')
+            ) : [];
             
             container.innerHTML = `
                 <div class="network-section">
@@ -596,12 +646,17 @@
         // ==========================================
         async loadStorageTab(container) {
             const [disks, dockerVolumes] = await Promise.all([
-                apiCall('/api/storage/disks'),
+                apiCall('/api/storage/disks').catch(() => ({ disks: [] })),
                 apiCall('/api/storage/docker').catch(() => ({ volumes: [] }))
             ]);
             
-            const diskList = disks.disks || [];
-            const volumes = dockerVolumes.volumes || [];
+            // Debug: log the actual response structure
+            console.log('Disks API response:', disks);
+            console.log('Docker volumes API response:', dockerVolumes);
+            
+            // Handle different response structures
+            const diskList = disks.disks || disks.partitions || disks.filesystems || (Array.isArray(disks) ? disks : []);
+            const volumes = dockerVolumes.volumes || dockerVolumes.Volumes || (Array.isArray(dockerVolumes) ? dockerVolumes : []);
             
             container.innerHTML = `
                 <div class="storage-section">
@@ -681,55 +736,69 @@
         // Processes Tab
         // ==========================================
         async loadProcessesTab(container) {
-            const data = await apiCall('/api/processes/');
-            const processes = data.processes || [];
+            // Render the processes (called by both initial load and refresh)
+            await this.renderProcesses(container);
             
-            // Sort by CPU usage
-            processes.sort((a, b) => (b.cpu_percent || 0) - (a.cpu_percent || 0));
-            
-            container.innerHTML = `
-                <div class="processes-section">
-                    <div class="info-card full-width">
-                        <div class="card-header">
-                            ${ICONS.process}
-                            <h3>Running Processes</h3>
-                            <span class="card-badge">${processes.length} processes</span>
-                        </div>
-                        <div class="card-body">
-                            <table class="data-table processes-table">
-                                <thead>
-                                    <tr>
-                                        <th>PID</th>
-                                        <th>Name</th>
-                                        <th>User</th>
-                                        <th>CPU %</th>
-                                        <th>Memory %</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${processes.slice(0, 50).map(proc => `
+            // Set up auto-refresh ONLY if not already running
+            if (!this.refreshIntervals.processes) {
+                this.refreshIntervals.processes = setInterval(async () => {
+                    // Only refresh if still on processes tab
+                    if (this.activeTab === 'processes' && this.isOpen) {
+                        await this.renderProcesses(container);
+                    }
+                }, CONFIG.pollInterval);
+            }
+        },
+        
+        async renderProcesses(container) {
+            try {
+                const data = await apiCall('/api/processes/');
+                const processes = data.processes || [];
+                
+                // Sort by CPU usage
+                processes.sort((a, b) => (b.cpu_percent || 0) - (a.cpu_percent || 0));
+                
+                container.innerHTML = `
+                    <div class="processes-section">
+                        <div class="info-card full-width">
+                            <div class="card-header">
+                                ${ICONS.process}
+                                <h3>Running Processes</h3>
+                                <span class="card-badge">${processes.length} processes</span>
+                            </div>
+                            <div class="card-body">
+                                <table class="data-table processes-table">
+                                    <thead>
                                         <tr>
-                                            <td class="mono">${proc.pid}</td>
-                                            <td title="${escapeHtml(proc.cmdline || proc.name)}">${escapeHtml(proc.name)}</td>
-                                            <td>${escapeHtml(proc.username || 'root')}</td>
-                                            <td class="${(proc.cpu_percent || 0) > 50 ? 'highlight' : ''}">${(proc.cpu_percent || 0).toFixed(1)}%</td>
-                                            <td class="${(proc.memory_percent || 0) > 50 ? 'highlight' : ''}">${(proc.memory_percent || 0).toFixed(1)}%</td>
-                                            <td><span class="status-badge ${proc.status}">${proc.status || 'running'}</span></td>
+                                            <th>PID</th>
+                                            <th>Name</th>
+                                            <th>User</th>
+                                            <th>CPU %</th>
+                                            <th>Memory %</th>
+                                            <th>Status</th>
                                         </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                            ${processes.length > 50 ? `<p class="table-note">Showing top 50 processes by CPU usage</p>` : ''}
+                                    </thead>
+                                    <tbody>
+                                        ${processes.slice(0, 50).map(proc => `
+                                            <tr>
+                                                <td class="mono">${proc.pid}</td>
+                                                <td title="${escapeHtml(proc.cmdline || proc.name)}">${escapeHtml(proc.name)}</td>
+                                                <td>${escapeHtml(proc.username || 'root')}</td>
+                                                <td class="${(proc.cpu_percent || 0) > 50 ? 'highlight' : ''}">${(proc.cpu_percent || 0).toFixed(1)}%</td>
+                                                <td class="${(proc.memory_percent || 0) > 50 ? 'highlight' : ''}">${(proc.memory_percent || 0).toFixed(1)}%</td>
+                                                <td><span class="status-badge ${proc.status}">${proc.status || 'running'}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                                ${processes.length > 50 ? `<p class="table-note">Showing top 50 processes by CPU usage</p>` : ''}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-            
-            // Auto-refresh
-            this.refreshIntervals.processes = setInterval(() => {
-                this.loadProcessesTab(container);
-            }, CONFIG.pollInterval);
+                `;
+            } catch (error) {
+                console.error('Failed to load processes:', error);
+            }
         },
 
         // ==========================================
