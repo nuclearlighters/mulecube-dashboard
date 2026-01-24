@@ -14,8 +14,7 @@
     // Configuration
     // ==========================================
     const CONFIG = {
-        statsEndpoint: '/stats.json',
-        powerEndpoint: 'http://servicemanager.mulecube.net/api/power/status',
+        apiBase: 'http://servicemanager.mulecube.net',
         syncEndpoint: '/api/sync/status',
         statsPollInterval: 5000,
         serviceCheckTimeout: 3000,
@@ -683,34 +682,72 @@
         
         async fetchStats() {
             try {
-                // Fetch system stats
-                const statsResponse = await fetch(CONFIG.statsEndpoint, { 
-                    cache: 'no-store',
-                    signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
-                });
+                const timeout = CONFIG.serviceCheckTimeout;
+                const apiBase = CONFIG.apiBase;
+                
+                // Fetch all data in parallel from service-manager API
+                const [statsRes, infoRes, powerRes, clientsRes, interfacesRes] = await Promise.allSettled([
+                    fetch(`${apiBase}/api/system/stats`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/system/info`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/power/status`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/network/clients`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/network/interfaces`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) })
+                ]);
                 
                 let data = {};
-                if (statsResponse.ok) {
-                    data = await statsResponse.json();
+                
+                // System stats (CPU, memory, disk, temperature)
+                if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
+                    const stats = await statsRes.value.json();
+                    data.cpu = Math.round(stats.cpu_percent || stats.cpu || 0);
+                    data.memory = Math.round(stats.memory_percent || stats.memory || 0);
+                    data.disk = Math.round(stats.disk_percent || stats.disk || 0);
+                    data.temperature = Math.round(stats.temperature || stats.cpu_temp || 0);
                 }
                 
-                // Fetch power/battery data from UPS API
-                try {
-                    const powerResponse = await fetch(CONFIG.powerEndpoint, {
-                        cache: 'no-store',
-                        signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
-                    });
-                    if (powerResponse.ok) {
-                        const powerData = await powerResponse.json();
-                        data.battery_available = powerData.i2c_connected;
-                        data.battery_percent = Math.round(powerData.battery?.capacity || 0);
-                        data.battery_charging = powerData.charging?.active || false;
-                        data.battery_time = powerData.estimated_runtime_minutes 
-                            ? `${Math.floor(powerData.estimated_runtime_minutes / 60)}h ${powerData.estimated_runtime_minutes % 60}m`
-                            : '';
+                // System info (hostname, uptime)
+                if (infoRes.status === 'fulfilled' && infoRes.value.ok) {
+                    const info = await infoRes.value.json();
+                    data.hostname = info.hostname || 'mulecube';
+                    // Format uptime from seconds
+                    const secs = info.uptime_seconds || info.uptime || 0;
+                    const days = Math.floor(secs / 86400);
+                    const hours = Math.floor((secs % 86400) / 3600);
+                    const mins = Math.floor((secs % 3600) / 60);
+                    data.uptime = days > 0 ? `${days}d ${hours}h ${mins}m` : `${hours}h ${mins}m`;
+                }
+                
+                // Power/battery status
+                if (powerRes.status === 'fulfilled' && powerRes.value.ok) {
+                    const power = await powerRes.value.json();
+                    data.battery_available = power.i2c_connected || false;
+                    data.battery_percent = Math.round(power.battery?.capacity || 0);
+                    data.battery_charging = power.charging?.active || false;
+                    if (power.estimated_runtime_minutes) {
+                        const h = Math.floor(power.estimated_runtime_minutes / 60);
+                        const m = power.estimated_runtime_minutes % 60;
+                        data.battery_time = h > 0 ? `${h}h ${m}m` : `${m}m`;
+                    } else {
+                        data.battery_time = '';
                     }
-                } catch (powerError) {
-                    console.warn('Power API fetch error:', powerError);
+                }
+                
+                // Network clients (WiFi)
+                if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
+                    const clients = await clientsRes.value.json();
+                    const clientList = Array.isArray(clients) ? clients : (clients.clients || []);
+                    const wifiClients = clientList.filter(c => 
+                        c.interface === 'wlan0' || c.interface === 'ap0' || c.type === 'wifi'
+                    ).length;
+                    data.wifi = `${wifiClients} clients`;
+                }
+                
+                // Network interfaces (Ethernet status)
+                if (interfacesRes.status === 'fulfilled' && interfacesRes.value.ok) {
+                    const interfaces = await interfacesRes.value.json();
+                    const ifaceList = Array.isArray(interfaces) ? interfaces : (interfaces.interfaces || []);
+                    const eth0 = ifaceList.find(i => i.name === 'eth0' || i.interface === 'eth0');
+                    data.ethernet = (eth0 && (eth0.is_up || eth0.status === 'up' || eth0.carrier)) ? 'Connected' : 'Disconnected';
                 }
                 
                 this.updateDisplay(data);
