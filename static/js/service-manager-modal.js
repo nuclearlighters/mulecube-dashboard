@@ -259,7 +259,7 @@ const ServiceManagerModal = {
                 // Don't regenerate services - keep user's changes
             } else {
                 // Production: fetch from API (single call, no individual details)
-                const response = await fetch('/api/services', {
+                const response = await fetch('http://servicemanager.mulecube.net/api/services', {
                     signal: AbortSignal.timeout(15000)
                 });
                 const data = await response.json();
@@ -330,7 +330,7 @@ const ServiceManagerModal = {
         // Fetch in parallel with timeout
         const fetchPromises = runningServices.map(async (svc) => {
             try {
-                const response = await fetch(`/api/services/${svc.name}`, {
+                const response = await fetch(`http://servicemanager.mulecube.net/api/services/${svc.name}`, {
                     signal: AbortSignal.timeout(5000)
                 });
                 if (response.ok) {
@@ -638,7 +638,7 @@ const ServiceManagerModal = {
             } else {
                 // Production: call API
                 const endpoint = enable ? 'enable' : 'disable';
-                const response = await fetch(`/api/services/${serviceName}/${endpoint}`, {
+                const response = await fetch(`http://servicemanager.mulecube.net/api/services/${serviceName}/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ force: false })
@@ -652,7 +652,7 @@ const ServiceManagerModal = {
                     const confirmed = confirm(`${deps} depend on ${serviceName}. Disable anyway?`);
                     
                     if (confirmed) {
-                        const forceResponse = await fetch(`/api/services/${serviceName}/disable`, {
+                        const forceResponse = await fetch(`http://servicemanager.mulecube.net/api/services/${serviceName}/disable`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ force: true })

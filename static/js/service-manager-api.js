@@ -4,7 +4,7 @@
  */
 
 const ServiceManagerAPI = {
-    endpoint: '/api/services',
+    endpoint: 'http://servicemanager.mulecube.net/api/services',
     services: {},
     containerStatus: {},  // Status for ALL containers (including system services)
     containerMap: {},
