@@ -300,38 +300,19 @@
                 apiCall('/api/system/stats')
             ]);
             
-            // Debug: log the actual response structure
-            console.log('System Info API response:', info);
-            console.log('System Stats API response:', stats);
+            // Extract values using EXACT field names from API
+            const cpuPercent = stats.cpu?.percent || 0;
+            const cpuCores = stats.cpu?.count || stats.cpu?.count_logical || 4;
+            const cpuFreqCurrent = stats.cpu?.frequency_current || 0;  // in MHz
+            const cpuFreqMax = stats.cpu?.frequency_max || 0;  // in MHz
             
-            // Handle different possible response structures for CPU
-            const cpuPercent = stats.cpu?.percent || stats.cpu_percent || stats.cpu?.usage || 0;
-            const cpuCores = stats.cpu?.cores || stats.cpu?.count || stats.cores || 4;
-            const cpuFreqCurrent = stats.cpu?.freq_current || stats.cpu?.frequency || stats.cpu_freq || 0;
-            const cpuFreqMax = stats.cpu?.freq_max || stats.cpu?.max_frequency || cpuFreqCurrent || 0;
+            const memPercent = stats.memory?.percent || 0;
+            const memUsedBytes = stats.memory?.used_bytes || 0;
+            const memTotalBytes = stats.memory?.total_bytes || 0;
+            const memAvailBytes = stats.memory?.available_bytes || 0;
             
-            // Handle different possible response structures for Memory
-            const memPercent = stats.memory?.percent || stats.memory_percent || stats.mem?.percent || 0;
-            // Memory values could be in bytes or MB - detect and convert
-            let memUsed = stats.memory?.used || stats.mem?.used || stats.memory_used || 0;
-            let memTotal = stats.memory?.total || stats.mem?.total || stats.memory_total || 0;
-            let memAvailable = stats.memory?.available || stats.mem?.available || stats.memory_available || 0;
-            
-            // If values look like they're already in bytes (> 100000), use directly
-            // Otherwise assume they're in MB and convert
-            if (memTotal > 0 && memTotal < 100000) {
-                memUsed = memUsed * 1024 * 1024;
-                memTotal = memTotal * 1024 * 1024;
-                memAvailable = memAvailable * 1024 * 1024;
-            }
-            
-            // Handle different possible response structures for Temperature
-            const temp = stats.temperature?.current || stats.temperature?.cpu || stats.temp || stats.cpu_temp || 0;
+            const temp = stats.temperature?.cpu_temp_c || 0;
             const tempStatus = temp > 80 ? 'danger' : temp > 70 ? 'warning' : 'normal';
-            
-            // Handle frequency - could be in MHz or Hz
-            const freqCurrent = cpuFreqCurrent > 10000 ? cpuFreqCurrent / 1000000 : cpuFreqCurrent / 1000;
-            const freqMax = cpuFreqMax > 10000 ? cpuFreqMax / 1000000 : cpuFreqMax / 1000;
             
             container.innerHTML = `
                 <div class="overview-grid">
@@ -348,19 +329,19 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Model</span>
-                                <span class="info-value">${escapeHtml(info.model || info.hardware || 'Raspberry Pi')}</span>
+                                <span class="info-value">${escapeHtml(info.pi_model || 'Raspberry Pi')}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Serial</span>
-                                <span class="info-value mono">${escapeHtml(info.serial || info.serial_number || 'N/A')}</span>
+                                <span class="info-value mono">${escapeHtml(info.pi_serial || 'N/A')}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Uptime</span>
-                                <span class="info-value">${formatUptime(info.uptime_seconds || info.uptime || 0)}</span>
+                                <span class="info-value">${info.uptime_human || formatUptime(info.uptime_seconds || 0)}</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Boot Time</span>
-                                <span class="info-value">${formatDateTime(info.boot_time || info.boot_timestamp)}</span>
+                                <span class="info-value">${formatDateTime(info.boot_time)}</span>
                             </div>
                         </div>
                     </div>
@@ -383,11 +364,11 @@
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Frequency</span>
-                                    <span class="stat-value">${freqCurrent > 0 ? freqCurrent.toFixed(1) + ' GHz' : 'N/A'}</span>
+                                    <span class="stat-value">${(cpuFreqCurrent / 1000).toFixed(1)} GHz</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Max Freq</span>
-                                    <span class="stat-value">${freqMax > 0 ? freqMax.toFixed(1) + ' GHz' : 'N/A'}</span>
+                                    <span class="stat-value">${(cpuFreqMax / 1000).toFixed(1)} GHz</span>
                                 </div>
                             </div>
                         </div>
@@ -407,15 +388,15 @@
                             <div class="stats-row">
                                 <div class="stat-item">
                                     <span class="stat-label">Used</span>
-                                    <span class="stat-value">${memUsed > 0 ? formatBytes(memUsed) : 'N/A'}</span>
+                                    <span class="stat-value">${formatBytes(memUsedBytes)}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Total</span>
-                                    <span class="stat-value">${memTotal > 0 ? formatBytes(memTotal) : 'N/A'}</span>
+                                    <span class="stat-value">${formatBytes(memTotalBytes)}</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label">Available</span>
-                                    <span class="stat-value">${memAvailable > 0 ? formatBytes(memAvailable) : 'N/A'}</span>
+                                    <span class="stat-value">${formatBytes(memAvailBytes)}</span>
                                 </div>
                             </div>
                         </div>
@@ -426,11 +407,11 @@
                         <div class="card-header">
                             ${ICONS.temp}
                             <h3>Temperature</h3>
-                            <span class="card-value ${tempStatus}">${temp > 0 ? temp.toFixed(1) + '°C' : 'N/A'}</span>
+                            <span class="card-value ${tempStatus}">${temp.toFixed(1)}°C</span>
                         </div>
                         <div class="card-body">
                             <div class="temp-gauge">
-                                <div class="temp-bar ${tempStatus}" style="width: ${temp > 0 ? Math.min(temp, 100) : 0}%"></div>
+                                <div class="temp-bar ${tempStatus}" style="width: ${Math.min(temp, 100)}%"></div>
                                 <div class="temp-markers">
                                     <span>0°C</span>
                                     <span>50°C</span>
@@ -438,7 +419,7 @@
                                 </div>
                             </div>
                             <div class="temp-status ${tempStatus}">
-                                ${temp > 80 ? 'Throttling may occur' : temp > 70 ? 'Running warm' : temp > 0 ? 'Normal operating temperature' : 'Temperature sensor unavailable'}
+                                ${temp > 80 ? 'Throttling may occur' : temp > 70 ? 'Running warm' : 'Normal operating temperature'}
                             </div>
                         </div>
                     </div>
@@ -476,8 +457,8 @@
             // Guard against running on wrong tab
             if (this.activeTab !== 'overview') return;
             
-            // Update CPU - handle different field names
-            const cpuPercent = stats.cpu?.percent || stats.cpu_percent || stats.cpu?.usage || 0;
+            // Update CPU - using exact API field names
+            const cpuPercent = stats.cpu?.percent || 0;
             const cpuCard = document.querySelector('.overview-grid .info-card:nth-child(2)');
             if (cpuCard) {
                 const valueEl = cpuCard.querySelector('.card-value');
@@ -486,8 +467,8 @@
                 if (barEl) barEl.style.width = `${cpuPercent}%`;
             }
             
-            // Update Memory - handle different field names
-            const memPercent = stats.memory?.percent || stats.memory_percent || stats.mem?.percent || 0;
+            // Update Memory - using exact API field names
+            const memPercent = stats.memory?.percent || 0;
             const memCard = document.querySelector('.overview-grid .info-card:nth-child(3)');
             if (memCard) {
                 const valueEl = memCard.querySelector('.card-value');
@@ -496,14 +477,14 @@
                 if (barEl) barEl.style.width = `${memPercent}%`;
             }
             
-            // Update Temperature - handle different field names
-            const temp = stats.temperature?.current || stats.temperature?.cpu || stats.temp || stats.cpu_temp || 0;
+            // Update Temperature - using exact API field names
+            const temp = stats.temperature?.cpu_temp_c || 0;
             const tempCard = document.querySelector('.overview-grid .info-card:nth-child(4)');
             if (tempCard) {
                 const tempStatus = temp > 80 ? 'danger' : temp > 70 ? 'warning' : 'normal';
                 const valueEl = tempCard.querySelector('.card-value');
                 if (valueEl) {
-                    valueEl.textContent = temp > 0 ? `${temp.toFixed(1)}°C` : 'N/A';
+                    valueEl.textContent = `${temp.toFixed(1)}°C`;
                     valueEl.className = `card-value ${tempStatus}`;
                 }
             }
@@ -544,27 +525,20 @@
         // ==========================================
         async loadNetworkTab(container) {
             const [clients, interfaces] = await Promise.all([
-                apiCall('/api/clients/').catch(() => ({ clients: [] })),
-                apiCall('/api/network/interfaces').catch(() => ({ interfaces: [] }))
+                apiCall('/api/clients/').catch(() => []),
+                apiCall('/api/network/interfaces').catch(() => [])
             ]);
             
-            // Debug: log the actual response structure
-            console.log('Clients API response:', clients);
-            console.log('Interfaces API response:', interfaces);
+            // API returns arrays directly, not wrapped in objects
+            const wifiClients = Array.isArray(clients) ? clients : (clients.clients || []);
+            const netInterfaces = Array.isArray(interfaces) ? interfaces : (interfaces.interfaces || []);
             
-            // Handle different response structures for clients
-            const wifiClients = clients.clients || clients.devices || clients.connected || (Array.isArray(clients) ? clients : []);
-            
-            // Handle different response structures for interfaces
-            let netInterfaces = interfaces.interfaces || interfaces.network || (Array.isArray(interfaces) ? interfaces : []);
-            
-            // Filter to main interfaces (if we have any)
-            const mainInterfaces = netInterfaces.length > 0 ? netInterfaces.filter(i => 
-                ['eth0', 'wlan0', 'wlan1', 'ap0', 'br0', 'docker0', 'end0'].includes(i.name) ||
-                i.name?.startsWith('wlan') ||
-                i.name?.startsWith('eth') ||
-                i.name?.startsWith('en')
-            ) : [];
+            // Filter to main interfaces (eth0, wlan0, etc. - exclude Docker bridges and veths)
+            const mainInterfaces = netInterfaces.filter(i => 
+                ['eth0', 'wlan0', 'wlan1', 'ap0', 'end0'].includes(i.name) ||
+                (i.name?.startsWith('eth') && !i.name?.includes('veth')) ||
+                (i.name?.startsWith('wlan'))
+            );
             
             container.innerHTML = `
                 <div class="network-section">
@@ -627,9 +601,9 @@
                                                 </span>
                                             </div>
                                             <div class="interface-details">
-                                                ${iface.ipv4 ? `<div class="detail"><span>IPv4:</span> <span class="mono">${escapeHtml(iface.ipv4)}</span></div>` : ''}
-                                                ${iface.mac ? `<div class="detail"><span>MAC:</span> <span class="mono">${escapeHtml(iface.mac)}</span></div>` : ''}
-                                                ${iface.type ? `<div class="detail"><span>Type:</span> ${escapeHtml(iface.type)}</div>` : ''}
+                                                ${iface.ipv4_addresses?.length ? `<div class="detail"><span>IPv4:</span> <span class="mono">${escapeHtml(iface.ipv4_addresses[0])}</span></div>` : ''}
+                                                ${iface.mac_address ? `<div class="detail"><span>MAC:</span> <span class="mono">${escapeHtml(iface.mac_address)}</span></div>` : ''}
+                                                ${iface.speed_mbps ? `<div class="detail"><span>Speed:</span> ${iface.speed_mbps} Mbps</div>` : ''}
                                             </div>
                                         </div>
                                     `).join('')}
@@ -646,17 +620,27 @@
         // ==========================================
         async loadStorageTab(container) {
             const [disks, dockerVolumes] = await Promise.all([
-                apiCall('/api/storage/disks').catch(() => ({ disks: [] })),
-                apiCall('/api/storage/docker').catch(() => ({ volumes: [] }))
+                apiCall('/api/storage/disks').catch(() => []),
+                apiCall('/api/storage/docker').catch(() => [])
             ]);
             
-            // Debug: log the actual response structure
-            console.log('Disks API response:', disks);
-            console.log('Docker volumes API response:', dockerVolumes);
+            // API returns arrays directly, not wrapped in objects
+            const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
+            const volumes = Array.isArray(dockerVolumes) ? dockerVolumes : (dockerVolumes.volumes || []);
             
-            // Handle different response structures
-            const diskList = disks.disks || disks.partitions || disks.filesystems || (Array.isArray(disks) ? disks : []);
-            const volumes = dockerVolumes.volumes || dockerVolumes.Volumes || (Array.isArray(dockerVolumes) ? dockerVolumes : []);
+            // Filter to unique mountpoints (API returns duplicates for bind mounts)
+            const seenMounts = new Set();
+            const uniqueDisks = diskList.filter(disk => {
+                // Skip non-root partitions and keep only main storage
+                if (seenMounts.has(disk.mountpoint)) return false;
+                if (disk.mountpoint.startsWith('/etc/') || 
+                    disk.mountpoint.startsWith('/var/lib/misc') ||
+                    disk.mountpoint.startsWith('/host/')) {
+                    return false;
+                }
+                seenMounts.add(disk.mountpoint);
+                return true;
+            });
             
             container.innerHTML = `
                 <div class="storage-section">
@@ -667,12 +651,12 @@
                             <h3>Disk Partitions</h3>
                         </div>
                         <div class="card-body">
-                            ${diskList.length === 0 ? `
+                            ${uniqueDisks.length === 0 ? `
                                 <div class="empty-state"><p>No disk information available</p></div>
                             ` : `
                                 <div class="disk-grid">
-                                    ${diskList.map(disk => {
-                                        const usedPercent = disk.percent || 0;
+                                    ${uniqueDisks.map(disk => {
+                                        const usedPercent = disk.percent_used || disk.percent || 0;
                                         const status = usedPercent > 90 ? 'danger' : usedPercent > 75 ? 'warning' : 'normal';
                                         return `
                                             <div class="disk-card">
@@ -684,7 +668,7 @@
                                                     <div class="progress-bar ${status}" style="width: ${usedPercent}%"></div>
                                                 </div>
                                                 <div class="disk-details">
-                                                    <span>${formatBytes(disk.used || 0)} / ${formatBytes(disk.total || 0)}</span>
+                                                    <span>${disk.used_human || formatBytes(disk.used_bytes || 0)} / ${disk.total_human || formatBytes(disk.total_bytes || 0)}</span>
                                                     <span class="disk-device mono">${escapeHtml(disk.device)}</span>
                                                 </div>
                                             </div>
