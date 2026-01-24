@@ -23,8 +23,10 @@ const ServiceManagerAPI = {
     demoDisabledServices: ['bentopdf', 'linkwarden'],
     
     async init() {
-        // Check for demo mode
-        this.isDemo = typeof ModeManager !== 'undefined' && ModeManager.isDemo;
+        // Check for demo mode - check meta tag directly to avoid race condition with ModeManager
+        const metaTag = document.querySelector('meta[name="mulecube-mode"]');
+        this.isDemo = (metaTag && metaTag.content === 'demo') || 
+                      (typeof ModeManager !== 'undefined' && ModeManager.isDemo);
         
         this.buildContainerMap();
         this.setupStatusBannerToggle();
