@@ -686,70 +686,107 @@
                 const apiBase = CONFIG.apiBase;
                 
                 // Fetch all data in parallel from service-manager API
-                const [statsRes, infoRes, powerRes, clientsRes, interfacesRes] = await Promise.allSettled([
+                const [statsRes, infoRes, powerRes, clientsRes, interfacesRes, storageRes] = await Promise.allSettled([
                     fetch(`${apiBase}/api/system/stats`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/system/info`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/power/status`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/network/clients`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
-                    fetch(`${apiBase}/api/network/interfaces`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) })
+                    fetch(`${apiBase}/api/network/interfaces`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/storage/disks`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) })
                 ]);
                 
                 let data = {};
                 
-                // System stats (CPU, memory, disk, temperature)
+                // System stats (CPU, memory, temperature) - nested objects!
                 if (statsRes.status === 'fulfilled' && statsRes.value.ok) {
-                    const stats = await statsRes.value.json();
-                    data.cpu = Math.round(stats.cpu_percent || stats.cpu || 0);
-                    data.memory = Math.round(stats.memory_percent || stats.memory || 0);
-                    data.disk = Math.round(stats.disk_percent || stats.disk || 0);
-                    data.temperature = Math.round(stats.temperature || stats.cpu_temp || 0);
+                    try {
+                        const stats = await statsRes.value.json();
+                        console.log('Stats API response:', stats);
+                        // CPU is nested: stats.cpu.percent
+                        data.cpu = Math.round(stats.cpu?.percent ?? stats.cpu ?? 0);
+                        // Memory is nested: stats.memory.percent  
+                        data.memory = Math.round(stats.memory?.percent ?? stats.memory ?? 0);
+                        // Temperature is nested: stats.temperature.cpu_temp_c
+                        data.temperature = Math.round(stats.temperature?.cpu_temp_c ?? stats.temperature ?? 0);
+                    } catch (e) { console.warn('Stats parse error:', e); }
+                } else {
+                    console.warn('Stats fetch failed:', statsRes.status, statsRes.reason);
+                }
+                
+                // Storage/disk usage - separate endpoint
+                if (storageRes.status === 'fulfilled' && storageRes.value.ok) {
+                    try {
+                        const disks = await storageRes.value.json();
+                        console.log('Storage API response:', disks);
+                        const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
+                        // Find root partition
+                        const rootDisk = diskList.find(d => d.mountpoint === '/' || d.mount === '/');
+                        data.disk = Math.round(rootDisk?.percent ?? rootDisk?.used_percent ?? 0);
+                    } catch (e) { console.warn('Storage parse error:', e); }
+                } else {
+                    console.warn('Storage fetch failed:', storageRes.status, storageRes.reason);
                 }
                 
                 // System info (hostname, uptime)
                 if (infoRes.status === 'fulfilled' && infoRes.value.ok) {
-                    const info = await infoRes.value.json();
-                    data.hostname = info.hostname || 'mulecube';
-                    // Format uptime from seconds
-                    const secs = info.uptime_seconds || info.uptime || 0;
-                    const days = Math.floor(secs / 86400);
-                    const hours = Math.floor((secs % 86400) / 3600);
-                    const mins = Math.floor((secs % 3600) / 60);
-                    data.uptime = days > 0 ? `${days}d ${hours}h ${mins}m` : `${hours}h ${mins}m`;
+                    try {
+                        const info = await infoRes.value.json();
+                        data.hostname = info.hostname || 'mulecube';
+                        // Format uptime from seconds
+                        const secs = info.uptime_seconds || info.uptime || 0;
+                        const days = Math.floor(secs / 86400);
+                        const hours = Math.floor((secs % 86400) / 3600);
+                        const mins = Math.floor((secs % 3600) / 60);
+                        data.uptime = days > 0 ? `${days}d ${hours}h ${mins}m` : `${hours}h ${mins}m`;
+                    } catch (e) { console.warn('Info parse error:', e); }
                 }
                 
                 // Power/battery status
                 if (powerRes.status === 'fulfilled' && powerRes.value.ok) {
-                    const power = await powerRes.value.json();
-                    data.battery_available = power.i2c_connected || false;
-                    data.battery_percent = Math.round(power.battery?.capacity || 0);
-                    data.battery_charging = power.charging?.active || false;
-                    if (power.estimated_runtime_minutes) {
-                        const h = Math.floor(power.estimated_runtime_minutes / 60);
-                        const m = power.estimated_runtime_minutes % 60;
-                        data.battery_time = h > 0 ? `${h}h ${m}m` : `${m}m`;
-                    } else {
-                        data.battery_time = '';
-                    }
+                    try {
+                        const power = await powerRes.value.json();
+                        data.battery_available = power.i2c_connected || false;
+                        data.battery_percent = Math.round(power.battery?.capacity || 0);
+                        data.battery_charging = power.charging?.active || false;
+                        if (power.estimated_runtime_minutes) {
+                            const h = Math.floor(power.estimated_runtime_minutes / 60);
+                            const m = power.estimated_runtime_minutes % 60;
+                            data.battery_time = h > 0 ? `${h}h ${m}m` : `${m}m`;
+                        } else {
+                            data.battery_time = '';
+                        }
+                    } catch (e) { console.warn('Power parse error:', e); }
                 }
                 
                 // Network clients (WiFi)
                 if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
-                    const clients = await clientsRes.value.json();
-                    const clientList = Array.isArray(clients) ? clients : (clients.clients || []);
-                    const wifiClients = clientList.filter(c => 
-                        c.interface === 'wlan0' || c.interface === 'ap0' || c.type === 'wifi'
-                    ).length;
-                    data.wifi = `${wifiClients} clients`;
+                    try {
+                        const clients = await clientsRes.value.json();
+                        console.log('Clients API response:', clients);
+                        const clientList = Array.isArray(clients) ? clients : (clients.clients || []);
+                        const wifiClients = clientList.filter(c => 
+                            c.interface === 'wlan0' || c.interface === 'ap0' || c.type === 'wifi'
+                        ).length;
+                        data.wifi = `${wifiClients} clients`;
+                    } catch (e) { console.warn('Clients parse error:', e); }
+                } else {
+                    console.warn('Clients fetch failed:', clientsRes.status, clientsRes.reason);
                 }
                 
                 // Network interfaces (Ethernet status)
                 if (interfacesRes.status === 'fulfilled' && interfacesRes.value.ok) {
-                    const interfaces = await interfacesRes.value.json();
-                    const ifaceList = Array.isArray(interfaces) ? interfaces : (interfaces.interfaces || []);
-                    const eth0 = ifaceList.find(i => i.name === 'eth0' || i.interface === 'eth0');
-                    data.ethernet = (eth0 && (eth0.is_up || eth0.status === 'up' || eth0.carrier)) ? 'Connected' : 'Disconnected';
+                    try {
+                        const interfaces = await interfacesRes.value.json();
+                        console.log('Interfaces API response:', interfaces);
+                        const ifaceList = Array.isArray(interfaces) ? interfaces : (interfaces.interfaces || []);
+                        const eth0 = ifaceList.find(i => i.name === 'eth0' || i.interface === 'eth0');
+                        data.ethernet = (eth0 && (eth0.is_up || eth0.status === 'up' || eth0.carrier)) ? 'Connected' : 'Disconnected';
+                    } catch (e) { console.warn('Interfaces parse error:', e); }
+                } else {
+                    console.warn('Interfaces fetch failed:', interfacesRes.status, interfacesRes.reason);
                 }
                 
+                console.log('Final stats data:', data);
                 this.updateDisplay(data);
             } catch (error) {
                 console.warn('Stats fetch error:', error);
@@ -758,18 +795,21 @@
         },
         
         updateDisplay(data) {
-            if (this.elements.cpu) this.elements.cpu.textContent = `${data.cpu}%`;
-            if (this.elements.memory) this.elements.memory.textContent = `${data.memory}%`;
-            if (this.elements.disk) this.elements.disk.textContent = `${data.disk}%`;
+            if (this.elements.cpu) this.elements.cpu.textContent = `${data.cpu ?? '--'}%`;
+            if (this.elements.memory) this.elements.memory.textContent = `${data.memory ?? '--'}%`;
+            if (this.elements.disk) this.elements.disk.textContent = `${data.disk ?? '--'}%`;
             if (this.elements.wifi) this.elements.wifi.textContent = data.wifi || 'N/A';
-            if (this.elements.ethernet) this.elements.ethernet.textContent = data.ethernet || 'N/A';
+            if (this.elements.ethernet) this.elements.ethernet.textContent = data.ethernet || '--';
             if (this.elements.hostname) this.elements.hostname.textContent = data.hostname || 'mulecube';
             if (this.elements.uptime) this.elements.uptime.textContent = data.uptime || '--';
             
             // Temperature with color coding
-            if (this.elements.temperature && data.temperature) {
-                this.elements.temperature.textContent = `${data.temperature}°C`;
-                this.elements.temperature.style.color = data.temperature > 80 ? '#ef4444' : data.temperature > 70 ? '#f59e0b' : '#22c55e';
+            if (this.elements.temperature) {
+                const temp = data.temperature ?? null;
+                this.elements.temperature.textContent = temp !== null ? `${temp}°C` : '--°C';
+                if (temp !== null) {
+                    this.elements.temperature.style.color = temp > 80 ? '#ef4444' : temp > 70 ? '#f59e0b' : '#22c55e';
+                }
             }
             
             // Battery (only show when available)

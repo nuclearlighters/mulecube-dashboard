@@ -52,7 +52,7 @@
             </span>
         </div>
         
-	<div class="stats-group stats-controls">
+	<div class="stats-group stats-controls" id="statsControlsGroup">
 	    <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
 	    <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
 	</div>        
@@ -366,3 +366,22 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') hideModal(); });
 })();
 </script>
+
+<style>
+/* System button in stats controls */
+.power-btn.system-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.power-btn.system-btn:hover {
+    border-color: #22c55e;
+    color: #22c55e;
+}
+
+.power-btn.system-btn svg {
+    width: 14px;
+    height: 14px;
+}
+</style>
