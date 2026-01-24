@@ -51,7 +51,7 @@ params:
           icon: "/images/icons/kiwix.ico"
           fallback: "◆"
           gradient: "#22c55e, #16a34a"
-        - name: Maps
+        - name: TileServer GL
           url: "http://tileservergl.mulecube.net"
           demo_url: "https://docs.maptiler.com/guides/self-hosting/map-server/"
           description: "View maps & plan routes"
@@ -60,7 +60,7 @@ params:
           icon: "/images/icons/openstreetmap.png"
           fallback: "◆"
           gradient: "#f59e0b, #d97706"
-        - name: Navigation
+        - name: Signal K
           url: "http://signalk.mulecube.net/@signalk/freeboard-sk/"
           demo_url: "https://signalk.org/about/"
           description: "Navigate with nautical charts"
@@ -69,7 +69,7 @@ params:
           icon: "/images/icons/fb-map.svg"
           fallback: "⚓"
           gradient: "#0077be, #005a8c"
-        - name: Calibre
+        - name: Calibre-Web
           url: "http://calibreweb.mulecube.net"
           demo_url: "https://github.com/janeczku/calibre-web?tab=readme-ov-file#calibre-web"
           description: "Read & manage your books"
@@ -78,7 +78,7 @@ params:
           icon: "/images/icons/calibre.ico"
           fallback: "◆"
           gradient: "#8b4513, #a0522d"
-        - name: Emergency
+        - name: RadioReference
           url: "http://emergency.mulecube.net"
           demo_url: "https://wiki.radioreference.com/index.php/Main_Page"
           description: "Look up radio frequencies"
@@ -88,8 +88,8 @@ params:
           fallback: "◆"
           gradient: "#dc2626, #b91c1c"
     
-    collaboration:
-      title: "Collaboration"
+    productivity:
+      title: "Productivity"
       items:
         - name: CryptPad
           url: "http://cryptpad.mulecube.net"
@@ -118,10 +118,6 @@ params:
           icon: "/images/icons/fb-file.svg"
           fallback: "◆"
           gradient: "#f43f5e, #e11d48"
-    
-    security:
-      title: "Security"
-      items:
         - name: Vaultwarden
           url: "https://vaultwarden.mulecube.net"
           demo_url: "https://bitwarden.com/help/getting-started-webvault/"
@@ -175,7 +171,7 @@ params:
     communication:
       title: "Communication"
       items:
-        - name: Element Chat
+        - name: Element
           url: "http://element.mulecube.net"
           demo_url: "https://element.io/en/user-guide"
           description: "Chat with your team"
@@ -193,20 +189,11 @@ params:
           icon: "/images/icons/meshtastic.png"
           fallback: "◆"
           gradient: "#67e8f9, #22d3ee"
-        - name: Conduit
-          url: "http://conduit.mulecube.net"
-          demo_url: "https://docs.conduit.rs/"
-          description: "Host private chat rooms"
-          service: conduit
-          container: conduit
-          icon: "/images/icons/fb-phone.svg"
-          fallback: "◆"
-          gradient: "#a855f7, #9333ea"
     
     tools:
       title: "Tools"
       items:
-        - name: App Store
+        - name: F-Droid
           url: "http://apkrepo.mulecube.net"
           demo_url: "https://f-droid.org/en/about/"
           description: "Download apps offline"
@@ -224,7 +211,7 @@ params:
           icon: "/images/icons/ittools.ico"
           fallback: "◆"
           gradient: "#6366f1, #4f46e5"
-        - name: Network Tools
+        - name: Networking Toolbox
           url: "http://networktools.mulecube.net"
           demo_url: "https://networkingtoolbox.net/about"
           description: "Test your network"
@@ -264,20 +251,11 @@ params:
           icon: "/images/icons/pihole.png"
           fallback: "◆"
           gradient: "#ef4444, #dc2626"
-        - name: Ollama
-          url: "http://ollama.mulecube.net"
-          demo_url: "https://docs.ollama.com/"
-          description: "Run AI models locally"
-          service: ollama
-          container: ollama
-          icon: "/images/icons/ollama.png"
-          fallback: "◆"
-          gradient: "#1e1e1e, #333"
     
     admin:
       title: "Admin"
       items:
-        - name: Containers
+        - name: Dockge
           url: "http://dockge.mulecube.net"
           demo_url: "https://dockge.kuma.pet/"
           description: "Manage containers"
@@ -286,7 +264,7 @@ params:
           icon: "/images/icons/dockge.svg"
           fallback: "◆"
           gradient: "#22c55e, #16a34a"
-        - name: Logs
+        - name: Dozzle
           url: "http://dozzle.mulecube.net"
           demo_url: "https://dozzle.dev/"
           description: "View container logs"
@@ -295,7 +273,7 @@ params:
           icon: "/images/icons/dozzle.ico"
           fallback: "◆"
           gradient: "#3b82f6, #1d4ed8"
-        - name: Terminal
+        - name: ttyd
           url: "http://terminal.mulecube.net"
           demo_url: "https://tsl0922.github.io/ttyd/"
           description: "Access terminal remotely"
@@ -322,6 +300,28 @@ params:
           icon: "/images/icons/fb-save.svg"
           fallback: "◆"
           gradient: "#06b6d4, #0891b2"
+    
+    backends:
+      title: "Backends"
+      items:
+        - name: Ollama
+          url: "http://ollama.mulecube.net"
+          demo_url: "https://docs.ollama.com/"
+          description: "Run AI models locally"
+          service: ollama
+          container: ollama
+          icon: "/images/icons/ollama.png"
+          fallback: "◆"
+          gradient: "#1e1e1e, #333"
+        - name: Conduit
+          url: "http://conduit.mulecube.net"
+          demo_url: "https://docs.conduit.rs/"
+          description: "Matrix server backend"
+          service: conduit
+          container: conduit
+          icon: "/images/icons/fb-phone.svg"
+          fallback: "◆"
+          gradient: "#a855f7, #9333ea"
 
   heroImages:
     - camping

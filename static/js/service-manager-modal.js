@@ -339,13 +339,15 @@ const ServiceManagerModal = {
      */
     generateDemoServices() {
         const categories = {
-            ai: ['LibreTranslate', 'Open WebUI', 'Ollama'],
-            knowledge: ['Kiwix', 'Calibre-Web', 'TileServer GL', 'Emergency Reference'],
-            collaboration: ['CryptPad', 'Excalidraw', 'BentoPDF'],
-            security: ['Vaultwarden'],
+            ai: ['LibreTranslate', 'Open WebUI'],
+            knowledge: ['Kiwix', 'TileServer GL', 'Signal K', 'Calibre-Web', 'RadioReference'],
+            productivity: ['CryptPad', 'Excalidraw', 'BentoPDF', 'Vaultwarden'],
             files: ['File Browser', 'Syncthing', 'Linkwarden', 'Open Archiver'],
-            communication: ['Element', 'Meshtastic', 'Conduit'],
-            tools: ['IT-Tools', 'Network Tools', 'APK Repo', 'Signal K']
+            communication: ['Element', 'Meshtastic'],
+            tools: ['F-Droid', 'IT-Tools', 'Networking Toolbox'],
+            infrastructure: ['Beszel', 'Uptime Kuma', 'Pi-hole'],
+            admin: ['Dockge', 'Dozzle', 'ttyd', 'Diagnostics', 'Backup'],
+            backends: ['Ollama', 'Conduit']
         };
         
         const services = [];
@@ -416,12 +418,13 @@ const ServiceManagerModal = {
         const categoryNames = {
             ai: 'AI Services',
             knowledge: 'Knowledge',
-            collaboration: 'Collaboration',
-            security: 'Security',
+            productivity: 'Productivity',
             files: 'Files & Sync',
             communication: 'Communication',
             tools: 'Tools',
-            media: 'Media',
+            infrastructure: 'Monitoring',
+            admin: 'Admin',
+            backends: 'Backends',
             other: 'Other'
         };
         
