@@ -29,6 +29,7 @@ const ServiceManagerModal = {
         if (this.isDemo) {
             this.services = this.generateDemoServices();
             this.generateDemoStats();
+            console.log('ServiceManagerModal: Pre-initialized', this.services.length, 'services with', Object.keys(this.serviceDetails).length, 'stats');
         }
         
         // Setup keyboard shortcut (M for Manage)
@@ -234,9 +235,10 @@ const ServiceManagerModal = {
                 // Demo mode: generate fake data only on first load
                 if (this.services.length === 0) {
                     this.services = this.generateDemoServices();
-                    this.generateDemoStats();
                 }
-                // Don't regenerate - keep user's changes
+                // Always ensure stats exist for all running services
+                this.generateDemoStats();
+                // Don't regenerate services - keep user's changes
             } else {
                 // Production: fetch from API (single call, no individual details)
                 const response = await fetch('/api/services', {
@@ -255,10 +257,11 @@ const ServiceManagerModal = {
             this.updateCategoryFilter();
             this.updateLastRefresh();
             
-            // Then fetch real stats in background (non-blocking)
-            if (!this.isDemo && !silent) {
-                this.loadServiceDetailsBackground();
-            }
+            // Background fetch disabled - too slow with current API
+            // Would need batch endpoint /api/services/stats for all-at-once fetch
+            // if (!this.isDemo && !silent) {
+            //     this.loadServiceDetailsBackground();
+            // }
             
         } catch (error) {
             console.error('Failed to load services:', error);
@@ -272,17 +275,21 @@ const ServiceManagerModal = {
     },
     
     /**
-     * Generate demo stats (called once)
+     * Generate demo stats for all running services
      */
     generateDemoStats() {
         this.services.forEach(svc => {
-            if (svc.status === 'running') {
-                this.serviceDetails[svc.name] = {
-                    cpu_percent: Math.random() * 15,
-                    ram_current_mb: Math.floor(svc.ram_estimate_mb * (0.5 + Math.random() * 0.5))
-                };
+            if (svc.status === 'running' || svc.enabled) {
+                // Only generate if not already present (preserve user-toggled states)
+                if (!this.serviceDetails[svc.name]) {
+                    this.serviceDetails[svc.name] = {
+                        cpu_percent: Math.random() * 12 + 0.1, // 0.1-12.1%
+                        ram_current_mb: Math.floor(svc.ram_estimate_mb * (0.4 + Math.random() * 0.5))
+                    };
+                }
             }
         });
+        console.log('ServiceManagerModal: Generated demo stats for', Object.keys(this.serviceDetails).length, 'services');
     },
     
     /**
