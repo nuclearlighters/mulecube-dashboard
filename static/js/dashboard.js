@@ -1779,18 +1779,17 @@
         },
         
         showServicesDialog() {
-            this.showDialog(
-                'Manage Services',
-                `<p>Service management allows you to enable or disable services to conserve system resources.</p>
-                 <p class="system-note">This feature requires backend API integration and is not available in the current version.</p>
-                 <p>In a future update, you'll be able to:</p>
-                 <ul>
-                     <li>Toggle services on/off</li>
-                     <li>See RAM/CPU usage per service</li>
-                     <li>Set services to auto-start</li>
-                 </ul>`,
-                `<button class="system-btn" onclick="this.closest('.system-modal-overlay').remove()">OK</button>`
-            );
+            // Use the new ServiceManagerModal if available
+            if (typeof ServiceManagerModal !== 'undefined') {
+                ServiceManagerModal.open();
+            } else {
+                this.showDialog(
+                    'Manage Services',
+                    `<p>Service management allows you to enable or disable services to conserve system resources.</p>
+                     <p class="system-note">Loading service manager...</p>`,
+                    `<button class="system-btn" onclick="this.closest('.system-modal-overlay').remove()">OK</button>`
+                );
+            }
         },
         
         gatherConfig() {
