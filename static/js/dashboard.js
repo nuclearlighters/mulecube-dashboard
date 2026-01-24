@@ -772,19 +772,20 @@
                     } catch (e) { console.warn('Power parse error:', e); }
                 }
                 
-                // Network clients (WiFi)
+                // Network clients (AP)
                 if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
                     try {
-                        const clients = await clientsRes.value.json();
-                        console.log('Clients API response:', clients);
-                        const clientList = Array.isArray(clients) ? clients : (clients.clients || []);
-                        const wifiClients = clientList.filter(c => 
-                            c.interface === 'wlan0' || c.interface === 'ap0' || c.type === 'wifi'
-                        ).length;
-                        data.wifi = `${wifiClients} Connected`;
+                        const response = await clientsRes.value.json();
+                        console.log('Clients API response:', response);
+                        // API returns {total_count: N, clients: [...]}
+                        const clientCount = response.total_count ?? response.count ?? 
+                            (Array.isArray(response.clients) ? response.clients.length : 
+                            (Array.isArray(response) ? response.length : 0));
+                        data.wifi = `${clientCount} Connected`;
                     } catch (e) { console.warn('Clients parse error:', e); }
                 } else {
                     console.warn('Clients fetch failed:', clientsRes.status, clientsRes.reason);
+                    data.wifi = 'N/A';
                 }
                 
                 // Network interfaces (Ethernet status)

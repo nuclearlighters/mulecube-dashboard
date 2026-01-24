@@ -674,31 +674,39 @@
             const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
             const volumes = Array.isArray(dockerVolumes) ? dockerVolumes : (dockerVolumes.volumes || []);
             
-            // Filter to only real disk partitions (not docker bind mounts)
-            const seenMounts = new Set();
+            // Filter to only show the main disk partition (/ or the primary data partition)
+            const seenDevices = new Set();
             const uniqueDisks = diskList.filter(disk => {
-                // Skip if we've already seen this mountpoint
-                if (seenMounts.has(disk.mountpoint)) return false;
+                // Skip if we've already seen this device
+                if (seenDevices.has(disk.device)) return false;
                 
-                // Only show real disk partitions (those with /dev/mmcblk, /dev/sd, /dev/nvme devices)
-                const isRealDisk = disk.device && (
-                    disk.device.startsWith('/dev/mmcblk') ||
-                    disk.device.startsWith('/dev/sd') ||
-                    disk.device.startsWith('/dev/nvme') ||
-                    disk.device.startsWith('/dev/vd')
-                );
+                // Only include root (/) or primary data partitions
+                // Skip all bind mounts and container-specific paths
+                const isMainPartition = 
+                    disk.mountpoint === '/' ||
+                    (disk.mountpoint === '/srv' && !seenDevices.has(disk.device));
                 
-                // Skip bind mounts and system paths
-                const isSystemPath = disk.mountpoint.startsWith('/usr/') ||
+                // Skip paths that are clearly bind mounts or container internals
+                const isBindMount = 
+                    disk.mountpoint.startsWith('/var/lib/misc') ||
                     disk.mountpoint.startsWith('/var/lib/mulecube') ||
+                    disk.mountpoint.startsWith('/usr/bin') ||
+                    disk.mountpoint.startsWith('/usr/lib') ||
                     disk.mountpoint.startsWith('/host/') ||
                     disk.mountpoint.startsWith('/etc/');
                 
-                if (!isRealDisk || isSystemPath) return false;
+                if (isBindMount) return false;
+                if (!isMainPartition) return false;
                 
-                seenMounts.add(disk.mountpoint);
+                seenDevices.add(disk.device);
                 return true;
             });
+            
+            // If no disks found after filtering, show the first one with mmcblk device
+            if (uniqueDisks.length === 0) {
+                const mainDisk = diskList.find(d => d.device && d.device.includes('mmcblk'));
+                if (mainDisk) uniqueDisks.push(mainDisk);
+            }
             
             container.innerHTML = `
                 <div class="storage-section">
@@ -867,12 +875,14 @@
                     </div>
                     
                     <div class="log-viewer" id="logViewer">
-                        <div class="empty-state">
-                            <p>Select a log source and click "Load Logs"</p>
-                        </div>
+                        <div class="loading-spinner"></div>
+                        <p style="text-align:center; color: var(--color-text-muted);">Loading logs...</p>
                     </div>
                 </div>
             `;
+            
+            // Auto-load logs when tab opens
+            setTimeout(() => this.fetchLogs(), 100);
             
             // Setup log source change handler
             const sourceSelect = document.getElementById('logSource');
@@ -909,34 +919,46 @@
         },
         
         async fetchLogs() {
-            const source = document.getElementById('logSource').value;
-            const containerName = document.getElementById('logContainer').value;
-            const lines = document.getElementById('logLines').value || 100;
+            const source = document.getElementById('logSource')?.value || 'system';
+            const containerName = document.getElementById('logContainer')?.value;
+            const lines = document.getElementById('logLines')?.value || 100;
             const viewer = document.getElementById('logViewer');
             
+            if (!viewer) return;
             viewer.innerHTML = '<div class="loading-spinner"></div>';
             
             try {
                 let logs;
                 if (source === 'container' && containerName) {
-                    logs = await apiCall(`/api/logs/container/${containerName}?lines=${lines}`);
+                    logs = await apiCall(`/api/logs/container/${encodeURIComponent(containerName)}?lines=${lines}`);
                 } else {
                     logs = await apiCall(`/api/logs/journal?lines=${lines}`);
                 }
                 
+                console.log('Logs API response:', logs);
                 const entries = logs.entries || logs.logs || [];
+                
+                if (entries.length === 0) {
+                    viewer.innerHTML = '<div class="empty-state"><p>No log entries found</p></div>';
+                    return;
+                }
                 
                 viewer.innerHTML = `
                     <pre class="log-content">${entries.map(entry => {
-                        const line = typeof entry === 'string' ? entry : entry.message || JSON.stringify(entry);
-                        return escapeHtml(line);
+                        if (typeof entry === 'string') return escapeHtml(entry);
+                        // Format: timestamp unit message
+                        const ts = entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString() : '';
+                        const unit = entry.unit || '';
+                        const msg = entry.message || JSON.stringify(entry);
+                        return escapeHtml(`${ts} ${unit}: ${msg}`);
                     }).join('\n')}</pre>
                 `;
                 
                 // Scroll to bottom
                 viewer.scrollTop = viewer.scrollHeight;
             } catch (error) {
-                viewer.innerHTML = `<div class="panel-error">${ICONS.warning}<p>Failed to fetch logs: ${error.message}</p></div>`;
+                console.error('Logs fetch error:', error);
+                viewer.innerHTML = `<div class="panel-error">${ICONS.warning}<p>Failed to fetch logs: ${error.message}</p><p class="error-hint">Check if service-manager has sudo access to journalctl</p></div>`;
             }
         },
 
@@ -944,44 +966,73 @@
         // Firewall Tab
         // ==========================================
         async loadFirewallTab(container) {
-            const data = await apiCall('/api/firewall/rules').catch(() => ({ rules: [] }));
+            const data = await apiCall('/api/firewall/rules').catch(e => {
+                console.error('Firewall API error:', e);
+                return { rules: [] };
+            });
+            console.log('Firewall API response:', data);
             const rules = data.rules || [];
+            
+            // Also get NAT status
+            const natData = await apiCall('/api/firewall/nat').catch(() => ({}));
+            const ipForward = await apiCall('/api/firewall/ip-forward').catch(() => ({}));
             
             container.innerHTML = `
                 <div class="firewall-section">
+                    <!-- Firewall Status -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            ${ICONS.firewall}
+                            <h3>Firewall Status</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <span class="status-label">IP Forwarding</span>
+                                    <span class="status-value ${ipForward.enabled ? 'text-success' : ''}">${ipForward.enabled ? 'Enabled' : 'Disabled'}</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">NAT/Masquerade</span>
+                                    <span class="status-value ${natData.masquerade_enabled ? 'text-success' : ''}">${natData.masquerade_enabled ? 'Enabled' : 'Disabled'}</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="status-label">Filter Rules</span>
+                                    <span class="status-value">${rules.length}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Rules Table -->
                     <div class="info-card full-width">
                         <div class="card-header">
                             ${ICONS.firewall}
-                            <h3>Firewall Rules (iptables)</h3>
+                            <h3>Active Rules (filter table)</h3>
                             <span class="card-badge">${rules.length} rules</span>
                         </div>
                         <div class="card-body">
                             <div class="firewall-note">
-                                <p>${ICONS.warning} Modifying firewall rules can lock you out of the system. Proceed with caution.</p>
+                                <p>${ICONS.warning} Modifying firewall rules can lock you out. Proceed with caution.</p>
                             </div>
                             ${rules.length === 0 ? `
-                                <div class="empty-state"><p>No custom firewall rules configured</p></div>
+                                <div class="empty-state"><p>No firewall rules in filter table (default policy applies)</p></div>
                             ` : `
                                 <table class="data-table">
                                     <thead>
                                         <tr>
                                             <th>Chain</th>
+                                            <th>Target</th>
                                             <th>Protocol</th>
-                                            <th>Source</th>
-                                            <th>Destination</th>
-                                            <th>Port</th>
-                                            <th>Action</th>
+                                            <th>Interface</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         ${rules.map(rule => `
                                             <tr>
-                                                <td>${escapeHtml(rule.chain || 'INPUT')}</td>
+                                                <td>${escapeHtml(rule.chain || '-')}</td>
+                                                <td><span class="action-badge ${(rule.target || '').toLowerCase()}">${escapeHtml(rule.target || '-')}</span></td>
                                                 <td>${escapeHtml(rule.protocol || 'all')}</td>
-                                                <td class="mono">${escapeHtml(rule.source || 'any')}</td>
-                                                <td class="mono">${escapeHtml(rule.destination || 'any')}</td>
-                                                <td>${rule.port || 'all'}</td>
-                                                <td><span class="action-badge ${rule.action?.toLowerCase()}">${escapeHtml(rule.action || 'ACCEPT')}</span></td>
+                                                <td class="mono">${escapeHtml(rule.interface_in || rule.interface_out || '*')}</td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
