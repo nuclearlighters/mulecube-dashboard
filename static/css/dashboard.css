@@ -3454,6 +3454,14 @@ select:focus-visible {
     pointer-events: none;
 }
 
+.service-row .service-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
 .service-row .service-info {
     flex: 1;
     min-width: 0;
@@ -3549,11 +3557,17 @@ select:focus-visible {
     flex-shrink: 0;
 }
 
+.service-row .toggle-switch,
+.service-row .service-badge.system {
+    margin-left: auto;
+}
+
 .toggle-switch {
     position: relative;
     display: inline-block;
     width: 48px;
     height: 26px;
+    flex-shrink: 0;
 }
 
 .toggle-switch input {
