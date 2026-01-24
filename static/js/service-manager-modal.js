@@ -25,6 +25,12 @@ const ServiceManagerModal = {
         // Setup event listeners
         this.setupEventListeners();
         
+        // In demo mode, pre-generate services so they're available for sync
+        if (this.isDemo) {
+            this.services = this.generateDemoServices();
+            this.generateDemoStats();
+        }
+        
         // Setup keyboard shortcut (M for Manage)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey) {
