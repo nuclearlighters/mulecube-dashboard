@@ -36,6 +36,7 @@
         process: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
         clients: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
         power: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>',
+        battery: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>',
         refresh: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
         close: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
         chevronDown: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>',
@@ -192,6 +193,7 @@
                         <button class="tab-btn" data-tab="logs">${ICONS.logs} Logs</button>
                         <button class="tab-btn" data-tab="firewall">${ICONS.firewall} Firewall</button>
                         <button class="tab-btn" data-tab="backup">${ICONS.backup} Backup</button>
+                        <button class="tab-btn" data-tab="power">${ICONS.battery} Power</button>
                     </div>
                     
                     <div class="system-panel-body" id="systemPanelBody">
@@ -299,6 +301,9 @@
                         break;
                     case 'backup':
                         await this.loadBackupTab(body);
+                        break;
+                    case 'power':
+                        await this.loadPowerTab(body);
                         break;
                     default:
                         body.innerHTML = '<div class="panel-error">Unknown tab</div>';
@@ -1119,7 +1124,178 @@
             } catch (error) {
                 alert('Failed to delete backup: ' + error.message);
             }
+        },
+        // ==========================================
+        // Power/UPS Tab
+        // ==========================================
+        async loadPowerTab(container) {
+            let powerData;
+            try {
+                powerData = await apiCall('/api/power/status');
+            } catch (error) {
+                container.innerHTML = '<div class="panel-error">' + ICONS.warning + '<p>UPS not available</p><small>Power management API not responding.</small></div>';
+                return;
+            }
+            
+            const battery = powerData.battery || {};
+            const acPower = powerData.ac_power || {};
+            const charging = powerData.charging || {};
+            
+            let batteryColor = '#22c55e';
+            let batteryBg = 'rgba(34, 197, 94, 0.1)';
+            if (battery.status === 'critical') {
+                batteryColor = '#ef4444';
+                batteryBg = 'rgba(239, 68, 68, 0.1)';
+            } else if (battery.status === 'low') {
+                batteryColor = '#f59e0b';
+                batteryBg = 'rgba(245, 158, 11, 0.1)';
+            }
+            
+            let runtimeText = 'N/A';
+            if (powerData.estimated_runtime_minutes) {
+                const hours = Math.floor(powerData.estimated_runtime_minutes / 60);
+                const mins = powerData.estimated_runtime_minutes % 60;
+                runtimeText = hours > 0 ? hours + 'h ' + mins + 'm' : mins + 'm';
+            }
+            
+            container.innerHTML = `
+                <div class="tab-content power-tab">
+                    <div class="stats-grid">
+                        <div class="stat-card" style="background: ${batteryBg}; border-left: 4px solid ${batteryColor};">
+                            <div class="stat-header">
+                                <span class="stat-icon">${ICONS.battery}</span>
+                                <span class="stat-label">Battery Level</span>
+                            </div>
+                            <div class="stat-value" style="color: ${batteryColor};">${battery.capacity?.toFixed(1) || 0}%</div>
+                            <div class="stat-details">
+                                <span>Voltage: ${battery.voltage?.toFixed(3) || 0}V</span>
+                                <span>Status: ${battery.status || 'unknown'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">${ICONS.power}</span>
+                                <span class="stat-label">AC Power</span>
+                            </div>
+                            <div class="stat-value" style="color: ${acPower.connected ? '#22c55e' : '#ef4444'};">
+                                ${acPower.connected ? 'Connected' : 'Disconnected'}
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">${ICONS.process}</span>
+                                <span class="stat-label">Charging</span>
+                            </div>
+                            <div class="stat-value" style="color: ${charging.active ? '#22c55e' : '#9ca3af'};">
+                                ${charging.active ? 'Charging' : charging.status === 'full' ? 'Full' : 'Not Charging'}
+                            </div>
+                            <div class="stat-details">
+                                <span>Enabled: ${charging.enabled ? 'Yes' : 'No'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">${ICONS.system}</span>
+                                <span class="stat-label">Est. Runtime</span>
+                            </div>
+                            <div class="stat-value">${runtimeText}</div>
+                            <div class="stat-details"><span>On battery power</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Battery Status</h3>
+                        <div class="battery-visual">
+                            <div class="battery-container">
+                                <div class="battery-body">
+                                    <div class="battery-level" style="width: ${Math.min(battery.capacity || 0, 100)}%; background: ${batteryColor};"></div>
+                                </div>
+                                <div class="battery-tip"></div>
+                            </div>
+                            <div class="battery-info">
+                                <div class="battery-percentage">${battery.capacity?.toFixed(1) || 0}%</div>
+                                <div class="battery-voltage">${battery.voltage?.toFixed(3) || 0}V</div>
+                            </div>
+                        </div>
+                        <div class="battery-health">
+                            <span class="health-label">Health:</span>
+                            <span class="health-value ${battery.health === 'good' ? 'health-good' : 'health-warning'}">
+                                ${battery.health || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>UPS Controls</h3>
+                        <div class="ups-controls">
+                            <div class="control-group">
+                                <label class="control-label">Battery Charging</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="chargingToggle" ${charging.enabled ? 'checked' : ''} 
+                                           onchange="SystemManagementPanel.toggleCharging(this.checked)">
+                                    <label for="chargingToggle" class="toggle-label">
+                                        <span class="toggle-inner"></span>
+                                        <span class="toggle-switch-btn"></span>
+                                    </label>
+                                    <span class="toggle-text">${charging.enabled ? 'Enabled' : 'Disabled'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label">Fuel Gauge Calibration</label>
+                                <button class="btn btn-secondary" onclick="SystemManagementPanel.calibrateFuelGauge()">
+                                    ${ICONS.refresh} Calibrate
+                                </button>
+                                <small class="control-hint">Recalibrate for accurate readings</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>UPS Information</h3>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Model</span><span class="info-value">${powerData.ups_model || 'X1202'}</span></div>
+                            <div class="info-item"><span class="info-label">I2C Connected</span><span class="info-value">${powerData.i2c_connected ? 'Yes' : 'No'}</span></div>
+                            <div class="info-item"><span class="info-label">Raw Voltage</span><span class="info-value">${battery.voltage_raw || 'N/A'}</span></div>
+                            <div class="info-item"><span class="info-label">Raw Capacity</span><span class="info-value">${battery.capacity_raw || 'N/A'}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (this.refreshIntervals.power) clearInterval(this.refreshIntervals.power);
+            this.refreshIntervals.power = setInterval(() => {
+                if (this.activeTab === 'power') this.loadPowerTab(container);
+            }, 5000);
+        },
+        
+        async toggleCharging(enabled) {
+            try {
+                await apiCall('/api/power/charging', {
+                    method: 'POST',
+                    body: JSON.stringify({ enabled: enabled })
+                });
+                setTimeout(() => this.loadTab('power'), 500);
+            } catch (error) {
+                alert('Failed to toggle charging: ' + error.message);
+                document.getElementById('chargingToggle').checked = !enabled;
+            }
+        },
+        
+        async calibrateFuelGauge() {
+            if (!confirm('Recalibrate fuel gauge? Battery percentage may change.')) return;
+            try {
+                const result = await apiCall('/api/power/calibrate', { method: 'POST' });
+                alert(result.message || 'Calibration initiated');
+                this.loadTab('power');
+            } catch (error) {
+                alert('Calibration failed: ' + error.message);
+            }
         }
+
     };
 
     // ==========================================

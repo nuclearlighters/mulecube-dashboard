@@ -1140,3 +1140,194 @@
 [data-theme="light"] .data-table tbody tr:hover {
     background: rgba(0, 0, 0, 0.02);
 }
+
+/* ==========================================
+   Power/UPS Tab Styles
+   ========================================== */
+
+.power-tab .battery-visual {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: var(--card-bg, #1a1a2e);
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.power-tab .battery-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.power-tab .battery-body {
+    width: 200px;
+    height: 60px;
+    border: 3px solid var(--text-secondary, #9ca3af);
+    border-radius: 8px;
+    padding: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.power-tab .battery-level {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease, background-color 0.3s ease;
+}
+
+.power-tab .battery-tip {
+    width: 8px;
+    height: 24px;
+    background: var(--text-secondary, #9ca3af);
+    border-radius: 0 4px 4px 0;
+}
+
+.power-tab .battery-info {
+    text-align: left;
+}
+
+.power-tab .battery-percentage {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-primary, #fff);
+}
+
+.power-tab .battery-voltage {
+    font-size: 1rem;
+    color: var(--text-secondary, #9ca3af);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.power-tab .battery-health {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: var(--card-bg, #1a1a2e);
+    border-radius: 6px;
+}
+
+.power-tab .health-label {
+    color: var(--text-secondary, #9ca3af);
+}
+
+.power-tab .health-value {
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.power-tab .health-good {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.power-tab .health-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.power-tab .ups-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.power-tab .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.power-tab .control-label {
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+.power-tab .control-hint {
+    color: var(--text-secondary, #9ca3af);
+    font-size: 0.85rem;
+}
+
+/* Toggle Switch */
+.power-tab .toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.power-tab .toggle-switch input {
+    display: none;
+}
+
+.power-tab .toggle-label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 32px;
+    cursor: pointer;
+}
+
+.power-tab .toggle-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--text-secondary, #4b5563);
+    border-radius: 32px;
+    transition: background 0.3s;
+}
+
+.power-tab .toggle-switch input:checked + .toggle-label .toggle-inner {
+    background: #22c55e;
+}
+
+.power-tab .toggle-switch-btn {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.power-tab .toggle-switch input:checked + .toggle-label .toggle-switch-btn {
+    transform: translateX(28px);
+}
+
+.power-tab .toggle-text {
+    color: var(--text-secondary, #9ca3af);
+    font-size: 0.9rem;
+}
+
+/* Info Grid */
+.power-tab .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.power-tab .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: var(--card-bg, #1a1a2e);
+    border-radius: 6px;
+}
+
+.power-tab .info-label {
+    color: var(--text-secondary, #9ca3af);
+}
+
+.power-tab .info-value {
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-primary, #fff);
+}
