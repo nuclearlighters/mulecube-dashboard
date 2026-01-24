@@ -2,8 +2,13 @@
 
 <!-- Status Banner - Clickable to toggle disabled services -->
 <div class="status-banner" id="statusBanner">
-    <span class="status-dot"></span>
-    <span id="statusText">Checking services...</span>
+    <span class="status-dot loading"></span>
+    <span id="statusText">
+        <span class="status-loading">
+            <span class="loading-text">Probing local services</span>
+            <span class="loading-subtext">usually takes 2–6 seconds</span>
+        </span>
+    </span>
     <span class="status-toggle-hint" id="statusToggleHint" style="display: none;">▼</span>
 </div>
 

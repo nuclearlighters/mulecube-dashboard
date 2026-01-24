@@ -14,6 +14,7 @@ const ServiceManagerAPI = {
     initialized: false,
     isExpanded: false,
     isDemo: false,
+    fetchErrorCount: 0,  // Track consecutive fetch failures
     
     // Long-press state
     longPressTimer: null,
@@ -235,29 +236,85 @@ const ServiceManagerAPI = {
                 }
             }
             
+            // Clear any error state
+            this.fetchErrorCount = 0;
+            
             this.updateAllCards();
             this.updateDisabledSection();
             this.updateStatusBanner();
         } catch (error) {
             console.warn('ServiceManagerAPI: Failed to fetch status', error);
+            this.fetchErrorCount = (this.fetchErrorCount || 0) + 1;
+            
+            // After 3 consecutive failures, show error state
+            if (this.fetchErrorCount >= 3) {
+                this.showConnectionError();
+            }
         }
+    },
+    
+    showConnectionError() {
+        const statusBanner = document.getElementById('statusBanner');
+        const statusText = document.getElementById('statusText');
+        const statusDot = statusBanner?.querySelector('.status-dot');
+        
+        if (statusBanner && statusText) {
+            statusBanner.classList.add('error');
+            if (statusDot) statusDot.classList.remove('loading');
+            statusText.innerHTML = `
+                <span class="status-error">
+                    <span class="error-text">Service manager unavailable</span>
+                    <span class="error-subtext">Services may still be running • <a href="#" onclick="ServiceManagerAPI.retryConnection(); return false;">Retry</a></span>
+                </span>
+            `;
+        }
+    },
+    
+    async retryConnection() {
+        const statusText = document.getElementById('statusText');
+        const statusBanner = document.getElementById('statusBanner');
+        const statusDot = statusBanner?.querySelector('.status-dot');
+        
+        if (statusText) {
+            statusText.innerHTML = `
+                <span class="status-loading">
+                    <span class="loading-text">Reconnecting to services</span>
+                    <span class="loading-subtext">please wait...</span>
+                </span>
+            `;
+            if (statusDot) statusDot.classList.add('loading');
+            statusBanner?.classList.remove('error');
+        }
+        
+        this.fetchErrorCount = 0;
+        await this.fetchServiceStatus();
     },
     
     updateStatusBanner() {
         const statusBanner = document.getElementById('statusBanner');
         const statusText = document.getElementById('statusText');
         const toggleHint = document.getElementById('statusToggleHint');
+        const statusDot = statusBanner?.querySelector('.status-dot');
         
         if (!statusBanner || !statusText) return;
         
         // If we don't have any service data yet, show loading state
         const serviceCount = Object.keys(this.services).length;
         if (serviceCount === 0 && !this.isDemo) {
-            statusText.innerHTML = '<span class="status-checking">Checking services...</span>';
+            statusText.innerHTML = `
+                <span class="status-loading">
+                    <span class="loading-text">Probing local services</span>
+                    <span class="loading-subtext">usually takes 2–6 seconds</span>
+                </span>
+            `;
             statusBanner.classList.remove('error', 'warning', 'has-disabled');
+            if (statusDot) statusDot.classList.add('loading');
             if (toggleHint) toggleHint.style.display = 'none';
             return;
         }
+        
+        // Remove loading state from dot
+        if (statusDot) statusDot.classList.remove('loading');
         
         let runningCount = 0;
         let enabledCount = 0;
