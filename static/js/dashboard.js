@@ -719,9 +719,23 @@
                         const disks = await storageRes.value.json();
                         console.log('Storage API response:', disks);
                         const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
-                        // Find root partition
-                        const rootDisk = diskList.find(d => d.mountpoint === '/' || d.mount === '/');
-                        data.disk = Math.round(rootDisk?.percent ?? rootDisk?.used_percent ?? 0);
+                        // Find root partition - try multiple common mount points
+                        const rootDisk = diskList.find(d => 
+                            d.mountpoint === '/' || d.mount === '/' ||
+                            d.mountpoint === '/srv' || d.mount === '/srv'
+                        );
+                        if (rootDisk) {
+                            // API returns percent_used or percent
+                            data.disk = Math.round(rootDisk.percent_used ?? rootDisk.percent ?? rootDisk.used_percent ?? 0);
+                        } else if (diskList.length > 0) {
+                            // Fallback to first disk with /dev/mmcblk or /dev/sd device
+                            const mainDisk = diskList.find(d => 
+                                d.device?.includes('/dev/mmcblk') || d.device?.includes('/dev/sd')
+                            );
+                            if (mainDisk) {
+                                data.disk = Math.round(mainDisk.percent_used ?? mainDisk.percent ?? 0);
+                            }
+                        }
                     } catch (e) { console.warn('Storage parse error:', e); }
                 } else {
                     console.warn('Storage fetch failed:', storageRes.status, storageRes.reason);
@@ -767,7 +781,7 @@
                         const wifiClients = clientList.filter(c => 
                             c.interface === 'wlan0' || c.interface === 'ap0' || c.type === 'wifi'
                         ).length;
-                        data.wifi = `${wifiClients} clients`;
+                        data.wifi = `${wifiClients} Connected`;
                     } catch (e) { console.warn('Clients parse error:', e); }
                 } else {
                     console.warn('Clients fetch failed:', clientsRes.status, clientsRes.reason);

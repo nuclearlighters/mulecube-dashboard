@@ -614,8 +614,8 @@
                                         ${wifiClients.map(client => `
                                             <tr>
                                                 <td>${escapeHtml(client.hostname || 'Unknown')}</td>
-                                                <td class="mono">${escapeHtml(client.ip || 'N/A')}</td>
-                                                <td class="mono">${escapeHtml(client.mac || 'N/A')}</td>
+                                                <td class="mono">${escapeHtml(client.ip_address || client.ip || 'N/A')}</td>
+                                                <td class="mono">${escapeHtml(client.mac_address || client.mac || 'N/A')}</td>
                                                 <td>${client.connected_since ? formatDateTime(client.connected_since) : 'Active'}</td>
                                             </tr>
                                         `).join('')}
@@ -674,16 +674,28 @@
             const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
             const volumes = Array.isArray(dockerVolumes) ? dockerVolumes : (dockerVolumes.volumes || []);
             
-            // Filter to unique mountpoints (API returns duplicates for bind mounts)
+            // Filter to only real disk partitions (not docker bind mounts)
             const seenMounts = new Set();
             const uniqueDisks = diskList.filter(disk => {
-                // Skip non-root partitions and keep only main storage
+                // Skip if we've already seen this mountpoint
                 if (seenMounts.has(disk.mountpoint)) return false;
-                if (disk.mountpoint.startsWith('/etc/') || 
-                    disk.mountpoint.startsWith('/var/lib/misc') ||
-                    disk.mountpoint.startsWith('/host/')) {
-                    return false;
-                }
+                
+                // Only show real disk partitions (those with /dev/mmcblk, /dev/sd, /dev/nvme devices)
+                const isRealDisk = disk.device && (
+                    disk.device.startsWith('/dev/mmcblk') ||
+                    disk.device.startsWith('/dev/sd') ||
+                    disk.device.startsWith('/dev/nvme') ||
+                    disk.device.startsWith('/dev/vd')
+                );
+                
+                // Skip bind mounts and system paths
+                const isSystemPath = disk.mountpoint.startsWith('/usr/') ||
+                    disk.mountpoint.startsWith('/var/lib/mulecube') ||
+                    disk.mountpoint.startsWith('/host/') ||
+                    disk.mountpoint.startsWith('/etc/');
+                
+                if (!isRealDisk || isSystemPath) return false;
+                
                 seenMounts.add(disk.mountpoint);
                 return true;
             });
@@ -909,7 +921,7 @@
                 if (source === 'container' && containerName) {
                     logs = await apiCall(`/api/logs/container/${containerName}?lines=${lines}`);
                 } else {
-                    logs = await apiCall(`/api/logs/system?lines=${lines}`);
+                    logs = await apiCall(`/api/logs/journal?lines=${lines}`);
                 }
                 
                 const entries = logs.entries || logs.logs || [];
