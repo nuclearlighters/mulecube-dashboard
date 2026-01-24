@@ -899,12 +899,13 @@
                     containerSelect.style.display = 'block';
                     // Fetch container list
                     try {
-                        const data = await apiCall('/api/services/status');
+                        const data = await apiCall('/api/storage/docker/containers');
                         const containers = data.containers || [];
                         containerSelect.innerHTML = '<option value="">Select container...</option>' +
-                            containers.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('');
+                            containers.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} (${escapeHtml(c.state || c.status || '')})</option>`).join('');
                     } catch (e) {
                         console.error('Failed to fetch containers:', e);
+                        containerSelect.innerHTML = '<option value="">Error loading containers</option>';
                     }
                 } else {
                     containerSelect.style.display = 'none';

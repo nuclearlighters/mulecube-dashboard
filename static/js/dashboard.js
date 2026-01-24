@@ -690,7 +690,7 @@
                     fetch(`${apiBase}/api/system/stats`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/system/info`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/power/status`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
-                    fetch(`${apiBase}/api/network/clients`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
+                    fetch(`${apiBase}/api/clients/`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/network/interfaces`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) }),
                     fetch(`${apiBase}/api/storage/disks`, { cache: 'no-store', signal: AbortSignal.timeout(timeout) })
                 ]);
