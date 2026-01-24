@@ -757,6 +757,7 @@
         statusBanner: null,
         statusText: null,
         serviceStatus: {},  // Track status per service ID: { kiwix: 'online', openwebui: 'offline', ... }
+        apiTookOver: false, // Flag to know if ServiceManagerAPI is handling counts
         
         init() {
             this.statusBanner = document.getElementById('statusBanner');
@@ -765,18 +766,24 @@
             if (ModeManager.isDemo) {
                 this.simulateOnline();
             } else {
-                // Wait a bit for ServiceManagerAPI to initialize first
+                // Wait for ServiceManagerAPI to initialize first
+                // It will update the status banner with correct counts
                 setTimeout(() => {
-                    // Only run if ServiceManagerAPI hasn't taken over
-                    if (typeof ServiceManagerAPI === 'undefined' || !ServiceManagerAPI.initialized) {
-                        this.checkAllServices();
+                    // Check if ServiceManagerAPI has taken over
+                    if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
+                        this.apiTookOver = true;
+                        // ServiceManagerAPI handles everything, we just do status dot updates
                     }
-                }, 500);
-                // Re-check every 30 seconds (only if ServiceManagerAPI not active)
+                    // Only run service checks for status dots, not for banner counts
+                    this.checkAllServices();
+                }, 1000);
+                
                 setInterval(() => {
-                    if (typeof ServiceManagerAPI === 'undefined' || !ServiceManagerAPI.initialized) {
-                        this.checkAllServices();
+                    // Only check services, don't update banner if API took over
+                    if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
+                        this.apiTookOver = true;
                     }
+                    this.checkAllServices();
                 }, 30000);
             }
         },
@@ -847,9 +854,9 @@
         updateStatusBanner(online, total) {
             if (!this.statusBanner || !this.statusText) return;
             
-            // Defer to ServiceManagerAPI if it's active (it has accurate enabled/disabled counts)
-            if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
-                return;
+            // Always defer to ServiceManagerAPI if it's active
+            if (this.apiTookOver || (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized)) {
+                return; // ServiceManagerAPI handles the status banner
             }
             
             const offline = total - online;

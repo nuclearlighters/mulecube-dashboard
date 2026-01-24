@@ -2732,14 +2732,14 @@ select:focus-visible {
 }
 /* ========================================
 /* ========================================
-   SERVICE MANAGER v5.0
-   - Fixed button positioning
-   - Better enable button styling
-   - Improved loading animation
+   SERVICE MANAGER v6.0
+   - Long-press to enable/disable
+   - Progress ring animation
+   - No buttons - cleaner UI
    ======================================== */
 
 /* ==========================================
-   Status Banner - Enhanced for toggle
+   Status Banner
    ========================================== */
 .status-banner {
     cursor: pointer;
@@ -2778,7 +2778,6 @@ select:focus-visible {
     margin-left: 0.5rem;
     color: var(--color-text-muted);
     font-size: 0.8em;
-    transition: transform 0.2s ease;
 }
 
 /* ==========================================
@@ -2803,14 +2802,11 @@ select:focus-visible {
     text-align: center;
 }
 
-/* ==========================================
-   Disabled Services Grid
-   ========================================== */
 .disabled-services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--space-lg);
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
 }
 
@@ -2828,13 +2824,14 @@ select:focus-visible {
     border-radius: var(--radius-md);
     opacity: 0.85;
     transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .disabled-service-card:hover {
     opacity: 1;
     border-color: var(--color-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .disabled-service-card .service-icon {
@@ -2862,7 +2859,6 @@ select:focus-visible {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    color: var(--color-text);
 }
 
 .disabled-service-card .service-info p {
@@ -2874,7 +2870,6 @@ select:focus-visible {
     text-overflow: ellipsis;
 }
 
-/* Grey status dot for disabled services - positioned top right */
 .disabled-service-card .service-status,
 .disabled-service-card .service-status.disabled {
     position: absolute;
@@ -2886,87 +2881,101 @@ select:focus-visible {
     background: #666 !important;
 }
 
+/* Long-press hint */
+.long-press-hint {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    opacity: 0.6;
+}
+
+.disabled-service-card:hover .long-press-hint {
+    opacity: 1;
+    color: var(--color-primary);
+}
+
 /* ==========================================
-   Enable Button - Better styling
+   Long Press Progress Ring
    ========================================== */
-.service-enable-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.5rem 1.2rem;
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-    white-space: nowrap;
+.long-press-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    z-index: 100;
+    pointer-events: none;
 }
 
-.service-enable-btn:hover {
-    background: var(--color-primary-hover);
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+.long-press-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
 }
 
-.service-enable-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
+.long-press-ring .ring-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 3;
 }
 
-.service-enable-btn .enable-icon {
-    font-size: 0.8em;
+.long-press-ring .ring-progress {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 100.53;
+    stroke-dashoffset: 100.53;
 }
 
-.service-enable-btn .enable-icon.spinning {
-    animation: spin 1s linear infinite;
+.long-press-ring .ring-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    color: var(--color-primary);
+}
+
+@keyframes longPressProgress {
+    from {
+        stroke-dashoffset: 100.53;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Card state during long press */
+.service-card.long-pressing {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.service-card.long-pressing::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: inherit;
+    z-index: 50;
 }
 
 /* ==========================================
-   Hidden class for disabled services in categories
+   Hidden class
    ========================================== */
 .service-disabled-hidden {
     display: none !important;
 }
 
 /* ==========================================
-   Disable Button - Better positioning
-   ========================================== */
-.service-disable-btn {
-    position: absolute;
-    top: 8px;
-    right: 24px;
-    padding: 0.25rem 0.4rem;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    z-index: 10;
-    opacity: 0;
-    background: rgba(0, 0, 0, 0.4);
-    color: var(--color-text-muted);
-}
-
-.service-card:hover .service-disable-btn {
-    opacity: 1;
-}
-
-.service-disable-btn:hover {
-    background: var(--color-danger);
-    color: white;
-}
-
-/* ==========================================
-   Loading State - Progress Bar
+   Loading State
    ========================================== */
 .service-card.service-loading {
     pointer-events: none;
-    position: relative;
     opacity: 0.7;
 }
 
@@ -2999,10 +3008,6 @@ select:focus-visible {
 @keyframes pulse {
     0%, 100% { opacity: 0.4; }
     50% { opacity: 1; }
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
 }
 
 /* ==========================================
@@ -3060,17 +3065,17 @@ select:focus-visible {
     border-color: #e5e5e5;
 }
 
-[data-theme="light"] .disabled-service-card:hover {
-    border-color: var(--color-primary);
+[data-theme="light"] .service-card.long-pressing::before {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] .long-press-ring .ring-bg {
+    stroke: rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="light"] .service-manager-toast {
     background: white;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .service-disable-btn {
-    background: rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================
@@ -3086,10 +3091,6 @@ select:focus-visible {
         padding: var(--space-sm) var(--space-md);
     }
     
-    .service-disable-btn {
-        opacity: 1;
-    }
-    
     .service-manager-toast {
         left: 10px;
         right: 10px;
@@ -3101,8 +3102,7 @@ select:focus-visible {
         padding-left: 0.5rem;
     }
     
-    .service-enable-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+    .long-press-hint {
+        font-size: 0.65rem;
     }
 }

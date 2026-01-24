@@ -1,6 +1,6 @@
 /**
  * MuleCube Service Manager API Integration
- * v5.0.0 - Fixed enable workflow, better button styling, improved UX
+ * v6.0.0 - Long-press to enable/disable (3 seconds with progress indicator)
  */
 
 const ServiceManagerAPI = {
@@ -12,6 +12,11 @@ const ServiceManagerAPI = {
     pollInterval: 30000,
     initialized: false,
     isExpanded: false,
+    
+    // Long-press state
+    longPressTimer: null,
+    longPressDuration: 2500, // 2.5 seconds
+    longPressTarget: null,
     
     async init() {
         // Skip in demo mode
@@ -30,7 +35,7 @@ const ServiceManagerAPI = {
         setInterval(() => this.fetchServiceStatus(), this.pollInterval);
         
         this.initialized = true;
-        console.log('ServiceManagerAPI: Initialized with', Object.keys(this.services).length, 'services');
+        console.log('ServiceManagerAPI: Initialized');
     },
     
     buildContainerMap() {
@@ -157,7 +162,6 @@ const ServiceManagerAPI = {
     },
     
     updateAllCards() {
-        // Update all cards in categories and start-here
         document.querySelectorAll('.service-category .service-card[data-service], .start-here .service-card[data-service]').forEach(card => {
             const serviceId = card.dataset.service;
             const containerName = card.dataset.container || this.containerMap[serviceId] || serviceId;
@@ -173,47 +177,112 @@ const ServiceManagerAPI = {
         const isEnabled = serviceData.enabled;
         const status = serviceData.status;
         
-        // Remove loading state if present
-        card.classList.remove('service-loading');
+        // Remove loading state
+        card.classList.remove('service-loading', 'long-pressing');
+        
+        // Remove any progress rings
+        const existingRing = card.querySelector('.long-press-ring');
+        if (existingRing) existingRing.remove();
         
         if (!isEnabled) {
             card.classList.add('service-disabled-hidden');
             card.style.display = 'none';
         } else {
-            // Re-enable the card
             card.classList.remove('service-disabled-hidden');
             card.style.display = '';
             
-            // Update status dot
             const statusDot = card.querySelector('.service-status');
             if (statusDot) {
                 statusDot.className = 'service-status ' + (status === 'running' ? 'online' : 'offline');
-                statusDot.style.background = ''; // Clear any inline styles
+                statusDot.style.background = '';
             }
             
-            // Add disable button (not in start-here)
+            // Add long-press to disable (not in start-here)
             if (!card.closest('.start-here')) {
-                this.addDisableButton(card, serviceData);
+                this.setupLongPress(card, serviceData, 'disable');
             }
         }
     },
     
-    addDisableButton(card, serviceData) {
-        let btn = card.querySelector('.service-disable-btn');
-        if (btn) btn.remove();
+    /**
+     * Setup long-press handler on a card
+     */
+    setupLongPress(card, serviceData, action) {
+        // Remove existing listeners by cloning
+        const newCard = card.cloneNode(true);
+        card.parentNode.replaceChild(newCard, card);
         
-        if (!serviceData.enabled) return;
+        let pressTimer = null;
+        let progressRing = null;
+        let startTime = null;
         
-        btn = document.createElement('button');
-        btn.className = 'service-disable-btn';
-        btn.innerHTML = '⏸';
-        btn.title = 'Disable this service';
-        btn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.disableService(serviceData.name);
+        const startPress = (e) => {
+            // Don't trigger on right-click
+            if (e.button && e.button !== 0) return;
+            
+            startTime = Date.now();
+            newCard.classList.add('long-pressing');
+            
+            // Create progress ring
+            progressRing = document.createElement('div');
+            progressRing.className = 'long-press-ring';
+            progressRing.innerHTML = `
+                <svg viewBox="0 0 36 36">
+                    <circle class="ring-bg" cx="18" cy="18" r="16"/>
+                    <circle class="ring-progress" cx="18" cy="18" r="16"/>
+                </svg>
+                <span class="ring-icon">${action === 'disable' ? '⏸' : '▶'}</span>
+            `;
+            newCard.appendChild(progressRing);
+            
+            // Animate the ring
+            const ring = progressRing.querySelector('.ring-progress');
+            ring.style.animation = `longPressProgress ${this.longPressDuration}ms linear forwards`;
+            
+            pressTimer = setTimeout(() => {
+                // Long press completed
+                newCard.classList.remove('long-pressing');
+                if (progressRing) progressRing.remove();
+                
+                if (action === 'disable') {
+                    this.disableService(serviceData.name);
+                } else {
+                    this.enableService(serviceData.name);
+                }
+            }, this.longPressDuration);
         };
-        card.appendChild(btn);
+        
+        const cancelPress = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+            newCard.classList.remove('long-pressing');
+            if (progressRing && progressRing.parentNode) {
+                progressRing.remove();
+            }
+        };
+        
+        // Mouse events
+        newCard.addEventListener('mousedown', startPress);
+        newCard.addEventListener('mouseup', cancelPress);
+        newCard.addEventListener('mouseleave', cancelPress);
+        
+        // Touch events
+        newCard.addEventListener('touchstart', (e) => {
+            startPress(e);
+        }, { passive: true });
+        newCard.addEventListener('touchend', cancelPress);
+        newCard.addEventListener('touchcancel', cancelPress);
+        
+        // Allow normal click for navigation (short press)
+        newCard.addEventListener('click', (e) => {
+            const pressDuration = Date.now() - (startTime || 0);
+            if (pressDuration > 500) {
+                // Was a long press attempt, prevent navigation
+                e.preventDefault();
+            }
+        });
     },
     
     updateDisabledSection() {
@@ -261,26 +330,14 @@ const ServiceManagerAPI = {
             statusDot.className = 'service-status disabled';
         }
         
-        // Remove existing buttons
-        card.querySelectorAll('.service-disable-btn').forEach(b => b.remove());
+        // Add hint text
+        const hint = document.createElement('div');
+        hint.className = 'long-press-hint';
+        hint.textContent = 'Hold to enable';
+        card.appendChild(hint);
         
-        // Add enable button
-        const btn = document.createElement('button');
-        btn.className = 'service-enable-btn';
-        btn.innerHTML = '<span class="enable-icon">▶</span> Enable';
-        btn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.enableService(serviceData.name, btn);
-        };
-        card.appendChild(btn);
-        
-        // Prevent navigation
-        card.onclick = (e) => {
-            if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
-                e.preventDefault();
-            }
-        };
+        // Setup long-press to enable
+        this.setupLongPressForDisabled(card, serviceData);
         
         return card;
     },
@@ -298,19 +355,71 @@ const ServiceManagerAPI = {
                 <p>${serviceData.description || ''}</p>
             </div>
             <div class="service-status disabled"></div>
+            <div class="long-press-hint">Hold to enable</div>
         `;
         
-        const btn = document.createElement('button');
-        btn.className = 'service-enable-btn';
-        btn.innerHTML = '<span class="enable-icon">▶</span> Enable';
-        btn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.enableService(serviceData.name, btn);
-        };
-        card.appendChild(btn);
+        this.setupLongPressForDisabled(card, serviceData);
         
         return card;
+    },
+    
+    /**
+     * Setup long-press for disabled cards (to enable)
+     */
+    setupLongPressForDisabled(card, serviceData) {
+        let pressTimer = null;
+        let progressRing = null;
+        let startTime = null;
+        
+        const startPress = (e) => {
+            if (e.button && e.button !== 0) return;
+            
+            startTime = Date.now();
+            card.classList.add('long-pressing');
+            
+            progressRing = document.createElement('div');
+            progressRing.className = 'long-press-ring';
+            progressRing.innerHTML = `
+                <svg viewBox="0 0 36 36">
+                    <circle class="ring-bg" cx="18" cy="18" r="16"/>
+                    <circle class="ring-progress" cx="18" cy="18" r="16"/>
+                </svg>
+                <span class="ring-icon">▶</span>
+            `;
+            card.appendChild(progressRing);
+            
+            const ring = progressRing.querySelector('.ring-progress');
+            ring.style.animation = `longPressProgress ${this.longPressDuration}ms linear forwards`;
+            
+            pressTimer = setTimeout(() => {
+                card.classList.remove('long-pressing');
+                card.classList.add('service-loading');
+                if (progressRing) progressRing.remove();
+                this.enableService(serviceData.name);
+            }, this.longPressDuration);
+        };
+        
+        const cancelPress = () => {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+            card.classList.remove('long-pressing');
+            if (progressRing && progressRing.parentNode) {
+                progressRing.remove();
+            }
+        };
+        
+        card.addEventListener('mousedown', startPress);
+        card.addEventListener('mouseup', cancelPress);
+        card.addEventListener('mouseleave', cancelPress);
+        card.addEventListener('touchstart', startPress, { passive: true });
+        card.addEventListener('touchend', cancelPress);
+        card.addEventListener('touchcancel', cancelPress);
+        
+        card.addEventListener('click', (e) => {
+            e.preventDefault(); // Disabled cards shouldn't navigate
+        });
     },
     
     updateCategoryCounts() {
@@ -326,18 +435,7 @@ const ServiceManagerAPI = {
         });
     },
     
-    async enableService(containerName, btnElement) {
-        const card = btnElement?.closest('.service-card');
-        
-        // Show loading state
-        if (card) {
-            card.classList.add('service-loading');
-        }
-        if (btnElement) {
-            btnElement.disabled = true;
-            btnElement.innerHTML = '<span class="enable-icon spinning">◐</span> Starting...';
-        }
-        
+    async enableService(containerName) {
         this.showToast(`Starting ${containerName}...`, 'info');
         
         try {
@@ -350,31 +448,17 @@ const ServiceManagerAPI = {
             
             if (result.success) {
                 this.showToast(`${containerName} enabled!`, 'success');
-                // Refresh status to update UI
                 await this.fetchServiceStatus();
             } else {
                 throw new Error(result.message || 'Enable failed');
             }
         } catch (error) {
             this.showToast(`Failed: ${error.message}`, 'error');
-            if (card) {
-                card.classList.remove('service-loading');
-            }
-            if (btnElement) {
-                btnElement.disabled = false;
-                btnElement.innerHTML = '<span class="enable-icon">▶</span> Enable';
-            }
+            await this.fetchServiceStatus();
         }
     },
     
     async disableService(containerName, force = false) {
-        const card = document.querySelector(`.service-category .service-card[data-container="${containerName}"]`) ||
-                    document.querySelector(`.service-category .service-card[data-service="${containerName}"]`);
-        
-        if (card) {
-            card.classList.add('service-loading');
-        }
-        
         this.showToast(`Stopping ${containerName}...`, 'info');
         
         try {
@@ -390,26 +474,19 @@ const ServiceManagerAPI = {
                 this.showToast(`${containerName} disabled. RAM freed: ${result.ram_freed_mb || 0}MB`, 'success');
                 await this.fetchServiceStatus();
             } else if (result.requires_force) {
-                if (card) card.classList.remove('service-loading');
                 const deps = result.affected_services?.join(', ') || 'other services';
                 if (confirm(`${deps} depend on ${containerName}. Disable anyway?`)) {
                     await this.disableService(containerName, true);
+                } else {
+                    await this.fetchServiceStatus();
                 }
             } else {
                 throw new Error(result.message || 'Disable failed');
             }
         } catch (error) {
             this.showToast(`Failed: ${error.message}`, 'error');
-            if (card) card.classList.remove('service-loading');
+            await this.fetchServiceStatus();
         }
-    },
-    
-    // Manual sync trigger
-    syncNow() {
-        this.showToast('Syncing...', 'info');
-        this.fetchServiceStatus().then(() => {
-            this.showToast('Sync complete!', 'success');
-        });
     },
     
     showToast(message, type = 'info') {
