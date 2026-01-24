@@ -142,8 +142,7 @@
     <!-- All Service Categories -->
     {{ partial "service-category.html" (dict "category" $services.ai "icon" "/images/icons/cat-ai.svg") }}
     {{ partial "service-category.html" (dict "category" $services.knowledge "icon" "/images/icons/cat-knowledge.svg") }}
-    {{ partial "service-category.html" (dict "category" $services.collaboration "icon" "/images/icons/cat-collaboration.svg") }}
-    {{ partial "service-category.html" (dict "category" $services.security "icon" "/images/icons/cat-security.svg") }}
+    {{ partial "service-category.html" (dict "category" $services.productivity "icon" "/images/icons/cat-collaboration.svg") }}
     {{ partial "service-category.html" (dict "category" $services.files "icon" "/images/icons/cat-files.svg") }}
     {{ partial "service-category.html" (dict "category" $services.communication "icon" "/images/icons/cat-communication.svg") }}
     {{ partial "service-category.html" (dict "category" $services.tools "icon" "/images/icons/cat-tools.svg") }}
@@ -158,6 +157,7 @@
     <div class="advanced-section" id="advancedSection" style="display: none;">
         {{ partial "service-category.html" (dict "category" $services.infrastructure "icon" "/images/icons/cat-infrastructure.svg") }}
         {{ partial "service-category.html" (dict "category" $services.admin "icon" "/images/icons/cat-admin.svg") }}
+        {{ partial "service-category.html" (dict "category" $services.backends "icon" "/images/icons/cat-admin.svg") }}
     </div>
 
 </main>
