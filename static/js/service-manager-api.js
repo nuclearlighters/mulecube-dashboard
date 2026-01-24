@@ -594,6 +594,23 @@ const ServiceManagerAPI = {
                 this.disabledServices = this.disabledServices.filter(s => s !== containerName);
             }
             
+            // Sync with modal if open
+            if (typeof ServiceManagerModal !== 'undefined' && ServiceManagerModal.services) {
+                const svc = ServiceManagerModal.services.find(s => s.name === containerName);
+                if (svc) {
+                    svc.enabled = true;
+                    svc.status = 'running';
+                    ServiceManagerModal.serviceDetails[containerName] = {
+                        cpu_percent: Math.random() * 10,
+                        ram_current_mb: Math.floor((svc.ram_estimate_mb || 256) * 0.7)
+                    };
+                }
+                if (ServiceManagerModal.isOpen) {
+                    ServiceManagerModal.renderServices();
+                    ServiceManagerModal.updateSummary();
+                }
+            }
+            
             this.showToast(`${containerName} enabled!`, 'success');
             this.updateAllCards();
             this.updateDisabledSection();
@@ -634,6 +651,20 @@ const ServiceManagerAPI = {
                 this.services[containerName].status = 'stopped';
                 if (!this.disabledServices.includes(containerName)) {
                     this.disabledServices.push(containerName);
+                }
+            }
+            
+            // Sync with modal if open
+            if (typeof ServiceManagerModal !== 'undefined' && ServiceManagerModal.services) {
+                const svc = ServiceManagerModal.services.find(s => s.name === containerName);
+                if (svc) {
+                    svc.enabled = false;
+                    svc.status = 'exited';
+                    delete ServiceManagerModal.serviceDetails[containerName];
+                }
+                if (ServiceManagerModal.isOpen) {
+                    ServiceManagerModal.renderServices();
+                    ServiceManagerModal.updateSummary();
                 }
             }
             
