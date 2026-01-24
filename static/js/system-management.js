@@ -48,6 +48,212 @@
         timestamp: new Date().toISOString()
     };
 
+    // Generate mock data functions for demo mode
+    function generateMockOverview() {
+        const uptime = 1080000 + Math.floor(Math.random() * 100000); // ~12 days
+        const cpuPercent = 8 + Math.random() * 20;
+        const memPercent = 50 + Math.random() * 15;
+        const memTotal = 8 * 1024 * 1024 * 1024; // 8GB
+        const memUsed = memTotal * (memPercent / 100);
+        const temp = 48 + Math.random() * 15;
+        
+        return {
+            hostname: 'mulecube-demo',
+            model: 'Raspberry Pi 5 Model B Rev 1.0',
+            serial: 'd83add36e17847c9',
+            uptime_seconds: uptime,
+            boot_time: new Date(Date.now() - uptime * 1000).toISOString(),
+            cpu: {
+                percent: cpuPercent,
+                count: 4,
+                freq_current: 1500 + Math.random() * 900,
+                freq_max: 2400
+            },
+            memory: {
+                percent: memPercent,
+                total: memTotal,
+                available: memTotal - memUsed,
+                used: memUsed
+            },
+            temperature: {
+                current: temp
+            }
+        };
+    }
+
+    function generateMockNetwork() {
+        const deviceNames = ['iPhone-Sarah', 'MacBook-Pro', 'iPad-Kids', 'Android-Phone', 'Laptop-Work'];
+        const numClients = 2 + Math.floor(Math.random() * 4);
+        const clients = [];
+        
+        for (let i = 0; i < numClients; i++) {
+            clients.push({
+                mac_address: `${['AA','BB','CC','DD','EE','FF'][Math.floor(Math.random()*6)]}:${Math.floor(Math.random()*100).toString(16).padStart(2,'0')}:${Math.floor(Math.random()*100).toString(16).padStart(2,'0')}:${Math.floor(Math.random()*100).toString(16).padStart(2,'0')}:${Math.floor(Math.random()*100).toString(16).padStart(2,'0')}:${Math.floor(Math.random()*100).toString(16).padStart(2,'0')}`.toUpperCase(),
+                ip_address: `192.168.42.${100 + i + Math.floor(Math.random() * 50)}`,
+                hostname: deviceNames[i] || `device-${i}`,
+                connected_since: new Date(Date.now() - Math.floor(Math.random() * 86400000)).toISOString()
+            });
+        }
+        
+        return {
+            clients: clients,
+            total_count: clients.length,
+            interfaces: [
+                {
+                    name: 'wlan0',
+                    type: 'wireless',
+                    state: 'up',
+                    mac: 'DC:A6:32:XX:XX:XX',
+                    ipv4: '192.168.42.1',
+                    ipv6: 'fe80::dea6:32ff:fexx:xxxx'
+                },
+                {
+                    name: 'eth0',
+                    type: 'ethernet',
+                    state: Math.random() > 0.3 ? 'up' : 'down',
+                    mac: 'DC:A6:32:YY:YY:YY',
+                    ipv4: Math.random() > 0.3 ? '192.168.1.150' : null,
+                    ipv6: null
+                }
+            ]
+        };
+    }
+
+    function generateMockStorage() {
+        const diskUsed = 180 + Math.random() * 60; // 180-240 GB
+        const diskTotal = 256;
+        
+        return {
+            disks: [{
+                device: '/dev/mmcblk0p2',
+                mountpoint: '/',
+                fstype: 'ext4',
+                total_bytes: diskTotal * 1024 * 1024 * 1024,
+                used_bytes: diskUsed * 1024 * 1024 * 1024,
+                free_bytes: (diskTotal - diskUsed) * 1024 * 1024 * 1024,
+                percent_used: (diskUsed / diskTotal) * 100,
+                total_human: `${diskTotal.toFixed(1)} GB`,
+                used_human: `${diskUsed.toFixed(1)} GB`,
+                free_human: `${(diskTotal - diskUsed).toFixed(1)} GB`
+            }],
+            volumes: [
+                { name: 'kiwix_data', size: '45.2 GB', created: '2025-12-15' },
+                { name: 'ollama_models', size: '12.8 GB', created: '2025-12-20' },
+                { name: 'syncthing_data', size: '8.4 GB', created: '2025-12-18' },
+                { name: 'pihole_config', size: '156 MB', created: '2025-12-10' },
+                { name: 'vaultwarden_data', size: '24 MB', created: '2025-12-12' }
+            ]
+        };
+    }
+
+    function generateMockProcesses() {
+        const processes = [
+            { pid: 1, name: 'systemd', user: 'root', cpu: 0.1, memory: 0.8, status: 'S' },
+            { pid: 892, name: 'dockerd', user: 'root', cpu: 2.3 + Math.random() * 2, memory: 3.2, status: 'S' },
+            { pid: 1024, name: 'containerd', user: 'root', cpu: 1.1 + Math.random(), memory: 2.1, status: 'S' },
+            { pid: 1156, name: 'nginx', user: 'www-data', cpu: 0.5 + Math.random() * 0.5, memory: 1.2, status: 'S' },
+            { pid: 1289, name: 'pihole-FTL', user: 'pihole', cpu: 1.8 + Math.random(), memory: 2.8, status: 'S' },
+            { pid: 1423, name: 'ollama', user: 'ollama', cpu: 5.2 + Math.random() * 10, memory: 8.5, status: 'S' },
+            { pid: 1567, name: 'python3', user: 'root', cpu: 0.8 + Math.random(), memory: 1.5, status: 'S' },
+            { pid: 1678, name: 'node', user: 'node', cpu: 2.1 + Math.random() * 2, memory: 4.2, status: 'S' },
+            { pid: 1789, name: 'postgres', user: 'postgres', cpu: 1.2 + Math.random(), memory: 3.8, status: 'S' },
+            { pid: 1890, name: 'redis-server', user: 'redis', cpu: 0.3 + Math.random() * 0.3, memory: 0.9, status: 'S' },
+            { pid: 2001, name: 'kiwix-serve', user: 'kiwix', cpu: 0.2 + Math.random() * 0.5, memory: 2.1, status: 'S' },
+            { pid: 2112, name: 'tileserver-gl', user: 'tileserver', cpu: 0.4 + Math.random() * 0.5, memory: 3.5, status: 'S' },
+            { pid: 2223, name: 'uptime-kuma', user: 'node', cpu: 0.6 + Math.random() * 0.4, memory: 1.8, status: 'S' },
+            { pid: 2334, name: 'dozzle', user: 'root', cpu: 0.2, memory: 0.5, status: 'S' },
+            { pid: 2445, name: 'syncthing', user: 'syncthing', cpu: 1.5 + Math.random() * 2, memory: 2.4, status: 'S' }
+        ];
+        return processes;
+    }
+
+    function generateMockLogs() {
+        const services = ['nginx', 'dockerd', 'pihole', 'systemd', 'kernel', 'ollama', 'syncthing'];
+        const levels = ['info', 'info', 'info', 'info', 'warn', 'error'];
+        const messages = [
+            'Request completed successfully',
+            'Connection established from 192.168.42.{n}',
+            'Container started: {service}',
+            'Health check passed',
+            'DNS query blocked: tracking.example.com',
+            'Model loaded successfully',
+            'Sync completed with 0 conflicts',
+            'Certificate renewed for mulecube.net',
+            'Backup completed: 156 files',
+            'Service restarted after config change',
+            'Memory usage at {n}%',
+            'CPU temperature: {n}°C',
+            'New device connected: {mac}',
+            'API request from 192.168.42.{n}',
+            'Cache cleared successfully'
+        ];
+        
+        const logs = [];
+        const now = Date.now();
+        
+        for (let i = 0; i < 100; i++) {
+            const timestamp = new Date(now - i * 30000 - Math.random() * 10000);
+            const service = services[Math.floor(Math.random() * services.length)];
+            const level = levels[Math.floor(Math.random() * levels.length)];
+            let msg = messages[Math.floor(Math.random() * messages.length)]
+                .replace('{n}', Math.floor(Math.random() * 100 + 100))
+                .replace('{service}', service)
+                .replace('{mac}', 'AA:BB:CC:DD:EE:FF');
+            
+            logs.push({
+                timestamp: timestamp.toISOString(),
+                service: service,
+                level: level,
+                message: `[${service}] ${msg}`,
+                formatted: `${timestamp.toLocaleTimeString()} ${level.toUpperCase().padEnd(5)} ${service.padEnd(12)} ${msg}`
+            });
+        }
+        return logs;
+    }
+
+    function generateMockFirewall() {
+        return {
+            ip_forwarding: true,
+            nat_enabled: true,
+            rules: [
+                { chain: 'INPUT', action: 'ACCEPT', protocol: 'tcp', source: 'any', destination: 'any', port: '22', comment: 'SSH' },
+                { chain: 'INPUT', action: 'ACCEPT', protocol: 'tcp', source: 'any', destination: 'any', port: '80', comment: 'HTTP' },
+                { chain: 'INPUT', action: 'ACCEPT', protocol: 'tcp', source: 'any', destination: 'any', port: '443', comment: 'HTTPS' },
+                { chain: 'INPUT', action: 'ACCEPT', protocol: 'udp', source: 'any', destination: 'any', port: '53', comment: 'DNS' },
+                { chain: 'INPUT', action: 'ACCEPT', protocol: 'udp', source: 'any', destination: 'any', port: '67', comment: 'DHCP' },
+                { chain: 'FORWARD', action: 'ACCEPT', protocol: 'all', source: '192.168.42.0/24', destination: 'any', port: '*', comment: 'LAN Forward' },
+                { chain: 'POSTROUTING', action: 'MASQUERADE', protocol: 'all', source: '192.168.42.0/24', destination: 'any', port: '*', comment: 'NAT' },
+                { chain: 'INPUT', action: 'DROP', protocol: 'all', source: 'any', destination: 'any', port: '*', comment: 'Default Drop' }
+            ]
+        };
+    }
+
+    function generateMockBackups() {
+        return {
+            backups: [
+                { filename: 'mulecube-backup-2026-01-20-config.tar.gz', size: '2.4 MB', created: '2026-01-20 14:30:00', type: 'config' },
+                { filename: 'mulecube-backup-2026-01-15-full.tar.gz', size: '45.8 MB', created: '2026-01-15 03:00:00', type: 'full' },
+                { filename: 'mulecube-backup-2026-01-10-config.tar.gz', size: '2.3 MB', created: '2026-01-10 14:30:00', type: 'config' }
+            ]
+        };
+    }
+
+    function generateMockContainers() {
+        const containers = [
+            { name: 'kiwix', id: 'abc123', image: 'ghcr.io/kiwix/kiwix-serve:latest', status: 'Up 12 days', state: 'running' },
+            { name: 'ollama', id: 'def456', image: 'ollama/ollama:latest', status: 'Up 12 days', state: 'running' },
+            { name: 'open-webui', id: 'ghi789', image: 'ghcr.io/open-webui/open-webui:main', status: 'Up 12 days', state: 'running' },
+            { name: 'pihole', id: 'jkl012', image: 'pihole/pihole:latest', status: 'Up 12 days (healthy)', state: 'running' },
+            { name: 'nginx-proxy', id: 'mno345', image: 'nginx:alpine', status: 'Up 12 days', state: 'running' },
+            { name: 'uptime-kuma', id: 'pqr678', image: 'louislam/uptime-kuma:latest', status: 'Up 12 days (healthy)', state: 'running' },
+            { name: 'syncthing', id: 'stu901', image: 'syncthing/syncthing:latest', status: 'Up 12 days (healthy)', state: 'running' },
+            { name: 'tileserver', id: 'vwx234', image: 'maptiler/tileserver-gl:latest', status: 'Up 12 days (healthy)', state: 'running' },
+            { name: 'filebrowser', id: 'yza567', image: 'filebrowser/filebrowser:latest', status: 'Up 12 days (healthy)', state: 'running' },
+            { name: 'vaultwarden', id: 'bcd890', image: 'vaultwarden/server:latest', status: 'Up 12 days (healthy)', state: 'running' }
+        ];
+        return { containers, count: containers.length };
+    }
+
 
 
     // ==========================================
@@ -344,10 +550,40 @@
         // Overview Tab
         // ==========================================
         async loadOverviewTab(container) {
-            const [info, stats] = await Promise.all([
-                apiCall('/api/system/info'),
-                apiCall('/api/system/stats')
-            ]);
+            let info, stats;
+            
+            if (IS_DEMO) {
+                const mockData = generateMockOverview();
+                info = {
+                    hostname: mockData.hostname,
+                    pi_model: mockData.model,
+                    pi_serial: mockData.serial,
+                    uptime_seconds: mockData.uptime_seconds,
+                    boot_time: mockData.boot_time
+                };
+                stats = {
+                    cpu: {
+                        percent: mockData.cpu.percent,
+                        count: mockData.cpu.count,
+                        frequency_current: mockData.cpu.freq_current,
+                        frequency_max: mockData.cpu.freq_max
+                    },
+                    memory: {
+                        percent: mockData.memory.percent,
+                        total_bytes: mockData.memory.total,
+                        used_bytes: mockData.memory.used,
+                        available_bytes: mockData.memory.available
+                    },
+                    temperature: {
+                        cpu_temp_c: mockData.temperature.current
+                    }
+                };
+            } else {
+                [info, stats] = await Promise.all([
+                    apiCall('/api/system/info'),
+                    apiCall('/api/system/stats')
+                ]);
+            }
             
             // Extract values using EXACT field names from API
             const cpuPercent = stats.cpu?.percent || 0;
@@ -585,10 +821,18 @@
         // Network Tab
         // ==========================================
         async loadNetworkTab(container) {
-            const [clients, interfaces] = await Promise.all([
-                apiCall('/api/clients/').catch(() => []),
-                apiCall('/api/network/interfaces').catch(() => [])
-            ]);
+            let clients, interfaces;
+            
+            if (IS_DEMO) {
+                const mockData = generateMockNetwork();
+                clients = mockData.clients;
+                interfaces = mockData.interfaces;
+            } else {
+                [clients, interfaces] = await Promise.all([
+                    apiCall('/api/clients/').catch(() => []),
+                    apiCall('/api/network/interfaces').catch(() => [])
+                ]);
+            }
             
             // API returns arrays directly, not wrapped in objects
             const wifiClients = Array.isArray(clients) ? clients : (clients.clients || []);
@@ -680,10 +924,18 @@
         // Storage Tab
         // ==========================================
         async loadStorageTab(container) {
-            const [disks, dockerVolumes] = await Promise.all([
-                apiCall('/api/storage/disks').catch(() => []),
-                apiCall('/api/storage/docker').catch(() => [])
-            ]);
+            let disks, dockerVolumes;
+            
+            if (IS_DEMO) {
+                const mockData = generateMockStorage();
+                disks = mockData.disks;
+                dockerVolumes = mockData.volumes;
+            } else {
+                [disks, dockerVolumes] = await Promise.all([
+                    apiCall('/api/storage/disks').catch(() => []),
+                    apiCall('/api/storage/docker').catch(() => [])
+                ]);
+            }
             
             // API returns arrays directly, not wrapped in objects
             const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
@@ -795,11 +1047,17 @@
         
         async renderProcesses(container) {
             try {
-                const data = await apiCall('/api/processes/');
-                const processes = data.processes || [];
+                let processes;
+                
+                if (IS_DEMO) {
+                    processes = generateMockProcesses();
+                } else {
+                    const data = await apiCall('/api/processes/');
+                    processes = data.processes || [];
+                }
                 
                 // Sort by CPU usage
-                processes.sort((a, b) => (b.cpu_percent || 0) - (a.cpu_percent || 0));
+                processes.sort((a, b) => (b.cpu_percent || b.cpu || 0) - (a.cpu_percent || a.cpu || 0));
                 
                 container.innerHTML = `
                     <div class="processes-section">
@@ -826,9 +1084,9 @@
                                             <tr>
                                                 <td class="mono">${proc.pid}</td>
                                                 <td title="${escapeHtml(proc.cmdline || proc.name)}">${escapeHtml(proc.name)}</td>
-                                                <td>${escapeHtml(proc.username || 'root')}</td>
-                                                <td class="${(proc.cpu_percent || 0) > 50 ? 'highlight' : ''}">${(proc.cpu_percent || 0).toFixed(1)}%</td>
-                                                <td class="${(proc.memory_percent || 0) > 50 ? 'highlight' : ''}">${(proc.memory_percent || 0).toFixed(1)}%</td>
+                                                <td>${escapeHtml(proc.username || proc.user || 'root')}</td>
+                                                <td class="${(proc.cpu_percent || proc.cpu || 0) > 50 ? 'highlight' : ''}">${(proc.cpu_percent || proc.cpu || 0).toFixed(1)}%</td>
+                                                <td class="${(proc.memory_percent || proc.memory || 0) > 50 ? 'highlight' : ''}">${(proc.memory_percent || proc.memory || 0).toFixed(1)}%</td>
                                                 <td><span class="status-badge ${proc.status}">${proc.status || 'running'}</span></td>
                                             </tr>
                                         `).join('')}
@@ -886,8 +1144,14 @@
                     containerSelect.style.display = 'block';
                     // Fetch container list
                     try {
-                        const data = await apiCall('/api/storage/docker/containers');
-                        const containers = data.containers || [];
+                        let containers;
+                        if (IS_DEMO) {
+                            const mockData = generateMockContainers();
+                            containers = mockData.containers;
+                        } else {
+                            const data = await apiCall('/api/storage/docker/containers');
+                            containers = data.containers || [];
+                        }
                         containerSelect.innerHTML = '<option value="">Select container...</option>' +
                             containers.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)} (${escapeHtml(c.state || c.status || '')})</option>`).join('');
                     } catch (e) {
@@ -923,10 +1187,16 @@
             
             try {
                 let logs;
-                if (source === 'container' && containerName) {
-                    logs = await apiCall(`/api/logs/container/${encodeURIComponent(containerName)}?lines=${lines}`);
+                
+                if (IS_DEMO) {
+                    const mockLogs = generateMockLogs();
+                    logs = { entries: mockLogs.map(l => l.formatted) };
                 } else {
-                    logs = await apiCall(`/api/logs/journal?lines=${lines}`);
+                    if (source === 'container' && containerName) {
+                        logs = await apiCall(`/api/logs/container/${encodeURIComponent(containerName)}?lines=${lines}`);
+                    } else {
+                        logs = await apiCall(`/api/logs/journal?lines=${lines}`);
+                    }
                 }
                 
                 console.log('Logs API response:', logs);
@@ -960,16 +1230,26 @@
         // Firewall Tab
         // ==========================================
         async loadFirewallTab(container) {
-            const data = await apiCall('/api/firewall/rules').catch(e => {
-                console.error('Firewall API error:', e);
-                return { rules: [] };
-            });
-            console.log('Firewall API response:', data);
-            const rules = data.rules || [];
+            let data, natData, ipForward;
             
-            // Also get NAT status
-            const natData = await apiCall('/api/firewall/nat').catch(() => ({}));
-            const ipForward = await apiCall('/api/firewall/ip-forward').catch(() => ({}));
+            if (IS_DEMO) {
+                const mockFirewall = generateMockFirewall();
+                data = { rules: mockFirewall.rules };
+                natData = { enabled: mockFirewall.nat_enabled };
+                ipForward = { enabled: mockFirewall.ip_forwarding };
+            } else {
+                data = await apiCall('/api/firewall/rules').catch(e => {
+                    console.error('Firewall API error:', e);
+                    return { rules: [] };
+                });
+                console.log('Firewall API response:', data);
+                
+                // Also get NAT status
+                natData = await apiCall('/api/firewall/nat').catch(() => ({}));
+                ipForward = await apiCall('/api/firewall/ip-forward').catch(() => ({}));
+            }
+            
+            const rules = data.rules || [];
             
             container.innerHTML = `
                 <div class="firewall-section">
@@ -1042,7 +1322,13 @@
         // Backup Tab
         // ==========================================
         async loadBackupTab(container) {
-            const data = await apiCall('/api/backup/').catch(() => ({ backups: [] }));
+            let data;
+            
+            if (IS_DEMO) {
+                data = generateMockBackups();
+            } else {
+                data = await apiCall('/api/backup/').catch(() => ({ backups: [] }));
+            }
             const backups = data.backups || [];
             
             container.innerHTML = `
