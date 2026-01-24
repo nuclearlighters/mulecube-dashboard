@@ -333,10 +333,19 @@ const ServiceManagerAPI = {
     },
     
     async enableService(containerName) {
-        this.showToast(`Enabling ${containerName}...`, 'info');
-        
         const card = document.querySelector(`#disabledServicesGrid .service-card[data-container="${containerName}"]`);
-        if (card) card.classList.add('service-loading');
+        const btn = card?.querySelector('.service-enable-btn');
+        
+        // Show loading state
+        if (card) {
+            card.classList.add('service-loading');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Starting...';
+            }
+        }
+        
+        this.showToast(`Starting ${containerName}...`, 'info');
         
         try {
             const response = await fetch(`${this.endpoint}/${containerName}/enable`, {
@@ -354,12 +363,26 @@ const ServiceManagerAPI = {
             }
         } catch (error) {
             this.showToast(`Failed: ${error.message}`, 'error');
-            if (card) card.classList.remove('service-loading');
+            if (card) {
+                card.classList.remove('service-loading');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Enable';
+                }
+            }
         }
     },
     
     async disableService(containerName, force = false) {
-        this.showToast(`Disabling ${containerName}...`, 'info');
+        // Find the card in categories
+        const card = document.querySelector(`.service-category .service-card[data-container="${containerName}"]`) ||
+                    document.querySelector(`.service-category .service-card[data-service="${containerName}"]`);
+        
+        if (card) {
+            card.classList.add('service-loading');
+        }
+        
+        this.showToast(`Stopping ${containerName}...`, 'info');
         
         try {
             const response = await fetch(`${this.endpoint}/${containerName}/disable`, {
@@ -374,6 +397,7 @@ const ServiceManagerAPI = {
                 this.showToast(`${containerName} disabled. RAM freed: ${result.ram_freed_mb || 0}MB`, 'success');
                 await this.fetchServiceStatus();
             } else if (result.requires_force) {
+                if (card) card.classList.remove('service-loading');
                 const deps = result.affected_services?.join(', ') || 'other services';
                 if (confirm(`${deps} depend on ${containerName}. Disable anyway?`)) {
                     await this.disableService(containerName, true);
@@ -383,6 +407,7 @@ const ServiceManagerAPI = {
             }
         } catch (error) {
             this.showToast(`Failed: ${error.message}`, 'error');
+            if (card) card.classList.remove('service-loading');
         }
     },
     

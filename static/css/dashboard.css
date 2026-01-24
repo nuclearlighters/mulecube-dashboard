@@ -2945,35 +2945,43 @@ select:focus-visible {
 }
 
 /* ==========================================
-   Loading State
+   Loading State - Progress Bar
    ========================================== */
 .service-card.service-loading {
     pointer-events: none;
     position: relative;
+    opacity: 0.7;
 }
 
 .service-card.service-loading::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: inherit;
-    z-index: 15;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--color-primary) 50%, 
+        transparent 100%);
+    background-size: 200% 100%;
+    animation: progressBar 1.5s ease-in-out infinite;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    z-index: 20;
 }
 
-.service-card.service-loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 24px;
-    margin: -12px 0 0 -12px;
-    border: 2px solid transparent;
-    border-top-color: var(--color-primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    z-index: 20;
+.service-card.service-loading .service-status {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes progressBar {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
 }
 
 @keyframes spin {

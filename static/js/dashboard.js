@@ -837,6 +837,11 @@
         updateStatusBanner(online, total) {
             if (!this.statusBanner || !this.statusText) return;
             
+            // Defer to ServiceManagerAPI if it's active (it has accurate enabled/disabled counts)
+            if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
+                return;
+            }
+            
             const offline = total - online;
             const offlinePercent = (offline / total) * 100;
             
