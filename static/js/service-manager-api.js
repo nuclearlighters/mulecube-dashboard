@@ -1,6 +1,6 @@
 /**
  * MuleCube Service Manager API Integration
- * v6.0.0 - Long-press to enable/disable (3 seconds with progress indicator)
+ * v7.0.0 - Full demo mode simulation + long-press enable/disable
  */
 
 const ServiceManagerAPI = {
@@ -12,30 +12,68 @@ const ServiceManagerAPI = {
     pollInterval: 30000,
     initialized: false,
     isExpanded: false,
+    isDemo: false,
     
     // Long-press state
     longPressTimer: null,
     longPressDuration: 2500, // 2.5 seconds
     longPressTarget: null,
     
+    // Demo mode: services to disable initially
+    demoDisabledServices: ['bentopdf', 'linkwarden'],
+    
     async init() {
-        // Skip in demo mode
-        if (typeof ModeManager !== 'undefined' && ModeManager.isDemo) {
-            console.log('ServiceManagerAPI: Demo mode, skipping');
-            return;
-        }
+        // Check for demo mode
+        this.isDemo = typeof ModeManager !== 'undefined' && ModeManager.isDemo;
         
         this.buildContainerMap();
         this.setupStatusBannerToggle();
         
-        // Initial fetch
-        await this.fetchServiceStatus();
-        
-        // Poll for updates
-        setInterval(() => this.fetchServiceStatus(), this.pollInterval);
+        if (this.isDemo) {
+            // Demo mode: simulate service data
+            this.initDemoServices();
+        } else {
+            // Production: fetch from API
+            await this.fetchServiceStatus();
+            setInterval(() => this.fetchServiceStatus(), this.pollInterval);
+        }
         
         this.initialized = true;
-        console.log('ServiceManagerAPI: Initialized');
+        console.log('ServiceManagerAPI: Initialized', this.isDemo ? '(demo mode)' : '(production)');
+    },
+    
+    /**
+     * Initialize demo mode with simulated service data
+     */
+    initDemoServices() {
+        // Build service data from DOM
+        document.querySelectorAll('.service-card[data-service]').forEach(card => {
+            const serviceId = card.dataset.service;
+            const container = card.dataset.container || serviceId;
+            const nameEl = card.querySelector('h3');
+            const descEl = card.querySelector('p');
+            
+            if (container && !this.services[container]) {
+                const isDisabled = this.demoDisabledServices.includes(container.toLowerCase());
+                
+                this.services[container] = {
+                    name: container,
+                    display_name: nameEl ? nameEl.textContent : container,
+                    description: descEl ? descEl.textContent : '',
+                    enabled: !isDisabled,
+                    status: isDisabled ? 'stopped' : 'running'
+                };
+                
+                if (isDisabled) {
+                    this.disabledServices.push(container);
+                }
+            }
+        });
+        
+        // Update UI
+        this.updateAllCards();
+        this.updateDisabledSection();
+        this.updateStatusBanner();
     },
     
     buildContainerMap() {
@@ -77,6 +115,9 @@ const ServiceManagerAPI = {
     },
     
     async fetchServiceStatus() {
+        // Skip in demo mode
+        if (this.isDemo) return;
+        
         try {
             const response = await fetch(this.endpoint, {
                 signal: AbortSignal.timeout(10000)
@@ -185,7 +226,7 @@ const ServiceManagerAPI = {
         // Remove loading state
         card.classList.remove('service-loading');
         
-        // Remove any stale progress rings (but not during active press)
+        // Remove any stale progress rings
         const existingRing = card.querySelector('.long-press-ring');
         if (existingRing) existingRing.remove();
         
@@ -388,6 +429,7 @@ const ServiceManagerAPI = {
             <div class="service-status disabled"></div>
         `;
         
+        card.setAttribute('draggable', 'false');
         this.setupLongPressForDisabled(card, serviceData);
         
         return card;
@@ -473,6 +515,24 @@ const ServiceManagerAPI = {
     async enableService(containerName) {
         this.showToast(`Starting ${containerName}...`, 'info');
         
+        if (this.isDemo) {
+            // Demo mode: simulate enable
+            await this.simulateDelay(1500);
+            
+            if (this.services[containerName]) {
+                this.services[containerName].enabled = true;
+                this.services[containerName].status = 'running';
+                this.disabledServices = this.disabledServices.filter(s => s !== containerName);
+            }
+            
+            this.showToast(`${containerName} enabled!`, 'success');
+            this.updateAllCards();
+            this.updateDisabledSection();
+            this.updateStatusBanner();
+            return;
+        }
+        
+        // Production mode
         try {
             const response = await fetch(`${this.endpoint}/${containerName}/enable`, {
                 method: 'POST',
@@ -496,6 +556,29 @@ const ServiceManagerAPI = {
     async disableService(containerName, force = false) {
         this.showToast(`Stopping ${containerName}...`, 'info');
         
+        if (this.isDemo) {
+            // Demo mode: simulate disable
+            await this.simulateDelay(1500);
+            
+            if (this.services[containerName]) {
+                this.services[containerName].enabled = false;
+                this.services[containerName].status = 'stopped';
+                if (!this.disabledServices.includes(containerName)) {
+                    this.disabledServices.push(containerName);
+                }
+            }
+            
+            // Simulate RAM freed (random between 50-300MB)
+            const ramFreed = Math.floor(Math.random() * 250) + 50;
+            this.showToast(`${containerName} disabled. RAM freed: ${ramFreed}MB`, 'success');
+            
+            this.updateAllCards();
+            this.updateDisabledSection();
+            this.updateStatusBanner();
+            return;
+        }
+        
+        // Production mode
         try {
             const response = await fetch(`${this.endpoint}/${containerName}/disable`, {
                 method: 'POST',
@@ -522,6 +605,13 @@ const ServiceManagerAPI = {
             this.showToast(`Failed: ${error.message}`, 'error');
             await this.fetchServiceStatus();
         }
+    },
+    
+    /**
+     * Simulate async delay for demo mode
+     */
+    simulateDelay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     },
     
     showToast(message, type = 'info') {

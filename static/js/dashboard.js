@@ -763,29 +763,30 @@
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
             
-            if (ModeManager.isDemo) {
-                this.simulateOnline();
-            } else {
-                // Wait for ServiceManagerAPI to initialize first
-                // It will update the status banner with correct counts
-                setTimeout(() => {
-                    // Check if ServiceManagerAPI has taken over
-                    if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
-                        this.apiTookOver = true;
-                        // ServiceManagerAPI handles everything, we just do status dot updates
-                    }
-                    // Only run service checks for status dots, not for banner counts
+            // Wait for ServiceManagerAPI to initialize first (both demo and production)
+            // ServiceManagerAPI now handles demo mode simulation too
+            setTimeout(() => {
+                if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
+                    this.apiTookOver = true;
+                    // ServiceManagerAPI handles everything including status banner
+                    console.log('ServiceManager: Deferring to ServiceManagerAPI');
+                } else if (ModeManager.isDemo) {
+                    // Fallback: simulate online for demo if ServiceManagerAPI not available
+                    this.simulateOnline();
+                } else {
+                    // Production fallback
                     this.checkAllServices();
-                }, 1000);
-                
-                setInterval(() => {
-                    // Only check services, don't update banner if API took over
-                    if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
-                        this.apiTookOver = true;
-                    }
+                }
+            }, 500);
+            
+            // Periodic checks (only if ServiceManagerAPI not active)
+            setInterval(() => {
+                if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
+                    this.apiTookOver = true;
+                } else if (!ModeManager.isDemo) {
                     this.checkAllServices();
-                }, 30000);
-            }
+                }
+            }, 30000);
         },
         
         // Update all cards with a given service ID to a specific status
