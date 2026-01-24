@@ -765,9 +765,19 @@
             if (ModeManager.isDemo) {
                 this.simulateOnline();
             } else {
-                this.checkAllServices();
-                // Re-check every 30 seconds
-                setInterval(() => this.checkAllServices(), 30000);
+                // Wait a bit for ServiceManagerAPI to initialize first
+                setTimeout(() => {
+                    // Only run if ServiceManagerAPI hasn't taken over
+                    if (typeof ServiceManagerAPI === 'undefined' || !ServiceManagerAPI.initialized) {
+                        this.checkAllServices();
+                    }
+                }, 500);
+                // Re-check every 30 seconds (only if ServiceManagerAPI not active)
+                setInterval(() => {
+                    if (typeof ServiceManagerAPI === 'undefined' || !ServiceManagerAPI.initialized) {
+                        this.checkAllServices();
+                    }
+                }, 30000);
             }
         },
         

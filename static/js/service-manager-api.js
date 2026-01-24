@@ -1,6 +1,6 @@
 /**
  * MuleCube Service Manager API Integration
- * v4.0.0 - Status banner toggles disabled section, proper counts, fixed styling
+ * v5.0.0 - Fixed enable workflow, better button styling, improved UX
  */
 
 const ServiceManagerAPI = {
@@ -23,11 +23,14 @@ const ServiceManagerAPI = {
         this.buildContainerMap();
         this.setupStatusBannerToggle();
         
+        // Initial fetch
         await this.fetchServiceStatus();
+        
+        // Poll for updates
         setInterval(() => this.fetchServiceStatus(), this.pollInterval);
         
         this.initialized = true;
-        console.log('ServiceManagerAPI: Initialized');
+        console.log('ServiceManagerAPI: Initialized with', Object.keys(this.services).length, 'services');
     },
     
     buildContainerMap() {
@@ -41,9 +44,6 @@ const ServiceManagerAPI = {
         });
     },
     
-    /**
-     * Setup status banner to toggle disabled services section
-     */
     setupStatusBannerToggle() {
         const statusBanner = document.getElementById('statusBanner');
         if (statusBanner) {
@@ -52,11 +52,7 @@ const ServiceManagerAPI = {
         }
     },
     
-    /**
-     * Toggle disabled services section visibility
-     */
     toggleDisabledSection() {
-        // Only toggle if there are disabled services
         if (this.disabledServices.length === 0) return;
         
         this.isExpanded = !this.isExpanded;
@@ -105,9 +101,6 @@ const ServiceManagerAPI = {
         }
     },
     
-    /**
-     * Update status banner with correct counts from API
-     */
     updateStatusBanner() {
         const statusBanner = document.getElementById('statusBanner');
         const statusText = document.getElementById('statusText');
@@ -130,10 +123,8 @@ const ServiceManagerAPI = {
         
         const offlineCount = enabledCount - runningCount;
         
-        // Remove state classes
         statusBanner.classList.remove('error', 'warning', 'has-disabled');
         
-        // Build status text
         let html = '';
         
         if (offlineCount === 0) {
@@ -147,7 +138,6 @@ const ServiceManagerAPI = {
             statusBanner.classList.add('has-disabled');
             html += `<span class="status-disabled">${disabledCount} disabled</span>`;
             
-            // Show toggle hint
             if (toggleHint) {
                 toggleHint.style.display = 'inline';
                 toggleHint.textContent = this.isExpanded ? '▲' : '▼';
@@ -155,11 +145,11 @@ const ServiceManagerAPI = {
         } else {
             if (toggleHint) toggleHint.style.display = 'none';
             
-            // Close section if no disabled services
             if (this.isExpanded) {
                 this.isExpanded = false;
                 const section = document.getElementById('disabledServicesSection');
                 if (section) section.style.display = 'none';
+                statusBanner.classList.remove('expanded');
             }
         }
         
@@ -167,6 +157,7 @@ const ServiceManagerAPI = {
     },
     
     updateAllCards() {
+        // Update all cards in categories and start-here
         document.querySelectorAll('.service-category .service-card[data-service], .start-here .service-card[data-service]').forEach(card => {
             const serviceId = card.dataset.service;
             const containerName = card.dataset.container || this.containerMap[serviceId] || serviceId;
@@ -182,16 +173,22 @@ const ServiceManagerAPI = {
         const isEnabled = serviceData.enabled;
         const status = serviceData.status;
         
+        // Remove loading state if present
+        card.classList.remove('service-loading');
+        
         if (!isEnabled) {
             card.classList.add('service-disabled-hidden');
             card.style.display = 'none';
         } else {
+            // Re-enable the card
             card.classList.remove('service-disabled-hidden');
             card.style.display = '';
             
+            // Update status dot
             const statusDot = card.querySelector('.service-status');
             if (statusDot) {
                 statusDot.className = 'service-status ' + (status === 'running' ? 'online' : 'offline');
+                statusDot.style.background = ''; // Clear any inline styles
             }
             
             // Add disable button (not in start-here)
@@ -202,13 +199,13 @@ const ServiceManagerAPI = {
     },
     
     addDisableButton(card, serviceData) {
-        let btn = card.querySelector('.service-action-btn');
+        let btn = card.querySelector('.service-disable-btn');
         if (btn) btn.remove();
         
         if (!serviceData.enabled) return;
         
         btn = document.createElement('button');
-        btn.className = 'service-action-btn service-disable-btn';
+        btn.className = 'service-disable-btn';
         btn.innerHTML = '⏸';
         btn.title = 'Disable this service';
         btn.onclick = (e) => {
@@ -227,13 +224,11 @@ const ServiceManagerAPI = {
         
         const count = this.disabledServices.length;
         
-        // If no disabled services and section is showing, hide it
-        if (count === 0) {
+        if (count === 0 && this.isExpanded) {
             section.style.display = 'none';
             this.isExpanded = false;
         }
         
-        // Clear and rebuild grid
         grid.innerHTML = '';
         
         this.disabledServices.forEach(containerName => {
@@ -263,27 +258,26 @@ const ServiceManagerAPI = {
         // Grey status dot
         const statusDot = card.querySelector('.service-status');
         if (statusDot) {
-            statusDot.className = 'service-status';
-            statusDot.style.background = 'var(--color-text-muted)';
+            statusDot.className = 'service-status disabled';
         }
         
         // Remove existing buttons
-        card.querySelectorAll('.service-action-btn').forEach(b => b.remove());
+        card.querySelectorAll('.service-disable-btn').forEach(b => b.remove());
         
         // Add enable button
         const btn = document.createElement('button');
         btn.className = 'service-enable-btn';
-        btn.textContent = 'Enable';
+        btn.innerHTML = '<span class="enable-icon">▶</span> Enable';
         btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.enableService(serviceData.name);
+            this.enableService(serviceData.name, btn);
         };
         card.appendChild(btn);
         
         // Prevent navigation
         card.onclick = (e) => {
-            if (e.target.tagName !== 'BUTTON') {
+            if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
                 e.preventDefault();
             }
         };
@@ -303,16 +297,16 @@ const ServiceManagerAPI = {
                 <h3>${serviceData.display_name || serviceData.name}</h3>
                 <p>${serviceData.description || ''}</p>
             </div>
-            <div class="service-status" style="background: var(--color-text-muted);"></div>
+            <div class="service-status disabled"></div>
         `;
         
         const btn = document.createElement('button');
         btn.className = 'service-enable-btn';
-        btn.textContent = 'Enable';
+        btn.innerHTML = '<span class="enable-icon">▶</span> Enable';
         btn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.enableService(serviceData.name);
+            this.enableService(serviceData.name, btn);
         };
         card.appendChild(btn);
         
@@ -332,17 +326,16 @@ const ServiceManagerAPI = {
         });
     },
     
-    async enableService(containerName) {
-        const card = document.querySelector(`#disabledServicesGrid .service-card[data-container="${containerName}"]`);
-        const btn = card?.querySelector('.service-enable-btn');
+    async enableService(containerName, btnElement) {
+        const card = btnElement?.closest('.service-card');
         
         // Show loading state
         if (card) {
             card.classList.add('service-loading');
-            if (btn) {
-                btn.disabled = true;
-                btn.textContent = 'Starting...';
-            }
+        }
+        if (btnElement) {
+            btnElement.disabled = true;
+            btnElement.innerHTML = '<span class="enable-icon spinning">◐</span> Starting...';
         }
         
         this.showToast(`Starting ${containerName}...`, 'info');
@@ -357,6 +350,7 @@ const ServiceManagerAPI = {
             
             if (result.success) {
                 this.showToast(`${containerName} enabled!`, 'success');
+                // Refresh status to update UI
                 await this.fetchServiceStatus();
             } else {
                 throw new Error(result.message || 'Enable failed');
@@ -365,16 +359,15 @@ const ServiceManagerAPI = {
             this.showToast(`Failed: ${error.message}`, 'error');
             if (card) {
                 card.classList.remove('service-loading');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'Enable';
-                }
+            }
+            if (btnElement) {
+                btnElement.disabled = false;
+                btnElement.innerHTML = '<span class="enable-icon">▶</span> Enable';
             }
         }
     },
     
     async disableService(containerName, force = false) {
-        // Find the card in categories
         const card = document.querySelector(`.service-category .service-card[data-container="${containerName}"]`) ||
                     document.querySelector(`.service-category .service-card[data-service="${containerName}"]`);
         
@@ -409,6 +402,14 @@ const ServiceManagerAPI = {
             this.showToast(`Failed: ${error.message}`, 'error');
             if (card) card.classList.remove('service-loading');
         }
+    },
+    
+    // Manual sync trigger
+    syncNow() {
+        this.showToast('Syncing...', 'info');
+        this.fetchServiceStatus().then(() => {
+            this.showToast('Sync complete!', 'success');
+        });
     },
     
     showToast(message, type = 'info') {
