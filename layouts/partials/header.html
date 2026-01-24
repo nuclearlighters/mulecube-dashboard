@@ -30,24 +30,24 @@
 <div class="stats-panel">
     <div class="stats-container">
         <div class="stats-group stats-info">
-            <span class="stat-item"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
-            <span class="stat-item"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
+            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
+            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
         </div>
 
         <div class="stats-group stats-primary">
-            <span class="stat-item"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
-            <span class="stat-item"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
-            <span class="stat-item"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
+            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
+            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
+            <span class="stat-item stat-clickable" data-tab="storage"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
         </div>
         
         <div class="stats-group stats-network">
-            <span class="stat-item"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
-            <span class="stat-item" id="ethStatus"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
+            <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
+            <span class="stat-item stat-clickable" data-tab="network" id="ethStatus"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
         </div>
         
         <div class="stats-group stats-hardware">
-            <span class="stat-item"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
-            <span class="stat-item" id="batteryContainer" style="display: none;">
+            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
+            <span class="stat-item stat-clickable" data-tab="power" id="batteryContainer" style="display: none;">
                 <span id="batteryIcon"><img src="/images/icons/stat-battery.svg" alt="" class="stat-icon"></span> <span class="stat-val" id="batteryValue">--%</span>
             </span>
         </div>
@@ -112,6 +112,16 @@
     min-width: 90px;
     height: 32px;
     box-sizing: border-box;
+}
+
+.stat-item.stat-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.stat-item.stat-clickable:hover {
+    border-color: var(--color-primary, #22c55e);
+    background: rgba(34, 197, 94, 0.1);
 }
 
 .stat-icon {
@@ -375,6 +385,20 @@
     
     if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') hideModal(); });
+    
+    // Handle clicks on stat tiles to open System Management to the correct tab
+    document.querySelectorAll('.stat-clickable').forEach(item => {
+        item.addEventListener('click', () => {
+            const targetTab = item.dataset.tab;
+            if (targetTab && typeof SystemManagementPanel !== 'undefined') {
+                SystemManagementPanel.open();
+                // Small delay to ensure panel is rendered before switching tab
+                setTimeout(() => {
+                    SystemManagementPanel.loadTab(targetTab);
+                }, 50);
+            }
+        });
+    });
 })();
 </script>
 
