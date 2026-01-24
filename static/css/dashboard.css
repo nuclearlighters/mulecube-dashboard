@@ -2827,6 +2827,10 @@ select:focus-visible {
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
 }
 
 .disabled-service-card:hover {
@@ -2956,20 +2960,27 @@ select:focus-visible {
     }
 }
 
-/* Card state during long press */
+/* Card state during long press - minimal visual change to prevent layout issues */
 .service-card.long-pressing {
-    transform: scale(0.98);
-    opacity: 0.9;
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+    opacity: 0.85;
 }
 
-.service-card.long-pressing::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: inherit;
-    z-index: 50;
+/* Prevent drag ghost on all service cards */
+.service-card {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    user-drag: none;
 }
+
+.service-card img {
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+/* No ::before pseudo-element - it might cause ghost frame issues */
 
 /* ==========================================
    Hidden class

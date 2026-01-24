@@ -177,10 +177,15 @@ const ServiceManagerAPI = {
         const isEnabled = serviceData.enabled;
         const status = serviceData.status;
         
-        // Remove loading state
-        card.classList.remove('service-loading', 'long-pressing');
+        // Don't touch cards that are being long-pressed
+        if (card.classList.contains('long-pressing')) {
+            return;
+        }
         
-        // Remove any progress rings
+        // Remove loading state
+        card.classList.remove('service-loading');
+        
+        // Remove any stale progress rings (but not during active press)
         const existingRing = card.querySelector('.long-press-ring');
         if (existingRing) existingRing.remove();
         
@@ -208,10 +213,12 @@ const ServiceManagerAPI = {
      * Setup long-press handler on a card
      */
     setupLongPress(card, serviceData, action) {
-        // Don't clone - just add listeners directly
-        // Remove any existing long-press data
+        // Don't setup twice
         if (card._longPressSetup) return;
         card._longPressSetup = true;
+        
+        // Prevent drag ghost image
+        card.setAttribute('draggable', 'false');
         
         let pressTimer = null;
         let progressRing = null;
@@ -220,6 +227,8 @@ const ServiceManagerAPI = {
         const startPress = (e) => {
             // Don't trigger on right-click
             if (e.button && e.button !== 0) return;
+            // Prevent default to stop drag behavior
+            e.preventDefault();
             
             startTime = Date.now();
             card.classList.add('long-pressing');
@@ -293,6 +302,11 @@ const ServiceManagerAPI = {
         
         if (!section || !grid) return;
         
+        // Don't rebuild if any card is being long-pressed
+        if (grid.querySelector('.long-pressing')) {
+            return;
+        }
+        
         const count = this.disabledServices.length;
         
         if (count === 0 && this.isExpanded) {
@@ -321,10 +335,14 @@ const ServiceManagerAPI = {
     },
     
     createDisabledCard(originalCard, serviceData) {
-        const card = originalCard.cloneNode(true);
+        // Create a div instead of cloning the anchor to prevent drag ghost
+        const card = document.createElement('div');
         card.className = 'service-card disabled-service-card';
-        card.style.display = '';
+        card.dataset.service = originalCard.dataset.service;
         card.dataset.container = serviceData.name;
+        
+        // Copy the inner content from original
+        card.innerHTML = originalCard.innerHTML;
         
         // Grey status dot
         const statusDot = card.querySelector('.service-status');
@@ -335,11 +353,18 @@ const ServiceManagerAPI = {
         // Add hint text inside service-info
         const serviceInfo = card.querySelector('.service-info');
         if (serviceInfo) {
+            // Remove any existing hint first
+            const existingHint = serviceInfo.querySelector('.long-press-hint');
+            if (existingHint) existingHint.remove();
+            
             const hint = document.createElement('div');
             hint.className = 'long-press-hint';
             hint.textContent = 'Hold to enable';
             serviceInfo.appendChild(hint);
         }
+        
+        // Prevent dragging
+        card.setAttribute('draggable', 'false');
         
         // Setup long-press to enable
         this.setupLongPressForDisabled(card, serviceData);
@@ -372,12 +397,16 @@ const ServiceManagerAPI = {
      * Setup long-press for disabled cards (to enable)
      */
     setupLongPressForDisabled(card, serviceData) {
+        // Prevent drag ghost
+        card.setAttribute('draggable', 'false');
+        
         let pressTimer = null;
         let progressRing = null;
         let startTime = null;
         
         const startPress = (e) => {
             if (e.button && e.button !== 0) return;
+            e.preventDefault(); // Prevent drag behavior
             
             startTime = Date.now();
             card.classList.add('long-pressing');
