@@ -589,6 +589,29 @@ const ServiceManagerModal = {
                     }
                 }
                 
+                // Sync with dashboard's ServiceManagerAPI
+                if (typeof ServiceManagerAPI !== 'undefined') {
+                    // Update service state
+                    if (ServiceManagerAPI.services[serviceName]) {
+                        ServiceManagerAPI.services[serviceName].enabled = enable;
+                        ServiceManagerAPI.services[serviceName].status = enable ? 'running' : 'stopped';
+                    }
+                    
+                    // Update disabled services list
+                    if (enable) {
+                        ServiceManagerAPI.disabledServices = ServiceManagerAPI.disabledServices.filter(s => s !== serviceName);
+                    } else {
+                        if (!ServiceManagerAPI.disabledServices.includes(serviceName)) {
+                            ServiceManagerAPI.disabledServices.push(serviceName);
+                        }
+                    }
+                    
+                    // Refresh dashboard UI
+                    ServiceManagerAPI.updateAllCards();
+                    ServiceManagerAPI.updateDisabledSection();
+                    ServiceManagerAPI.updateStatusBanner();
+                }
+                
                 this.showToast(`${serviceName} ${enable ? 'enabled' : 'disabled'}`, 'success');
             } else {
                 // Production: call API
