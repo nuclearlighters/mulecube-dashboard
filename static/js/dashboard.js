@@ -759,6 +759,7 @@
         statusText: null,
         serviceStatus: {},  // Track status per service ID: { kiwix: 'online', openwebui: 'offline', ... }
         apiTookOver: false, // Flag to know if ServiceManagerAPI is handling counts
+        hasRealData: false, // Flag to indicate we have real data (not just DOM count)
         
         init() {
             this.statusBanner = document.getElementById('statusBanner');
@@ -773,15 +774,16 @@
             }
             
             // Production mode: wait for ServiceManagerAPI to initialize first
+            // Don't show any counts until we have real data
             setTimeout(() => {
                 if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
                     this.apiTookOver = true;
                     console.log('ServiceManager: Deferring to ServiceManagerAPI');
                 } else {
-                    // Fallback if ServiceManagerAPI not available
+                    // Fallback if ServiceManagerAPI not available - but don't update banner yet
                     this.checkAllServices();
                 }
-            }, 500);
+            }, 2000); // Increased to 2s to give API time to load
             
             // Periodic checks (only if ServiceManagerAPI not active)
             setInterval(() => {
@@ -807,6 +809,12 @@
         },
         
         async checkAllServices() {
+            // Don't run if ServiceManagerAPI exists - let it handle everything
+            if (typeof ServiceManagerAPI !== 'undefined') {
+                this.apiTookOver = true;
+                return;
+            }
+            
             // Get unique services from category cards (source of truth)
             const categoryCards = document.querySelectorAll('.service-category .service-card');
             const uniqueServices = new Map();
@@ -859,8 +867,8 @@
         updateStatusBanner(online, total) {
             if (!this.statusBanner || !this.statusText) return;
             
-            // Always defer to ServiceManagerAPI if it's active
-            if (this.apiTookOver || (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized)) {
+            // Always defer to ServiceManagerAPI if it's active or initializing
+            if (this.apiTookOver || (typeof ServiceManagerAPI !== 'undefined')) {
                 return; // ServiceManagerAPI handles the status banner
             }
             

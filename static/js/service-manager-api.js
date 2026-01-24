@@ -239,6 +239,15 @@ const ServiceManagerAPI = {
         
         if (!statusBanner || !statusText) return;
         
+        // If we don't have any service data yet, show loading state
+        const serviceCount = Object.keys(this.services).length;
+        if (serviceCount === 0 && !this.isDemo) {
+            statusText.innerHTML = '<span class="status-checking">Checking services...</span>';
+            statusBanner.classList.remove('error', 'warning', 'has-disabled');
+            if (toggleHint) toggleHint.style.display = 'none';
+            return;
+        }
+        
         let runningCount = 0;
         let enabledCount = 0;
         const disabledCount = this.disabledServices.length;

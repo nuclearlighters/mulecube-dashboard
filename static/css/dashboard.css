@@ -3921,3 +3921,9 @@ select:focus-visible {
         display: none;
     }
 }
+
+/* Status banner loading state */
+.status-checking {
+    color: var(--color-text-muted);
+    font-style: italic;
+}
