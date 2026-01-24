@@ -19,6 +19,36 @@
         logRefreshInterval: 3000,
         maxLogLines: 500
     };
+    // Check for demo mode
+    const demoMeta = document.querySelector('meta[name="mulecube-mode"]');
+    const IS_DEMO = demoMeta && demoMeta.content === 'demo';
+    
+    // Mock data for demo mode
+    const MOCK_POWER_DATA = {
+        battery: {
+            voltage: 4.12 + Math.random() * 0.08,
+            capacity: 75 + Math.random() * 20,
+            voltage_raw: 52000 + Math.floor(Math.random() * 2000),
+            capacity_raw: 20000 + Math.floor(Math.random() * 5000),
+            status: 'good',
+            health: 'good'
+        },
+        ac_power: {
+            connected: true,
+            status: 'ok'
+        },
+        charging: {
+            enabled: true,
+            active: true,
+            status: 'charging'
+        },
+        ups_model: 'X1202',
+        i2c_connected: true,
+        estimated_runtime_minutes: null,
+        timestamp: new Date().toISOString()
+    };
+
+
 
     // ==========================================
     // SVG Icons (inline for reliability)
@@ -1130,11 +1160,19 @@
         // ==========================================
         async loadPowerTab(container) {
             let powerData;
-            try {
-                powerData = await apiCall('/api/power/status');
-            } catch (error) {
-                container.innerHTML = '<div class="panel-error">' + ICONS.warning + '<p>UPS not available</p><small>Power management API not responding.</small></div>';
-                return;
+            
+            // Use mock data in demo mode
+            if (IS_DEMO) {
+                powerData = JSON.parse(JSON.stringify(MOCK_POWER_DATA));
+                powerData.battery.voltage = 4.12 + Math.random() * 0.08;
+                powerData.battery.capacity = 75 + Math.random() * 20;
+            } else {
+                try {
+                    powerData = await apiCall('/api/power/status');
+                } catch (error) {
+                    container.innerHTML = '<div class="panel-error">' + ICONS.warning + '<p>UPS not available</p><small>Power management API not responding.</small></div>';
+                    return;
+                }
             }
             
             const battery = powerData.battery || {};
@@ -1273,6 +1311,13 @@
         },
         
         async toggleCharging(enabled) {
+            if (IS_DEMO) {
+                MOCK_POWER_DATA.charging.enabled = enabled;
+                MOCK_POWER_DATA.charging.active = enabled;
+                MOCK_POWER_DATA.charging.status = enabled ? 'charging' : 'disabled';
+                setTimeout(() => this.loadTab('power'), 300);
+                return;
+            }
             try {
                 await apiCall('/api/power/charging', {
                     method: 'POST',
@@ -1287,6 +1332,11 @@
         
         async calibrateFuelGauge() {
             if (!confirm('Recalibrate fuel gauge? Battery percentage may change.')) return;
+            if (IS_DEMO) {
+                alert('Calibration initiated (demo mode)');
+                this.loadTab('power');
+                return;
+            }
             try {
                 const result = await apiCall('/api/power/calibrate', { method: 'POST' });
                 alert(result.message || 'Calibration initiated');
