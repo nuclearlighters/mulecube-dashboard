@@ -92,7 +92,7 @@ const ServiceManagerModal = {
                     </div>
                     <div class="summary-item ram">
                         <span class="summary-value" id="summaryRam">--</span>
-                        <span class="summary-label">Est. RAM</span>
+                        <span class="summary-label">RAM Used</span>
                     </div>
                 </div>
                 
@@ -162,8 +162,8 @@ const ServiceManagerModal = {
         // Load services
         await this.loadServices();
         
-        // Start auto-refresh every 10 seconds
-        this.refreshInterval = setInterval(() => this.loadServices(true), 10000);
+        // Start auto-refresh every 30 seconds (not 10, to reduce load)
+        this.refreshInterval = setInterval(() => this.loadServices(true), 30000);
         
         // Focus search input
         setTimeout(() => {
@@ -225,23 +225,34 @@ const ServiceManagerModal = {
         
         try {
             if (this.isDemo) {
-                // Demo mode: generate fake data
-                this.services = this.generateDemoServices();
+                // Demo mode: generate fake data only on first load
+                if (this.services.length === 0) {
+                    this.services = this.generateDemoServices();
+                    this.generateDemoStats();
+                }
+                // Don't regenerate - keep user's changes
             } else {
-                // Production: fetch from API
-                const response = await fetch('/api/services');
+                // Production: fetch from API (single call, no individual details)
+                const response = await fetch('/api/services', {
+                    signal: AbortSignal.timeout(15000)
+                });
                 const data = await response.json();
                 this.services = data.services || [];
+                
+                // Skip individual detail calls - use estimates from list endpoint
+                // The /api/services already includes ram_estimate_mb
             }
             
-            // Load detailed stats for running services
-            await this.loadServiceDetails();
-            
-            // Update UI
+            // Update UI immediately with estimates
             this.renderServices();
             this.updateSummary();
             this.updateCategoryFilter();
             this.updateLastRefresh();
+            
+            // Then fetch real stats in background (non-blocking)
+            if (!this.isDemo && !silent) {
+                this.loadServiceDetailsBackground();
+            }
             
         } catch (error) {
             console.error('Failed to load services:', error);
@@ -255,42 +266,63 @@ const ServiceManagerModal = {
     },
     
     /**
-     * Load detailed stats for each service
+     * Generate demo stats (called once)
+     */
+    generateDemoStats() {
+        this.services.forEach(svc => {
+            if (svc.status === 'running') {
+                this.serviceDetails[svc.name] = {
+                    cpu_percent: Math.random() * 15,
+                    ram_current_mb: Math.floor(svc.ram_estimate_mb * (0.5 + Math.random() * 0.5))
+                };
+            }
+        });
+    },
+    
+    /**
+     * Load detailed stats for each service - DISABLED for performance
+     * The list endpoint already has ram_estimate_mb which is sufficient
      */
     async loadServiceDetails() {
-        if (this.isDemo) {
-            // Generate demo stats
-            this.services.forEach(svc => {
-                if (svc.status === 'running') {
-                    this.serviceDetails[svc.name] = {
-                        cpu_percent: Math.random() * 15,
-                        ram_current_mb: Math.floor(svc.ram_estimate_mb * (0.5 + Math.random() * 0.5)),
-                        uptime: Math.floor(Math.random() * 86400 * 7) // Up to 7 days
-                    };
-                }
-            });
-            return;
-        }
-        
-        // Production: fetch details for running services (in parallel, max 5 at a time)
+        // Skip this - too slow with many services
+        // Individual /api/services/{name} calls take too long
+        return;
+    },
+    
+    /**
+     * Load service details in background (non-blocking)
+     * Fetches real CPU/RAM stats after initial render
+     */
+    async loadServiceDetailsBackground() {
         const runningServices = this.services.filter(s => s.status === 'running');
         
-        for (const svc of runningServices) {
+        // Fetch in parallel with timeout
+        const fetchPromises = runningServices.map(async (svc) => {
             try {
-                const response = await fetch(`/api/services/${svc.name}`);
+                const response = await fetch(`/api/services/${svc.name}`, {
+                    signal: AbortSignal.timeout(5000)
+                });
                 if (response.ok) {
                     const detail = await response.json();
                     this.serviceDetails[svc.name] = {
                         cpu_percent: detail.cpu_percent,
-                        ram_current_mb: detail.ram_current_mb,
-                        uptime_kuma_status: detail.uptime_kuma_status,
-                        last_state_change: detail.last_state_change
+                        ram_current_mb: detail.ram_current_mb
                     };
                 }
             } catch (e) {
                 // Ignore individual failures
             }
-        }
+        });
+        
+        // Wait for all with overall timeout
+        await Promise.race([
+            Promise.all(fetchPromises),
+            new Promise(resolve => setTimeout(resolve, 30000)) // 30s max
+        ]);
+        
+        // Re-render with actual stats
+        this.renderServices();
+        this.updateSummary();
     },
     
     /**
@@ -476,14 +508,31 @@ const ServiceManagerModal = {
         const total = this.services.length;
         const running = this.services.filter(s => s.status === 'running').length;
         const stopped = total - running;
-        const totalRam = this.services
-            .filter(s => s.status === 'running')
-            .reduce((sum, s) => sum + (s.ram_estimate_mb || 0), 0);
+        
+        // Calculate actual RAM used (from details) or fall back to estimates
+        let actualRam = 0;
+        let hasActualData = false;
+        
+        this.services.forEach(s => {
+            if (s.status === 'running') {
+                const details = this.serviceDetails[s.name];
+                if (details && details.ram_current_mb) {
+                    actualRam += details.ram_current_mb;
+                    hasActualData = true;
+                }
+            }
+        });
         
         document.getElementById('summaryTotal').textContent = total;
         document.getElementById('summaryRunning').textContent = running;
         document.getElementById('summaryStopped').textContent = stopped;
-        document.getElementById('summaryRam').textContent = `${totalRam}MB`;
+        
+        // Show actual RAM if we have data, otherwise show "Loading..."
+        if (hasActualData) {
+            document.getElementById('summaryRam').textContent = `${actualRam}MB`;
+        } else if (!this.isDemo) {
+            document.getElementById('summaryRam').textContent = '...';
+        }
     },
     
     /**
