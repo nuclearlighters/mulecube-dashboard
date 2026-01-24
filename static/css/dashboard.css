@@ -2881,19 +2881,16 @@ select:focus-visible {
     background: #666 !important;
 }
 
-/* Long-press hint */
+/* Long-press hint - green colored, below description */
 .long-press-hint {
-    position: absolute;
-    bottom: 8px;
-    right: 12px;
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
-    opacity: 0.6;
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+    opacity: 0.8;
 }
 
 .disabled-service-card:hover .long-press-hint {
     opacity: 1;
-    color: var(--color-primary);
 }
 
 /* ==========================================
@@ -2924,11 +2921,16 @@ select:focus-visible {
 
 .long-press-ring .ring-progress {
     fill: none;
-    stroke: var(--color-primary);
+    stroke: var(--color-danger); /* Default: red for disable */
     stroke-width: 3;
     stroke-linecap: round;
     stroke-dasharray: 100.53;
     stroke-dashoffset: 100.53;
+}
+
+/* Green ring for enable action */
+.long-press-ring .ring-progress.ring-enable {
+    stroke: var(--color-primary);
 }
 
 .long-press-ring .ring-icon {
@@ -2937,6 +2939,11 @@ select:focus-visible {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 1.2rem;
+    color: var(--color-danger); /* Default: red for disable */
+}
+
+/* Green icon for enable action */
+.long-press-ring .ring-icon.ring-icon-enable {
     color: var(--color-primary);
 }
 

@@ -208,9 +208,10 @@ const ServiceManagerAPI = {
      * Setup long-press handler on a card
      */
     setupLongPress(card, serviceData, action) {
-        // Remove existing listeners by cloning
-        const newCard = card.cloneNode(true);
-        card.parentNode.replaceChild(newCard, card);
+        // Don't clone - just add listeners directly
+        // Remove any existing long-press data
+        if (card._longPressSetup) return;
+        card._longPressSetup = true;
         
         let pressTimer = null;
         let progressRing = null;
@@ -221,19 +222,20 @@ const ServiceManagerAPI = {
             if (e.button && e.button !== 0) return;
             
             startTime = Date.now();
-            newCard.classList.add('long-pressing');
+            card.classList.add('long-pressing');
             
-            // Create progress ring
+            // Create progress ring with color based on action
+            const ringColor = action === 'disable' ? 'var(--color-danger)' : 'var(--color-primary)';
             progressRing = document.createElement('div');
             progressRing.className = 'long-press-ring';
             progressRing.innerHTML = `
                 <svg viewBox="0 0 36 36">
                     <circle class="ring-bg" cx="18" cy="18" r="16"/>
-                    <circle class="ring-progress" cx="18" cy="18" r="16"/>
+                    <circle class="ring-progress" cx="18" cy="18" r="16" style="stroke: ${ringColor}"/>
                 </svg>
-                <span class="ring-icon">${action === 'disable' ? '⏸' : '▶'}</span>
+                <span class="ring-icon" style="color: ${ringColor}">${action === 'disable' ? '⏸' : '▶'}</span>
             `;
-            newCard.appendChild(progressRing);
+            card.appendChild(progressRing);
             
             // Animate the ring
             const ring = progressRing.querySelector('.ring-progress');
@@ -241,8 +243,8 @@ const ServiceManagerAPI = {
             
             pressTimer = setTimeout(() => {
                 // Long press completed
-                newCard.classList.remove('long-pressing');
-                if (progressRing) progressRing.remove();
+                card.classList.remove('long-pressing');
+                if (progressRing && progressRing.parentNode) progressRing.remove();
                 
                 if (action === 'disable') {
                     this.disableService(serviceData.name);
@@ -257,26 +259,26 @@ const ServiceManagerAPI = {
                 clearTimeout(pressTimer);
                 pressTimer = null;
             }
-            newCard.classList.remove('long-pressing');
+            card.classList.remove('long-pressing');
             if (progressRing && progressRing.parentNode) {
                 progressRing.remove();
             }
         };
         
         // Mouse events
-        newCard.addEventListener('mousedown', startPress);
-        newCard.addEventListener('mouseup', cancelPress);
-        newCard.addEventListener('mouseleave', cancelPress);
+        card.addEventListener('mousedown', startPress);
+        card.addEventListener('mouseup', cancelPress);
+        card.addEventListener('mouseleave', cancelPress);
         
         // Touch events
-        newCard.addEventListener('touchstart', (e) => {
+        card.addEventListener('touchstart', (e) => {
             startPress(e);
         }, { passive: true });
-        newCard.addEventListener('touchend', cancelPress);
-        newCard.addEventListener('touchcancel', cancelPress);
+        card.addEventListener('touchend', cancelPress);
+        card.addEventListener('touchcancel', cancelPress);
         
         // Allow normal click for navigation (short press)
-        newCard.addEventListener('click', (e) => {
+        card.addEventListener('click', (e) => {
             const pressDuration = Date.now() - (startTime || 0);
             if (pressDuration > 500) {
                 // Was a long press attempt, prevent navigation
@@ -330,11 +332,14 @@ const ServiceManagerAPI = {
             statusDot.className = 'service-status disabled';
         }
         
-        // Add hint text
-        const hint = document.createElement('div');
-        hint.className = 'long-press-hint';
-        hint.textContent = 'Hold to enable';
-        card.appendChild(hint);
+        // Add hint text inside service-info
+        const serviceInfo = card.querySelector('.service-info');
+        if (serviceInfo) {
+            const hint = document.createElement('div');
+            hint.className = 'long-press-hint';
+            hint.textContent = 'Hold to enable';
+            serviceInfo.appendChild(hint);
+        }
         
         // Setup long-press to enable
         this.setupLongPressForDisabled(card, serviceData);
@@ -353,9 +358,9 @@ const ServiceManagerAPI = {
             <div class="service-info">
                 <h3>${serviceData.display_name || serviceData.name}</h3>
                 <p>${serviceData.description || ''}</p>
+                <div class="long-press-hint">Hold to enable</div>
             </div>
             <div class="service-status disabled"></div>
-            <div class="long-press-hint">Hold to enable</div>
         `;
         
         this.setupLongPressForDisabled(card, serviceData);
@@ -377,14 +382,15 @@ const ServiceManagerAPI = {
             startTime = Date.now();
             card.classList.add('long-pressing');
             
+            // Green ring for enable
             progressRing = document.createElement('div');
             progressRing.className = 'long-press-ring';
             progressRing.innerHTML = `
                 <svg viewBox="0 0 36 36">
                     <circle class="ring-bg" cx="18" cy="18" r="16"/>
-                    <circle class="ring-progress" cx="18" cy="18" r="16"/>
+                    <circle class="ring-progress ring-enable" cx="18" cy="18" r="16"/>
                 </svg>
-                <span class="ring-icon">▶</span>
+                <span class="ring-icon ring-icon-enable">▶</span>
             `;
             card.appendChild(progressRing);
             
