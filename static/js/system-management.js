@@ -116,17 +116,50 @@
         },
         
         addNavigationButton() {
-            // Add "System" button to the status banner area or nav
-            const statusBanner = document.getElementById('statusBanner');
-            if (statusBanner) {
-                const btn = document.createElement('button');
-                btn.className = 'system-panel-trigger';
-                btn.innerHTML = `${ICONS.settings} <span>System</span>`;
-                btn.onclick = () => this.toggle();
-                btn.title = 'System Management (Ctrl+Shift+S)';
-                
-                // Insert at the beginning of the status banner
-                statusBanner.insertBefore(btn, statusBanner.firstChild);
+            // Try to add "System" button to the top navigation bar
+            // Look for common top bar elements in priority order
+            const possibleContainers = [
+                document.querySelector('.top-nav-actions'),      // Top nav actions area
+                document.querySelector('.nav-actions'),          // Nav actions
+                document.querySelector('.header-actions'),       // Header actions
+                document.querySelector('.toolbar-right'),        // Toolbar right side
+                document.querySelector('.nav-right'),            // Nav right
+                document.querySelector('[data-nav-actions]'),    // Data attribute fallback
+                document.querySelector('.status-bar-actions'),   // Status bar actions
+                document.getElementById('navActions'),           // ID-based lookup
+            ];
+            
+            const btn = document.createElement('button');
+            btn.className = 'system-panel-trigger top-bar-btn';
+            btn.innerHTML = `${ICONS.settings} <span>System</span>`;
+            btn.onclick = () => this.toggle();
+            btn.title = 'System Management (Ctrl+Shift+S)';
+            btn.id = 'systemManagementBtn';
+            
+            // Try to find a container in the top bar
+            let placed = false;
+            for (const container of possibleContainers) {
+                if (container) {
+                    // Insert before any reboot/power button if found
+                    const rebootBtn = container.querySelector('[data-action="reboot"], .reboot-btn, button[title*="Reboot"]');
+                    if (rebootBtn) {
+                        container.insertBefore(btn, rebootBtn);
+                    } else {
+                        container.appendChild(btn);
+                    }
+                    placed = true;
+                    console.log('SystemManagementPanel: Button placed in top bar');
+                    break;
+                }
+            }
+            
+            // Fallback: add to status banner if no top bar found
+            if (!placed) {
+                const statusBanner = document.getElementById('statusBanner');
+                if (statusBanner) {
+                    statusBanner.insertBefore(btn, statusBanner.firstChild);
+                    console.log('SystemManagementPanel: Button placed in status banner (fallback)');
+                }
             }
         },
         
