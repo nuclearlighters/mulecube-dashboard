@@ -435,46 +435,31 @@ const ServiceManagerModal = {
                 const cpuPercent = details.cpu_percent;
                 const ramCurrent = details.ram_current_mb;
                 
+                // Show actual RAM if available, otherwise estimate
+                const ramDisplay = ramCurrent ? `${ramCurrent}MB` : `~${svc.ram_estimate_mb}MB`;
+                const ramTitle = ramCurrent ? 'Current RAM' : 'Estimated RAM';
+                const ramClass = ramCurrent ? '' : 'estimate';
+                
                 html += `
                     <div class="service-row ${isRunning ? 'running' : 'stopped'}" data-service="${svc.name}">
-                        <div class="service-info">
-                            <div class="service-name-row">
-                                <span class="service-status-dot ${isRunning ? 'online' : 'offline'}"></span>
-                                <span class="service-name">${svc.display_name}</span>
-                                ${svc.dependencies?.length ? `<span class="service-deps" title="Depends on: ${svc.dependencies.join(', ')}">⚡</span>` : ''}
-                                ${svc.dependents?.length ? `<span class="service-deps" title="Required by: ${svc.dependents.join(', ')}">🔗</span>` : ''}
-                            </div>
-                            <div class="service-meta">
-                                ${svc.description ? `<span class="service-desc">${svc.description}</span>` : ''}
-                            </div>
+                        <div class="service-main">
+                            <span class="service-status-dot ${isRunning ? 'online' : 'offline'}"></span>
+                            <span class="service-name">${svc.display_name}</span>
+                            ${svc.dependencies?.length ? `<span class="service-badge dep" title="Depends on: ${svc.dependencies.join(', ')}">DEP</span>` : ''}
+                            ${svc.dependents?.length ? `<span class="service-badge req" title="Required by: ${svc.dependents.join(', ')}">REQ</span>` : ''}
                         </div>
                         <div class="service-stats">
                             ${isRunning && cpuPercent !== undefined ? `
-                                <div class="stat-item" title="CPU Usage">
-                                    <span class="stat-icon">⚡</span>
-                                    <span class="stat-value">${cpuPercent.toFixed(1)}%</span>
-                                </div>
+                                <span class="stat" title="CPU">${cpuPercent.toFixed(1)}%</span>
                             ` : ''}
-                            ${isRunning && ramCurrent ? `
-                                <div class="stat-item" title="Current RAM">
-                                    <span class="stat-icon">📊</span>
-                                    <span class="stat-value">${ramCurrent}MB</span>
-                                </div>
-                            ` : ''}
-                            <div class="stat-item estimate" title="Estimated RAM">
-                                <span class="stat-icon">💾</span>
-                                <span class="stat-value">${svc.ram_estimate_mb}MB</span>
-                            </div>
+                            <span class="stat ${ramClass}" title="${ramTitle}">${ramDisplay}</span>
                         </div>
-                        <div class="service-toggle">
-                            <label class="toggle-switch">
-                                <input type="checkbox" 
-                                    ${svc.enabled ? 'checked' : ''} 
-                                    onchange="ServiceManagerModal.toggleService('${svc.name}', this.checked)"
-                                    ${svc.dependents?.length && svc.enabled ? 'data-has-dependents="true"' : ''}>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" 
+                                ${svc.enabled ? 'checked' : ''} 
+                                onchange="ServiceManagerModal.toggleService('${svc.name}', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
                 `;
             }
