@@ -1,6 +1,6 @@
 /**
  * MuleCube Service Manager API Integration
- * v7.0.0 - Full demo mode simulation + long-press enable/disable
+ * v8.0.0 - System service protection + profile support
  */
 
 const ServiceManagerAPI = {
@@ -21,6 +21,29 @@ const ServiceManagerAPI = {
     
     // Demo mode: services to disable initially
     demoDisabledServices: ['bentopdf', 'linkwarden'],
+    
+    // System services that should never be toggled
+    systemServices: [
+        'mulecube-service-manager', 'mulecube-hw-monitor', 'mulecube-reset',
+        'mulecube-terminal', 'mulecube-terminal-ro', 'mulecube-status',
+        'mulecube-diagnostics', 'mulecube-backup', 'mulecube-wifi-status',
+        'mulecube-watchdog', 'mulecube-usb-monitor', 'mulecube-nettools',
+        'mulecube-gpio', 'mulecube-dockge', 'mulecube-logs', 'mulecube-dashboard',
+        'mulecube-homarr', 'nginx-proxy', 'pihole', 'uptime-kuma',
+        // Database backends
+        'postgres', 'postgres-linkwarden', 'valkey', 'meilisearch',
+        'meilisearch-linkwarden', 'tika'
+    ],
+    
+    /**
+     * Check if a container is a system service (non-toggleable)
+     */
+    isSystemService(containerName) {
+        if (!containerName) return false;
+        return this.systemServices.includes(containerName) ||
+               containerName.startsWith('mulecube-') ||
+               containerName.startsWith('watchtower-');
+    },
     
     async init() {
         // Check for demo mode - check meta tag directly to avoid race condition with ModeManager
@@ -325,6 +348,12 @@ const ServiceManagerAPI = {
     setupLongPress(card, serviceData, action) {
         // Don't setup twice
         if (card._longPressSetup) return;
+        
+        // Don't setup for system services - they can't be toggled
+        if (this.isSystemService(serviceData.name)) {
+            return;
+        }
+        
         card._longPressSetup = true;
         
         // Prevent drag ghost image
@@ -582,6 +611,12 @@ const ServiceManagerAPI = {
     },
     
     async enableService(containerName) {
+        // Block system services from being toggled
+        if (this.isSystemService(containerName)) {
+            console.log('ServiceManagerAPI: Cannot toggle system service:', containerName);
+            return;
+        }
+        
         this.showToast(`Starting ${containerName}...`, 'info');
         
         if (this.isDemo) {
@@ -640,6 +675,12 @@ const ServiceManagerAPI = {
     },
     
     async disableService(containerName, force = false) {
+        // Block system services from being toggled
+        if (this.isSystemService(containerName)) {
+            console.log('ServiceManagerAPI: Cannot toggle system service:', containerName);
+            return;
+        }
+        
         this.showToast(`Stopping ${containerName}...`, 'info');
         
         if (this.isDemo) {

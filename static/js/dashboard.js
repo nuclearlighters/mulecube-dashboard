@@ -1258,42 +1258,99 @@
     // Onboarding Wizard
     // ==========================================
     const OnboardingWizard = {
+        // System services that are always running (never toggleable)
+        systemServices: [
+            'mulecube-service-manager', 'mulecube-hw-monitor', 'mulecube-reset',
+            'mulecube-terminal', 'mulecube-terminal-ro', 'mulecube-status',
+            'mulecube-diagnostics', 'mulecube-backup', 'mulecube-wifi-status',
+            'mulecube-watchdog', 'mulecube-usb-monitor', 'mulecube-nettools',
+            'mulecube-gpio', 'mulecube-dockge', 'mulecube-logs', 'mulecube-dashboard',
+            'mulecube-homarr', 'nginx-proxy', 'pihole', 'uptime-kuma',
+            // Database backends
+            'postgres', 'postgres-linkwarden', 'valkey', 'meilisearch', 
+            'meilisearch-linkwarden', 'tika',
+            // Watchtowers
+            'watchtower-signalk', 'watchtower-pihole', 'watchtower-syncthing',
+            'watchtower-openwebui', 'watchtower-ollama', 'watchtower-meshtastic',
+            'watchtower-maps', 'watchtower-kiwix', 'watchtower-bentopdf',
+            'watchtower-beszel', 'watchtower-vaultwarden'
+        ],
+        
+        // All toggleable services (container names)
+        allServices: [
+            'kiwix', 'tileserver', 'signalk-server', 'calibre-web', 'emergency-ref',
+            'libretranslate', 'open-webui', 'ollama',
+            'cryptpad', 'excalidraw', 'bentopdf', 'vaultwarden',
+            'filebrowser', 'syncthing', 'linkwarden', 'open-archiver',
+            'element', 'meshtastic-web', 'conduit',
+            'apkrepo-nginx', 'it-tools', 'networking-toolbox',
+            'beszel'
+        ],
+        
         profiles: {
             sailor: {
                 name: 'Sailor / Maritime',
                 icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 18H2a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4Z"/><path d="M21 14 10 2 3 14"/><path d="M10 2v16"/></svg>',
                 description: 'Navigation, weather, emergency communications',
-                services: ['kiwix', 'maps', 'meshtastic', 'openwebui', 'calibre', 'filebrowser']
+                // Services to enable for this profile
+                enabled: [
+                    'kiwix', 'tileserver', 'signalk-server', 'calibre-web', 'emergency-ref',
+                    'meshtastic-web', 'element', 'conduit',
+                    'filebrowser', 'vaultwarden'
+                ],
+                // Everything else is disabled
+                highlights: ['Signal K', 'TileServer GL', 'Meshtastic', 'Kiwix']
             },
             expedition: {
                 name: 'Expedition / Outdoor',
                 icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/><path d="M4.14 15.08c2.62-1.57 5.24-1.43 7.86.42 2.74 1.94 5.49 2 8.23.19"/></svg>',
                 description: 'Offline maps, mesh networks, survival info',
-                services: ['kiwix', 'maps', 'meshtastic', 'openwebui', 'filebrowser', 'excalidraw']
+                enabled: [
+                    'kiwix', 'tileserver', 'calibre-web', 'emergency-ref',
+                    'meshtastic-web',
+                    'filebrowser', 'excalidraw', 'vaultwarden'
+                ],
+                highlights: ['TileServer GL', 'Meshtastic', 'Kiwix', 'Calibre-Web']
             },
             prepper: {
                 name: 'Emergency Preparedness',
                 icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12z"/><line x1="6" x2="18" y1="6" y2="6"/><line x1="12" x2="12" y1="12" y2="12"/></svg>',
                 description: 'Document storage, emergency comms, offline reference',
-                services: ['kiwix', 'maps', 'meshtastic', 'vaultwarden', 'filebrowser', 'syncthing']
+                enabled: [
+                    'kiwix', 'tileserver', 'calibre-web', 'emergency-ref',
+                    'meshtastic-web', 'element', 'conduit',
+                    'filebrowser', 'syncthing', 'vaultwarden',
+                    'cryptpad'
+                ],
+                highlights: ['RadioReference', 'Meshtastic', 'CryptPad', 'Syncthing']
             },
             remote: {
                 name: 'Remote Work',
                 icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
                 description: 'Productivity tools, document collaboration, AI assistant',
-                services: ['openwebui', 'cryptpad', 'excalidraw', 'filebrowser', 'libretranslate', 'calibre']
+                enabled: [
+                    'kiwix', 'calibre-web',
+                    'libretranslate', 'open-webui', 'ollama',
+                    'cryptpad', 'excalidraw', 'bentopdf', 'vaultwarden',
+                    'filebrowser', 'syncthing', 'linkwarden',
+                    'it-tools'
+                ],
+                highlights: ['Open WebUI', 'CryptPad', 'LibreTranslate', 'Excalidraw']
             },
             general: {
-                name: 'Privacy / General',
+                name: 'General',
                 icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
                 description: 'Explore all features at your own pace',
-                services: [] // All services enabled
+                enabled: null, // null means ALL services enabled
+                highlights: ['All services enabled']
             }
         },
         
         currentStep: 0,
         selectedProfile: null,
         setupType: 'quick', // quick or advanced
+        customServices: [], // For advanced setup customization
+        isApplying: false,
         
         init() {
             // Check if wizard should show
@@ -1466,9 +1523,89 @@
                         });
                     }
                 },
-                // Step 4: Feature Tour
+                // Step 4: Feature Tour (for Quick) or Service Selection (for Advanced)
                 {
-                    render: () => `
+                    render: () => {
+                        if (this.setupType === 'advanced') {
+                            // Advanced: Show service checkboxes
+                            const profile = this.profiles[this.selectedProfile] || this.profiles.general;
+                            const enabledServices = profile.enabled || this.allServices; // null = all
+                            
+                            // Initialize customServices from profile
+                            if (this.customServices.length === 0) {
+                                this.customServices = [...enabledServices];
+                            }
+                            
+                            // Group services by category
+                            const serviceInfo = {
+                                'kiwix': { name: 'Kiwix', category: 'Knowledge', desc: 'Wikipedia offline' },
+                                'tileserver': { name: 'TileServer GL', category: 'Knowledge', desc: 'Offline maps' },
+                                'signalk-server': { name: 'Signal K', category: 'Knowledge', desc: 'Nautical navigation' },
+                                'calibre-web': { name: 'Calibre-Web', category: 'Knowledge', desc: 'E-book library' },
+                                'emergency-ref': { name: 'RadioReference', category: 'Knowledge', desc: 'Radio frequencies' },
+                                'libretranslate': { name: 'LibreTranslate', category: 'AI', desc: 'Translation' },
+                                'open-webui': { name: 'Open WebUI', category: 'AI', desc: 'AI chat interface' },
+                                'ollama': { name: 'Ollama', category: 'AI', desc: 'AI model backend' },
+                                'cryptpad': { name: 'CryptPad', category: 'Productivity', desc: 'Secure documents' },
+                                'excalidraw': { name: 'Excalidraw', category: 'Productivity', desc: 'Diagrams' },
+                                'bentopdf': { name: 'BentoPDF', category: 'Productivity', desc: 'PDF tools' },
+                                'vaultwarden': { name: 'Vaultwarden', category: 'Productivity', desc: 'Passwords' },
+                                'filebrowser': { name: 'File Browser', category: 'Files', desc: 'Browse files' },
+                                'syncthing': { name: 'Syncthing', category: 'Files', desc: 'Sync files' },
+                                'linkwarden': { name: 'Linkwarden', category: 'Files', desc: 'Save links' },
+                                'open-archiver': { name: 'Open Archiver', category: 'Files', desc: 'Archive emails' },
+                                'element': { name: 'Element', category: 'Communication', desc: 'Team chat' },
+                                'meshtastic-web': { name: 'Meshtastic', category: 'Communication', desc: 'Mesh network' },
+                                'conduit': { name: 'Conduit', category: 'Communication', desc: 'Matrix backend' },
+                                'apkrepo-nginx': { name: 'F-Droid', category: 'Tools', desc: 'App store' },
+                                'it-tools': { name: 'IT-Tools', category: 'Tools', desc: 'Dev tools' },
+                                'networking-toolbox': { name: 'Networking Toolbox', category: 'Tools', desc: 'Network tools' },
+                                'beszel': { name: 'Beszel', category: 'Monitoring', desc: 'Resource monitoring' }
+                            };
+                            
+                            const categories = ['Knowledge', 'AI', 'Productivity', 'Files', 'Communication', 'Tools', 'Monitoring'];
+                            
+                            let html = `
+                                <div class="wizard-step wizard-services">
+                                    <h2>Customize Services</h2>
+                                    <p class="wizard-subtitle">Select which services to enable for your ${profile.name} setup</p>
+                                    
+                                    <div class="wizard-services-grid">
+                            `;
+                            
+                            for (const cat of categories) {
+                                const catServices = Object.entries(serviceInfo).filter(([k, v]) => v.category === cat);
+                                if (catServices.length === 0) continue;
+                                
+                                html += `<div class="wizard-service-category">
+                                    <h4>${cat}</h4>
+                                    <div class="wizard-service-list">`;
+                                
+                                for (const [key, info] of catServices) {
+                                    const isChecked = this.customServices.includes(key);
+                                    html += `
+                                        <label class="wizard-service-item">
+                                            <input type="checkbox" data-service="${key}" ${isChecked ? 'checked' : ''}>
+                                            <span class="service-name">${info.name}</span>
+                                            <span class="service-desc">${info.desc}</span>
+                                        </label>
+                                    `;
+                                }
+                                
+                                html += `</div></div>`;
+                            }
+                            
+                            html += `
+                                    </div>
+                                    <p class="wizard-services-note">System services (Admin, Monitoring, Backends) are always running and cannot be disabled.</p>
+                                </div>
+                            `;
+                            
+                            return html;
+                        }
+                        
+                        // Quick setup: Show tour
+                        return `
                         <div class="wizard-step wizard-tour">
                             <h2>Quick Tour</h2>
                             <p class="wizard-subtitle">Here's what you can do with MuleCube</p>
@@ -1504,7 +1641,25 @@
                                 </div>
                             </div>
                         </div>
-                    `
+                    `;
+                    },
+                    afterRender: () => {
+                        if (this.setupType === 'advanced') {
+                            // Handle checkbox changes
+                            document.querySelectorAll('.wizard-service-item input').forEach(cb => {
+                                cb.addEventListener('change', () => {
+                                    const service = cb.dataset.service;
+                                    if (cb.checked) {
+                                        if (!this.customServices.includes(service)) {
+                                            this.customServices.push(service);
+                                        }
+                                    } else {
+                                        this.customServices = this.customServices.filter(s => s !== service);
+                                    }
+                                });
+                            });
+                        }
+                    }
                 },
                 // Step 5: Completion
                 {
@@ -1604,6 +1759,18 @@
             localStorage.setItem(CONFIG.wizardStorageKey, 'true');
             localStorage.setItem(CONFIG.profileStorageKey, this.selectedProfile || 'general');
             
+            // Apply profile services (if not demo mode)
+            const isDemo = document.querySelector('meta[name="mulecube-mode"]')?.content === 'demo';
+            
+            if (!isDemo && this.selectedProfile) {
+                // For advanced setup, use customServices; for quick setup, use profile defaults
+                if (this.setupType === 'advanced' && this.customServices.length > 0) {
+                    this.applyCustomServices(this.customServices);
+                } else {
+                    this.applyProfile(this.selectedProfile);
+                }
+            }
+            
             // Remove overlay
             const overlay = document.querySelector('.wizard-overlay');
             if (overlay) overlay.remove();
@@ -1611,7 +1778,79 @@
             // Restore scroll
             document.body.style.overflow = '';
             
-            console.log('Onboarding wizard completed. Profile:', this.selectedProfile);
+            console.log('Onboarding wizard completed. Profile:', this.selectedProfile, 'Setup:', this.setupType);
+            
+            // Refresh dashboard to reflect changes
+            if (!isDemo) {
+                setTimeout(() => {
+                    if (typeof ServiceManagerAPI !== 'undefined') {
+                        ServiceManagerAPI.fetchServiceStatus();
+                    }
+                }, 2000);
+            }
+        },
+        
+        /**
+         * Apply a profile's service configuration
+         */
+        async applyProfile(profileKey) {
+            const profile = this.profiles[profileKey];
+            if (!profile) return;
+            
+            // General profile = enable all, so no changes needed
+            if (profile.enabled === null) {
+                console.log('General profile: keeping all services enabled');
+                return;
+            }
+            
+            await this.applyCustomServices(profile.enabled);
+        },
+        
+        /**
+         * Apply custom service selection
+         */
+        async applyCustomServices(servicesToEnable) {
+            const servicesToDisable = this.allServices.filter(s => !servicesToEnable.includes(s));
+            
+            console.log('Applying custom services');
+            console.log('Enabling:', servicesToEnable);
+            console.log('Disabling:', servicesToDisable);
+            
+            // Disable services not selected
+            for (const service of servicesToDisable) {
+                try {
+                    await fetch(`/api/services/${service}/disable`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ force: true })
+                    });
+                } catch (e) {
+                    console.warn('Failed to disable:', service, e);
+                }
+            }
+            
+            // Enable selected services
+            for (const service of servicesToEnable) {
+                try {
+                    await fetch(`/api/services/${service}/enable`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                } catch (e) {
+                    console.warn('Failed to enable:', service, e);
+                }
+            }
+        },
+        
+        /**
+         * Check if a container is a system service (non-toggleable)
+         */
+        isSystemService(containerName) {
+            return this.systemServices.some(s => 
+                containerName === s || 
+                containerName.startsWith('mulecube-') ||
+                containerName.startsWith('watchtower-')
+            );
         },
         
         reset() {

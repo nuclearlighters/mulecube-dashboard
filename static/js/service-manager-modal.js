@@ -1,7 +1,7 @@
 /**
  * MuleCube Service Manager Modal
  * Full-featured service management interface
- * v1.0.0
+ * v1.1.0 - System service protection
  */
 
 const ServiceManagerModal = {
@@ -10,6 +10,28 @@ const ServiceManagerModal = {
     serviceDetails: {},
     refreshInterval: null,
     isDemo: false,
+    
+    // System services that cannot be toggled
+    systemServices: [
+        'mulecube-service-manager', 'mulecube-hw-monitor', 'mulecube-reset',
+        'mulecube-terminal', 'mulecube-terminal-ro', 'mulecube-status',
+        'mulecube-diagnostics', 'mulecube-backup', 'mulecube-wifi-status',
+        'mulecube-watchdog', 'mulecube-usb-monitor', 'mulecube-nettools',
+        'mulecube-gpio', 'mulecube-dockge', 'mulecube-logs', 'mulecube-dashboard',
+        'mulecube-homarr', 'nginx-proxy', 'pihole', 'uptime-kuma',
+        'postgres', 'postgres-linkwarden', 'valkey', 'meilisearch',
+        'meilisearch-linkwarden', 'tika'
+    ],
+    
+    /**
+     * Check if a container is a system service
+     */
+    isSystemService(containerName) {
+        if (!containerName) return false;
+        return this.systemServices.includes(containerName) ||
+               containerName.startsWith('mulecube-') ||
+               containerName.startsWith('watchtower-');
+    },
     
     /**
      * Initialize the modal system
@@ -446,13 +468,24 @@ const ServiceManagerModal = {
                 const details = this.serviceDetails[svc.name] || {};
                 const cpuPercent = details.cpu_percent;
                 const ramCurrent = details.ram_current_mb;
+                const isSystem = this.isSystemService(svc.name);
                 
                 // Show estimate with clear label
                 const ramDisplay = `EST. ${svc.ram_estimate_mb}MB`;
                 const ramTitle = 'Estimated max RAM usage';
                 
+                // System services show "SYSTEM" badge instead of toggle
+                const toggleHtml = isSystem 
+                    ? `<span class="service-badge system" title="System service - always running">SYSTEM</span>`
+                    : `<label class="toggle-switch">
+                            <input type="checkbox" 
+                                ${svc.enabled ? 'checked' : ''} 
+                                onchange="ServiceManagerModal.toggleService('${svc.name}', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>`;
+                
                 html += `
-                    <div class="service-row ${isRunning ? 'running' : 'stopped'}" data-service="${svc.name}">
+                    <div class="service-row ${isRunning ? 'running' : 'stopped'} ${isSystem ? 'system-service' : ''}" data-service="${svc.name}">
                         <div class="service-main">
                             <span class="service-status-dot ${isRunning ? 'online' : 'offline'}"></span>
                             <span class="service-name">${svc.display_name}</span>
@@ -462,12 +495,7 @@ const ServiceManagerModal = {
                         <div class="service-stats">
                             <span class="stat estimate" title="${ramTitle}">${ramDisplay}</span>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" 
-                                ${svc.enabled ? 'checked' : ''} 
-                                onchange="ServiceManagerModal.toggleService('${svc.name}', this.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
+                        ${toggleHtml}
                     </div>
                 `;
             }
@@ -549,6 +577,13 @@ const ServiceManagerModal = {
      * Toggle a service on/off
      */
     async toggleService(serviceName, enable) {
+        // Block system services from being toggled
+        if (this.isSystemService(serviceName)) {
+            console.log('ServiceManagerModal: Cannot toggle system service:', serviceName);
+            this.showToast('System services cannot be disabled', 'warning');
+            return;
+        }
+        
         const row = document.querySelector(`.service-row[data-service="${serviceName}"]`);
         const toggle = row.querySelector('input[type="checkbox"]');
         
