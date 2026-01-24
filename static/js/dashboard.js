@@ -15,6 +15,7 @@
     // ==========================================
     const CONFIG = {
         statsEndpoint: '/stats.json',
+        powerEndpoint: 'http://servicemanager.mulecube.net/api/power/status',
         syncEndpoint: '/api/sync/status',
         statsPollInterval: 5000,
         serviceCheckTimeout: 3000,
@@ -682,14 +683,36 @@
         
         async fetchStats() {
             try {
-                const response = await fetch(CONFIG.statsEndpoint, { 
+                // Fetch system stats
+                const statsResponse = await fetch(CONFIG.statsEndpoint, { 
                     cache: 'no-store',
                     signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
                 });
                 
-                if (!response.ok) throw new Error('Stats fetch failed');
+                let data = {};
+                if (statsResponse.ok) {
+                    data = await statsResponse.json();
+                }
                 
-                const data = await response.json();
+                // Fetch power/battery data from UPS API
+                try {
+                    const powerResponse = await fetch(CONFIG.powerEndpoint, {
+                        cache: 'no-store',
+                        signal: AbortSignal.timeout(CONFIG.serviceCheckTimeout)
+                    });
+                    if (powerResponse.ok) {
+                        const powerData = await powerResponse.json();
+                        data.battery_available = powerData.i2c_connected;
+                        data.battery_percent = Math.round(powerData.battery?.capacity || 0);
+                        data.battery_charging = powerData.charging?.active || false;
+                        data.battery_time = powerData.estimated_runtime_minutes 
+                            ? `${Math.floor(powerData.estimated_runtime_minutes / 60)}h ${powerData.estimated_runtime_minutes % 60}m`
+                            : '';
+                    }
+                } catch (powerError) {
+                    console.warn('Power API fetch error:', powerError);
+                }
+                
                 this.updateDisplay(data);
             } catch (error) {
                 console.warn('Stats fetch error:', error);
@@ -727,21 +750,30 @@
         },
         
         startDemoStats() {
-            // Simulate realistic stats for demo
+            // Simulate realistic stats for demo - use stable values that match system-management
+            // Store demo battery value so it's consistent across refreshes within same session
+            if (!window._demoBatteryPercent) {
+                window._demoBatteryPercent = Math.floor(Math.random() * 20) + 75; // 75-95%
+            }
+            
             const updateDemo = () => {
+                // Small fluctuation around the base value (±1%)
+                const batteryFluctuation = (Math.random() - 0.5) * 2;
+                const currentBattery = Math.round(Math.min(99, Math.max(70, window._demoBatteryPercent + batteryFluctuation)));
+                
                 const data = {
                     cpu: Math.floor(Math.random() * 30) + 5,
                     memory: Math.floor(Math.random() * 20) + 40,
                     disk: Math.floor(Math.random() * 5) + 60,
-                    wifi: `${Math.floor(Math.random() * 5)} clients`,
+                    wifi: `${Math.floor(Math.random() * 3) + 1} clients`,
                     ethernet: 'Disconnected',
                     hostname: 'mulecube-demo',
                     uptime: '12d 4h 32m',
-                    temperature: Math.floor(Math.random() * 15) + 45,
+                    temperature: Math.floor(Math.random() * 10) + 45,
                     battery_available: true,
-                    battery_percent: Math.floor(Math.random() * 30) + 60,
-                    battery_charging: Math.random() > 0.5,
-                    battery_time: '3h 45m'
+                    battery_percent: currentBattery,
+                    battery_charging: true,
+                    battery_time: ''
                 };
                 this.updateDisplay(data);
             };

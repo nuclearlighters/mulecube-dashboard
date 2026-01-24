@@ -1161,11 +1161,18 @@
         async loadPowerTab(container) {
             let powerData;
             
-            // Use mock data in demo mode
+            // Use mock data in demo mode - share value with dashboard for consistency
             if (IS_DEMO) {
+                // Use the same battery value as the dashboard status bar
+                if (!window._demoBatteryPercent) {
+                    window._demoBatteryPercent = Math.floor(Math.random() * 20) + 75;
+                }
+                const batteryFluctuation = (Math.random() - 0.5) * 2;
+                const currentBattery = Math.min(99, Math.max(70, window._demoBatteryPercent + batteryFluctuation));
+                
                 powerData = JSON.parse(JSON.stringify(MOCK_POWER_DATA));
-                powerData.battery.voltage = 4.12 + Math.random() * 0.08;
-                powerData.battery.capacity = 75 + Math.random() * 20;
+                powerData.battery.voltage = 4.10 + (currentBattery / 100) * 0.12; // 4.10V at 70%, 4.22V at 100%
+                powerData.battery.capacity = currentBattery;
             } else {
                 try {
                     powerData = await apiCall('/api/power/status');
