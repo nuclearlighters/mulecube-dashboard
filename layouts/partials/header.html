@@ -102,12 +102,16 @@
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     font-size: 0.75rem;
     background: transparent;
     border: 1px solid var(--color-border, #27272a);
     border-radius: var(--border-radius, 6px);
     padding: 5px 10px;
+    min-width: 90px;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .stat-icon {
@@ -153,6 +157,13 @@
     white-space: nowrap;
     transition: all 0.2s ease;
     color: var(--color-text-muted, #a1a1aa);
+    min-width: 90px;
+    height: 32px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }
 
 .power-btn:hover {

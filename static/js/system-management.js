@@ -213,7 +213,10 @@
                     
                     <div class="system-panel-footer">
                         <span class="panel-hint">Press <kbd>Ctrl+Shift+S</kbd> to toggle</span>
-                        <span class="panel-version">Service Manager v1.0.0</span>
+                        <div class="panel-footer-right">
+                            <a href="http://servicemanager.mulecube.net/docs" target="_blank" class="footer-link">API Docs</a>
+                            <span class="panel-version">Service Manager v1.0.0</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -467,25 +470,6 @@
                             <div class="temp-status ${tempStatus}">
                                 ${temp > 80 ? 'Throttling may occur' : temp > 70 ? 'Running warm' : 'Normal operating temperature'}
                             </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Power Controls & Links -->
-                <div class="power-controls-section">
-                    <div class="controls-row">
-                        <div class="power-buttons">
-                            <button class="btn btn-warning" onclick="SystemManagementPanel.confirmReboot()">
-                                ${ICONS.refresh} Reboot
-                            </button>
-                            <button class="btn btn-danger" onclick="SystemManagementPanel.confirmShutdown()">
-                                ${ICONS.power} Shutdown
-                            </button>
-                        </div>
-                        <div class="quick-links">
-                            <a href="http://servicemanager.mulecube.net/docs" target="_blank" class="btn btn-secondary btn-sm">
-                                API Docs
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -1255,48 +1239,109 @@
             }
             
             container.innerHTML = `
-                <div class="tab-content power-tab compact">
-                    <!-- Compact Status Row -->
-                    <div class="power-status-row">
-                        <div class="power-main">
-                            <div class="battery-visual-compact">
-                                <div class="battery-body-compact">
-                                    <div class="battery-level-compact" style="width: ${Math.min(battery.capacity || 0, 100)}%; background: ${batteryColor};"></div>
+                <div class="tab-content power-tab">
+                    <!-- Battery Status Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            ${ICONS.battery}
+                            <h3>Battery Status</h3>
+                            <span class="card-value" style="color: ${batteryColor};">${battery.capacity?.toFixed(0) || 0}%</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="battery-display">
+                                <div class="battery-visual-large">
+                                    <div class="battery-body-large" style="background: ${batteryBg}; border-color: ${batteryColor};">
+                                        <div class="battery-level-large" style="width: ${Math.min(battery.capacity || 0, 100)}%; background: ${batteryColor};"></div>
+                                    </div>
+                                    <div class="battery-tip-large" style="background: ${batteryColor};"></div>
                                 </div>
-                                <div class="battery-tip-compact"></div>
+                                <div class="battery-info">
+                                    <div class="battery-stat">
+                                        <span class="stat-label">Voltage</span>
+                                        <span class="stat-value">${battery.voltage?.toFixed(2) || '-.--'}V</span>
+                                    </div>
+                                    <div class="battery-stat">
+                                        <span class="stat-label">Health</span>
+                                        <span class="stat-value ${battery.health === 'good' ? 'text-success' : ''}">${battery.health || 'Unknown'}</span>
+                                    </div>
+                                    <div class="battery-stat">
+                                        <span class="stat-label">Runtime</span>
+                                        <span class="stat-value">${runtimeText}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="battery-stats">
-                                <span class="battery-pct" style="color: ${batteryColor};">${battery.capacity?.toFixed(0) || 0}%</span>
-                                <span class="battery-volt">${battery.voltage?.toFixed(2) || 0}V</span>
-                            </div>
-                        </div>
-                        <div class="power-indicators">
-                            <span class="indicator ${acPower.connected ? 'on' : 'off'}">AC ${acPower.connected ? '✓' : '✗'}</span>
-                            <span class="indicator ${charging.active ? 'on' : ''}">CHG ${charging.active ? '⚡' : charging.status === 'full' ? '✓' : '○'}</span>
-                            <span class="indicator">RT ${runtimeText}</span>
                         </div>
                     </div>
                     
-                    <!-- Controls Row -->
-                    <div class="power-controls-row">
-                        <div class="control-inline">
-                            <span>Charging:</span>
-                            <label class="toggle-compact">
-                                <input type="checkbox" id="chargingToggle" ${charging.enabled ? 'checked' : ''} 
-                                       onchange="SystemManagementPanel.toggleCharging(this.checked)">
-                                <span class="slider-compact"></span>
-                            </label>
+                    <!-- Power Status Card -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            ${ICONS.power}
+                            <h3>Power Status</h3>
                         </div>
-                        <button class="btn btn-sm" onclick="SystemManagementPanel.calibrateFuelGauge()">Calibrate</button>
+                        <div class="card-body">
+                            <div class="power-status-grid">
+                                <div class="power-indicator-card ${acPower.connected ? 'active' : ''}">
+                                    <div class="indicator-icon">${acPower.connected ? '⚡' : '○'}</div>
+                                    <div class="indicator-label">AC Power</div>
+                                    <div class="indicator-status">${acPower.connected ? 'Connected' : 'Disconnected'}</div>
+                                </div>
+                                <div class="power-indicator-card ${charging.active ? 'active' : ''}">
+                                    <div class="indicator-icon">${charging.active ? '🔋' : charging.status === 'full' ? '✓' : '○'}</div>
+                                    <div class="indicator-label">Charging</div>
+                                    <div class="indicator-status">${charging.active ? 'Active' : charging.status === 'full' ? 'Full' : 'Inactive'}</div>
+                                </div>
+                                <div class="power-indicator-card">
+                                    <div class="indicator-icon">🔌</div>
+                                    <div class="indicator-label">UPS Model</div>
+                                    <div class="indicator-status">${powerData.ups_model || 'X1202'}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Info Row -->
-                    <div class="power-info-row">
-                        <span>Model: <b>${powerData.ups_model || 'X1202'}</b></span>
-                        <span>I2C: <b>${powerData.i2c_connected ? 'Yes' : 'No'}</b></span>
-                        <span>Health: <b class="${battery.health === 'good' ? 'text-success' : ''}">${battery.health || '?'}</b></span>
-                        <span>Raw: <b>${battery.voltage_raw || '-'}/${battery.capacity_raw || '-'}</b></span>
+                    <!-- Controls Card -->
+                    <div class="info-card full-width">
+                        <div class="card-header">
+                            ${ICONS.settings}
+                            <h3>Power Controls</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="power-controls-grid">
+                                <div class="control-group">
+                                    <label class="control-label">Charging</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="chargingToggle" ${charging.enabled ? 'checked' : ''} 
+                                               onchange="SystemManagementPanel.toggleCharging(this.checked)">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Calibrate</label>
+                                    <button class="btn btn-secondary btn-sm" onclick="SystemManagementPanel.calibrateFuelGauge()">
+                                        Run Calibration
+                                    </button>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Reboot System</label>
+                                    <button class="btn btn-warning btn-sm" onclick="SystemManagementPanel.confirmReboot()">
+                                        ${ICONS.refresh} Reboot
+                                    </button>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Shutdown System</label>
+                                    <button class="btn btn-danger btn-sm" onclick="SystemManagementPanel.confirmShutdown()">
+                                        ${ICONS.power} Shutdown
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Debug Info -->
+                    <div class="power-debug">
+                        <span>I2C: ${powerData.i2c_connected ? 'Connected' : 'N/A'}</span>
+                        <span>Raw: ${battery.voltage_raw || '-'}/${battery.capacity_raw || '-'}</span>
                     </div>
                 </div>
             `;

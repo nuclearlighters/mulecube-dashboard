@@ -10,6 +10,7 @@
 .system-panel-trigger {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     padding: 4px 12px;
     margin-right: 12px;
@@ -21,6 +22,9 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 90px;
+    height: 32px;
+    box-sizing: border-box;
 }
 
 .system-panel-trigger:hover {
@@ -1577,6 +1581,239 @@
     gap: 16px;
 }
 
+/* New Power Tab Design */
+.power-tab {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.power-tab .info-card.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Large Battery Visual */
+.battery-display {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.battery-visual-large {
+    display: flex;
+    align-items: center;
+}
+
+.battery-body-large {
+    width: 120px;
+    height: 48px;
+    border: 3px solid var(--color-border-light);
+    border-radius: 8px;
+    padding: 4px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.battery-level-large {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.battery-tip-large {
+    width: 8px;
+    height: 24px;
+    border-radius: 0 4px 4px 0;
+    margin-left: 4px;
+}
+
+.battery-info {
+    display: flex;
+    gap: 20px;
+}
+
+.battery-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.battery-stat .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.battery-stat .stat-value {
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+/* Power Status Grid */
+.power-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.power-indicator-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.power-indicator-card.active {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.power-indicator-card .indicator-icon {
+    font-size: 1.5rem;
+}
+
+.power-indicator-card .indicator-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+}
+
+.power-indicator-card .indicator-status {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.power-indicator-card.active .indicator-status {
+    color: #22c55e;
+}
+
+/* Power Controls Grid */
+.power-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.control-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Toggle Switch for Power Tab */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--color-text-muted);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: rgba(34, 197, 94, 0.3);
+    border-color: #22c55e;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+    background-color: #22c55e;
+}
+
+/* Power Debug Row */
+.power-debug {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 24px;
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+}
+
+/* Footer Link Styles */
+.panel-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.footer-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .power-tab {
+        grid-template-columns: 1fr;
+    }
+    
+    .power-status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .power-controls-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .battery-display {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* Legacy compact styles kept for compatibility */
 .power-status-row {
     display: flex;
     align-items: center;
@@ -1659,114 +1896,4 @@
 .indicator.off {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
-}
-
-.power-controls-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 12px 20px;
-}
-
-.control-inline {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.85rem;
-}
-
-.toggle-compact {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-}
-
-.toggle-compact input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider-compact {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
-    transition: 0.3s;
-}
-
-.slider-compact:before {
-    position: absolute;
-    content: "";
-    height: 14px;
-    width: 14px;
-    left: 2px;
-    bottom: 2px;
-    background-color: var(--color-text-muted);
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.toggle-compact input:checked + .slider-compact {
-    background-color: rgba(34, 197, 94, 0.3);
-    border-color: #22c55e;
-}
-
-.toggle-compact input:checked + .slider-compact:before {
-    transform: translateX(20px);
-    background-color: #22c55e;
-}
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.75rem;
-}
-
-.power-info-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 12px 20px;
-    background: var(--color-bg-card);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-}
-
-.power-info-row b {
-    color: var(--color-text);
-    font-family: var(--font-mono);
-}
-
-.power-info-row b.text-success {
-    color: #22c55e;
-}
-
-/* Overview Controls Row */
-.power-controls-section .controls-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.quick-links {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.75rem;
 }
