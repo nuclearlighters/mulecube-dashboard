@@ -70,10 +70,70 @@ const ServiceManagerAPI = {
             }
         });
         
+        // Set all visible status dots to green immediately
+        this.setAllDotsOnline();
+        
         // Update UI
         this.updateAllCards();
         this.updateDisabledSection();
         this.updateStatusBanner();
+        
+        // Watch for dynamically created cards (Recently Used, etc) and set them to green
+        this.setupDemoMutationObserver();
+        
+        // Also update after delays to catch any dynamically created cards
+        setTimeout(() => this.setAllDotsOnline(), 300);
+        setTimeout(() => this.setAllDotsOnline(), 1000);
+    },
+    
+    /**
+     * Watch for new service cards being added to DOM and set their status to online
+     */
+    setupDemoMutationObserver() {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // Element node
+                        // Check if it's a service card or contains service cards
+                        if (node.classList?.contains('service-card')) {
+                            this.setCardOnline(node);
+                        } else if (node.querySelectorAll) {
+                            node.querySelectorAll('.service-card').forEach(card => {
+                                this.setCardOnline(card);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+        
+        observer.observe(document.body, { childList: true, subtree: true });
+    },
+    
+    /**
+     * Set a single card's status dot to online (for demo mode)
+     */
+    setCardOnline(card) {
+        if (!card || card.classList.contains('disabled-service-card') || card.classList.contains('service-disabled-hidden')) {
+            return;
+        }
+        const statusDot = card.querySelector('.service-status');
+        if (statusDot && !statusDot.classList.contains('disabled')) {
+            statusDot.className = 'service-status online';
+        }
+    },
+    
+    /**
+     * Set all visible service status dots to online (green) - for demo mode
+     */
+    setAllDotsOnline() {
+        document.querySelectorAll('.service-card .service-status').forEach(dot => {
+            const card = dot.closest('.service-card');
+            // Skip disabled cards
+            if (card && !card.classList.contains('disabled-service-card') && !card.classList.contains('service-disabled-hidden')) {
+                dot.className = 'service-status online';
+            }
+        });
     },
     
     buildContainerMap() {
@@ -203,13 +263,20 @@ const ServiceManagerAPI = {
     },
     
     updateAllCards() {
-        document.querySelectorAll('.service-category .service-card[data-service], .start-here .service-card[data-service]').forEach(card => {
+        // Update cards in all sections: categories, start-here, recently-used, and admin
+        document.querySelectorAll('.service-category .service-card[data-service], .start-here .service-card[data-service], #recentlyUsedGrid .service-card[data-service], .advanced-section .service-card[data-service]').forEach(card => {
             const serviceId = card.dataset.service;
             const containerName = card.dataset.container || this.containerMap[serviceId] || serviceId;
             const serviceData = this.services[containerName];
             
             if (serviceData) {
                 this.updateCard(card, serviceData);
+            } else if (this.isDemo) {
+                // In demo mode, set any card without service data to online
+                const statusDot = card.querySelector('.service-status');
+                if (statusDot) {
+                    statusDot.className = 'service-status online';
+                }
             }
         });
     },

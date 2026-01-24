@@ -763,18 +763,21 @@
             this.statusBanner = document.getElementById('statusBanner');
             this.statusText = document.getElementById('statusText');
             
-            // Wait for ServiceManagerAPI to initialize first (both demo and production)
-            // ServiceManagerAPI now handles demo mode simulation too
+            // In demo mode, let ServiceManagerAPI handle everything
+            if (ModeManager.isDemo) {
+                // ServiceManagerAPI will handle demo simulation
+                // Don't run any health checks
+                console.log('ServiceManager: Demo mode - deferring to ServiceManagerAPI');
+                return;
+            }
+            
+            // Production mode: wait for ServiceManagerAPI to initialize first
             setTimeout(() => {
                 if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
                     this.apiTookOver = true;
-                    // ServiceManagerAPI handles everything including status banner
                     console.log('ServiceManager: Deferring to ServiceManagerAPI');
-                } else if (ModeManager.isDemo) {
-                    // Fallback: simulate online for demo if ServiceManagerAPI not available
-                    this.simulateOnline();
                 } else {
-                    // Production fallback
+                    // Fallback if ServiceManagerAPI not available
                     this.checkAllServices();
                 }
             }, 500);
@@ -783,7 +786,7 @@
             setInterval(() => {
                 if (typeof ServiceManagerAPI !== 'undefined' && ServiceManagerAPI.initialized) {
                     this.apiTookOver = true;
-                } else if (!ModeManager.isDemo) {
+                } else {
                     this.checkAllServices();
                 }
             }, 30000);
