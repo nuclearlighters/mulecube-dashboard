@@ -6,6 +6,7 @@
 const ServiceManagerAPI = {
     endpoint: '/api/services',
     services: {},
+    containerStatus: {},  // Status for ALL containers (including system services)
     containerMap: {},
     reverseMap: {},
     disabledServices: [],
@@ -204,29 +205,39 @@ const ServiceManagerAPI = {
         if (this.isDemo) return;
         
         try {
-            const response = await fetch(this.endpoint, {
-                signal: AbortSignal.timeout(10000)
-            });
+            // Fetch both toggleable services AND all container status in parallel
+            const [servicesResponse, statusResponse] = await Promise.all([
+                fetch(this.endpoint, { signal: AbortSignal.timeout(10000) }),
+                fetch(`${this.endpoint}/status`, { signal: AbortSignal.timeout(10000) })
+            ]);
             
-            if (!response.ok) throw new Error(`API returned ${response.status}`);
-            
-            const data = await response.json();
-            
-            if (data.services && Array.isArray(data.services)) {
-                this.services = {};
-                this.disabledServices = [];
-                
-                data.services.forEach(svc => {
-                    this.services[svc.name] = svc;
-                    if (!svc.enabled) {
-                        this.disabledServices.push(svc.name);
-                    }
-                });
-                
-                this.updateAllCards();
-                this.updateDisabledSection();
-                this.updateStatusBanner();
+            // Process toggleable services
+            if (servicesResponse.ok) {
+                const data = await servicesResponse.json();
+                if (data.services && Array.isArray(data.services)) {
+                    this.services = {};
+                    this.disabledServices = [];
+                    
+                    data.services.forEach(svc => {
+                        this.services[svc.name] = svc;
+                        if (!svc.enabled) {
+                            this.disabledServices.push(svc.name);
+                        }
+                    });
+                }
             }
+            
+            // Process ALL container status (including system services)
+            if (statusResponse.ok) {
+                const statusData = await statusResponse.json();
+                if (statusData.containers) {
+                    this.containerStatus = statusData.containers;
+                }
+            }
+            
+            this.updateAllCards();
+            this.updateDisabledSection();
+            this.updateStatusBanner();
         } catch (error) {
             console.warn('ServiceManagerAPI: Failed to fetch status', error);
         }
@@ -310,6 +321,15 @@ const ServiceManagerAPI = {
                 const statusDot = card.querySelector('.service-status');
                 if (statusDot) {
                     statusDot.className = 'service-status online';
+                }
+            } else {
+                // For system services: use containerStatus to set status dot
+                const containerInfo = this.containerStatus[containerName];
+                if (containerInfo) {
+                    const statusDot = card.querySelector('.service-status');
+                    if (statusDot) {
+                        statusDot.className = 'service-status ' + (containerInfo.running ? 'online' : 'offline');
+                    }
                 }
             }
         });
