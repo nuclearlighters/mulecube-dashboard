@@ -80,6 +80,7 @@
 .system-panel {
     width: 95%;
     max-width: 1100px;
+    height: 80vh;
     max-height: 90vh;
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
@@ -216,6 +217,7 @@
     padding: 1.5rem;
     scrollbar-width: thin;
     scrollbar-color: var(--color-border) transparent;
+    min-height: 0; /* Allow flex shrink for scrolling */
 }
 
 .system-panel-body::-webkit-scrollbar {

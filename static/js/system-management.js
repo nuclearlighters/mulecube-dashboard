@@ -543,33 +543,58 @@
         },
         
         confirmReboot() {
-            if (confirm('Are you sure you want to reboot the system? All services will be temporarily unavailable.')) {
-                this.executeReboot();
+            // Use the existing modal from header.html
+            const modal = document.getElementById('powerModal');
+            const modalTitle = document.getElementById('powerModalTitle');
+            const modalMessage = document.getElementById('powerModalMessage');
+            const modalConfirm = document.getElementById('powerModalConfirm');
+            
+            if (modal && modalTitle && modalMessage && modalConfirm) {
+                modalTitle.textContent = 'Reboot MuleCube?';
+                modalMessage.textContent = 'System will restart in 1 minute. Services will be briefly unavailable.';
+                modalConfirm.className = 'modal-btn confirm-btn reboot';
+                modalConfirm.onclick = () => {
+                    window.location.href = '/reboot.html?action=reboot&trigger=true';
+                };
+                modal.style.display = 'flex';
+            } else {
+                // Fallback: navigate directly
+                if (confirm('Are you sure you want to reboot?')) {
+                    window.location.href = '/reboot.html?action=reboot&trigger=true';
+                }
             }
         },
         
         confirmShutdown() {
-            if (confirm('Are you sure you want to shutdown the system? You will need physical access to power it back on.')) {
-                this.executeShutdown();
+            // Use the existing modal from header.html
+            const modal = document.getElementById('powerModal');
+            const modalTitle = document.getElementById('powerModalTitle');
+            const modalMessage = document.getElementById('powerModalMessage');
+            const modalConfirm = document.getElementById('powerModalConfirm');
+            
+            if (modal && modalTitle && modalMessage && modalConfirm) {
+                modalTitle.textContent = '⏻ Shut Down MuleCube?';
+                modalMessage.textContent = 'System will power off in 1 minute. Physical access needed to restart!';
+                modalConfirm.className = 'modal-btn confirm-btn';
+                modalConfirm.onclick = () => {
+                    window.location.href = '/reboot.html?action=shutdown&trigger=true';
+                };
+                modal.style.display = 'flex';
+            } else {
+                // Fallback: navigate directly
+                if (confirm('Are you sure you want to shutdown?')) {
+                    window.location.href = '/reboot.html?action=shutdown&trigger=true';
+                }
             }
         },
         
+        // Keep these for compatibility but they're no longer called directly
         async executeReboot() {
-            try {
-                await apiCall('/api/system/reboot', { method: 'POST', body: JSON.stringify({ delay: 5 }) });
-                window.location.href = '/reboot.html?action=reboot';
-            } catch (error) {
-                alert('Failed to initiate reboot: ' + error.message);
-            }
+            window.location.href = '/reboot.html?action=reboot&trigger=true';
         },
         
         async executeShutdown() {
-            try {
-                await apiCall('/api/system/shutdown', { method: 'POST', body: JSON.stringify({ delay: 5 }) });
-                window.location.href = '/reboot.html?action=shutdown';
-            } catch (error) {
-                alert('Failed to initiate shutdown: ' + error.message);
-            }
+            window.location.href = '/reboot.html?action=shutdown&trigger=true';
         },
 
         // ==========================================
@@ -680,39 +705,17 @@
             const diskList = Array.isArray(disks) ? disks : (disks.disks || []);
             const volumes = Array.isArray(dockerVolumes) ? dockerVolumes : (dockerVolumes.volumes || []);
             
-            // Filter to only show the main disk partition (/ or the primary data partition)
-            const seenDevices = new Set();
-            const uniqueDisks = diskList.filter(disk => {
-                // Skip if we've already seen this device
-                if (seenDevices.has(disk.device)) return false;
-                
-                // Only include root (/) or primary data partitions
-                // Skip all bind mounts and container-specific paths
-                const isMainPartition = 
-                    disk.mountpoint === '/' ||
-                    (disk.mountpoint === '/srv' && !seenDevices.has(disk.device));
-                
-                // Skip paths that are clearly bind mounts or container internals
-                const isBindMount = 
-                    disk.mountpoint.startsWith('/var/lib/misc') ||
-                    disk.mountpoint.startsWith('/var/lib/mulecube') ||
-                    disk.mountpoint.startsWith('/usr/bin') ||
-                    disk.mountpoint.startsWith('/usr/lib') ||
-                    disk.mountpoint.startsWith('/host/') ||
-                    disk.mountpoint.startsWith('/etc/');
-                
-                if (isBindMount) return false;
-                if (!isMainPartition) return false;
-                
-                seenDevices.add(disk.device);
-                return true;
-            });
-            
-            // If no disks found after filtering, show the first one with mmcblk device
-            if (uniqueDisks.length === 0) {
-                const mainDisk = diskList.find(d => d.device && d.device.includes('mmcblk'));
-                if (mainDisk) uniqueDisks.push(mainDisk);
+            // Prioritize showing the root partition (/)
+            // First look for /, then fall back to /srv, then any mmcblk device
+            let mainPartition = diskList.find(d => d.mountpoint === '/');
+            if (!mainPartition) {
+                mainPartition = diskList.find(d => d.mountpoint === '/srv');
             }
+            if (!mainPartition) {
+                mainPartition = diskList.find(d => d.device && d.device.includes('mmcblk'));
+            }
+            
+            const uniqueDisks = mainPartition ? [mainPartition] : [];
             
             container.innerHTML = `
                 <div class="storage-section">
