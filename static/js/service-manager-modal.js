@@ -97,10 +97,6 @@ const ServiceManagerModal = {
                         <span class="summary-value" id="summaryStopped">--</span>
                         <span class="summary-label">Stopped</span>
                     </div>
-                    <div class="summary-item ram">
-                        <span class="summary-value" id="summaryRam">--</span>
-                        <span class="summary-label">RAM Used</span>
-                    </div>
                 </div>
                 
                 <div class="service-modal-filters">
@@ -448,10 +444,9 @@ const ServiceManagerModal = {
                 const cpuPercent = details.cpu_percent;
                 const ramCurrent = details.ram_current_mb;
                 
-                // Show actual RAM if available, otherwise estimate
-                const ramDisplay = ramCurrent ? `${ramCurrent}MB` : `~${svc.ram_estimate_mb}MB`;
-                const ramTitle = ramCurrent ? 'Current RAM' : 'Estimated RAM';
-                const ramClass = ramCurrent ? '' : 'estimate';
+                // Show estimate with clear label
+                const ramDisplay = `EST. ${svc.ram_estimate_mb}MB`;
+                const ramTitle = 'Estimated max RAM usage';
                 
                 html += `
                     <div class="service-row ${isRunning ? 'running' : 'stopped'}" data-service="${svc.name}">
@@ -462,10 +457,7 @@ const ServiceManagerModal = {
                             ${svc.dependents?.length ? `<span class="service-badge req" title="Required by: ${svc.dependents.join(', ')}">REQ</span>` : ''}
                         </div>
                         <div class="service-stats">
-                            ${isRunning && cpuPercent !== undefined ? `
-                                <span class="stat" title="CPU">${cpuPercent.toFixed(1)}%</span>
-                            ` : ''}
-                            <span class="stat ${ramClass}" title="${ramTitle}">${ramDisplay}</span>
+                            <span class="stat estimate" title="${ramTitle}">${ramDisplay}</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" 
@@ -507,30 +499,9 @@ const ServiceManagerModal = {
         const running = this.services.filter(s => s.status === 'running').length;
         const stopped = total - running;
         
-        // Calculate actual RAM used (from details) or fall back to estimates
-        let actualRam = 0;
-        let hasActualData = false;
-        
-        this.services.forEach(s => {
-            if (s.status === 'running') {
-                const details = this.serviceDetails[s.name];
-                if (details && details.ram_current_mb) {
-                    actualRam += details.ram_current_mb;
-                    hasActualData = true;
-                }
-            }
-        });
-        
         document.getElementById('summaryTotal').textContent = total;
         document.getElementById('summaryRunning').textContent = running;
         document.getElementById('summaryStopped').textContent = stopped;
-        
-        // Show actual RAM if we have data, otherwise show "Loading..."
-        if (hasActualData) {
-            document.getElementById('summaryRam').textContent = `${actualRam}MB`;
-        } else if (!this.isDemo) {
-            document.getElementById('summaryRam').textContent = '...';
-        }
     },
     
     /**
