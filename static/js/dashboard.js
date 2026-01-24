@@ -542,6 +542,7 @@
             banner.innerHTML = `
                 <span class="demo-label">Demo Mode</span>
                 <span class="demo-text">This is a preview — on a real MuleCube, services run locally</span>
+                <span class="demo-browser-hint">Best experienced in Chrome/Brave</span>
                 <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube →</a>
             `;
             document.body.insertBefore(banner, document.body.firstChild);

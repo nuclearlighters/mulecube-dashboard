@@ -1184,6 +1184,15 @@ a:hover {
     color: white;
 }
 
+.demo-banner .demo-browser-hint {
+    opacity: 0.7;
+    font-size: 0.75rem;
+    font-style: italic;
+    margin-left: var(--space-sm);
+    padding-left: var(--space-md);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
 /* Adjust layout when demo banner is shown */
 .demo-mode .site-header {
     top: 40px;
@@ -1295,6 +1304,10 @@ a:hover {
     .demo-banner {
         flex-wrap: wrap;
         font-size: 0.75rem;
+    }
+    
+    .demo-banner .demo-browser-hint {
+        display: none;
     }
     
     .demo-banner .demo-text {
