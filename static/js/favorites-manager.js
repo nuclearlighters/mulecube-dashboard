@@ -222,6 +222,15 @@
                 clone.classList.add('favorite-card');
                 clone.setAttribute('data-favorite-index', index);
                 
+                // Re-attach event listener to cloned favorite button (listeners don't clone)
+                const clonedBtn = clone.querySelector('.favorite-btn');
+                if (clonedBtn) {
+                    // Remove old (non-functional) button and create fresh one
+                    clonedBtn.remove();
+                }
+                // Add a fresh favorite button with working event handler
+                this.addFavoriteButton(clone);
+                
                 // Add drag handle
                 const dragHandle = document.createElement('span');
                 dragHandle.className = 'drag-handle';

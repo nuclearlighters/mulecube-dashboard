@@ -756,8 +756,14 @@ a:hover {
 
 .start-here-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: var(--space-md);
+}
+
+@media (min-width: 1200px) {
+    .start-here-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 @media (max-width: 900px) {
@@ -868,6 +874,10 @@ a:hover {
     transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
     position: relative;
     min-height: 72px;
+    /* Prevent Firefox/mobile long-press context menu */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 .service-card:hover {
