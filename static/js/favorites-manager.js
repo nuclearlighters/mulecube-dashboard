@@ -108,14 +108,23 @@
             const isFavorited = this.favorites.includes(serviceId);
             
             const button = document.createElement('button');
+            button.type = 'button';  // Explicitly set type to prevent form submission
             button.className = `favorite-btn ${isFavorited ? 'favorited' : ''}`;
             button.setAttribute('aria-label', isFavorited ? 'Remove from favorites' : 'Add to favorites');
             button.innerHTML = isFavorited ? ICONS.starFilled : ICONS.starOutline;
             
+            // Use capture phase to ensure we catch the event first
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
                 this.toggleFavorite(serviceId, button);
+                return false;
+            }, true);
+            
+            // Also prevent mousedown from triggering card actions
+            button.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
             });
             
             card.appendChild(button);
@@ -136,14 +145,19 @@
         },
         
         toggleFavorite(serviceId, button) {
+            // Reload favorites in case they were modified elsewhere
+            this.loadFavorites();
+            
             const index = this.favorites.indexOf(serviceId);
             
             if (index > -1) {
                 // Remove from favorites
                 this.favorites.splice(index, 1);
-                button.classList.remove('favorited');
-                button.innerHTML = ICONS.starOutline;
-                button.setAttribute('aria-label', 'Add to favorites');
+                if (button) {
+                    button.classList.remove('favorited');
+                    button.innerHTML = ICONS.starOutline;
+                    button.setAttribute('aria-label', 'Add to favorites');
+                }
                 this.showToast('Removed from favorites');
             } else {
                 // Add to favorites
@@ -152,9 +166,11 @@
                     return;
                 }
                 this.favorites.push(serviceId);
-                button.classList.add('favorited');
-                button.innerHTML = ICONS.starFilled;
-                button.setAttribute('aria-label', 'Remove from favorites');
+                if (button) {
+                    button.classList.add('favorited');
+                    button.innerHTML = ICONS.starFilled;
+                    button.setAttribute('aria-label', 'Remove from favorites');
+                }
                 this.showToast('Added to favorites');
             }
             

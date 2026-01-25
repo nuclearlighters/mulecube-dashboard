@@ -418,7 +418,7 @@
             };
             
             const config = configs[state] || configs.unknown;
-            iconEl.textContent = config.icon;
+            iconEl.innerHTML = config.icon;
             textEl.textContent = config.text;
             button.className = `sync-status-button ${config.class}`;
             

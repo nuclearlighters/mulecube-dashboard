@@ -160,22 +160,22 @@
 
 .favorite-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 32px;  /* Moved left to avoid status LED */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     padding: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     color: #94a3b8;
     opacity: 0;
     transition: all 0.2s ease;
-    z-index: 5;
+    z-index: 10;
 }
 
 .service-card:hover .favorite-btn,
