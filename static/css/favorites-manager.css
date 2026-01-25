@@ -160,22 +160,28 @@
 
 .favorite-btn {
     position: absolute;
-    top: 6px;
-    right: 32px;  /* Moved left to avoid status LED */
+    top: 50%;
+    right: 28px;  /* Position left of the status LED */
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     padding: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     cursor: pointer;
-    color: #94a3b8;
+    color: #64748b;
     opacity: 0;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
     z-index: 10;
+}
+
+.favorite-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
 .service-card:hover .favorite-btn,
@@ -185,9 +191,8 @@
 }
 
 .favorite-btn:hover {
-    background: rgba(0, 0, 0, 0.5);
     color: #fbbf24;
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.15);
 }
 
 .favorite-btn.favorited {
@@ -195,24 +200,25 @@
 }
 
 .favorite-btn:active {
-    transform: scale(0.95);
+    transform: translateY(-50%) scale(0.95);
 }
 
 /* Light theme */
 [data-theme="light"] .favorite-btn,
 [data-display-mode="day"] .favorite-btn {
-    background: rgba(255, 255, 255, 0.8);
     color: #94a3b8;
 }
 
 [data-theme="light"] .favorite-btn:hover,
-[data-display-mode="day"] .favorite-btn:hover {
-    background: rgba(255, 255, 255, 0.95);
+[data-display-mode="day"] .favorite-btn:hover,
+[data-theme="light"] .favorite-btn.favorited,
+[data-display-mode="day"] .favorite-btn.favorited {
+    color: #f59e0b;
 }
 
-/* Touch devices - always show */
+/* Touch devices - always show favorited */
 @media (hover: none) {
-    .favorite-btn {
+    .favorite-btn.favorited {
         opacity: 1;
     }
 }
