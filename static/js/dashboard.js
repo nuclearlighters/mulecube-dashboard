@@ -27,6 +27,20 @@
     };
 
     // ==========================================
+    // SVG Icons (monochrome, Apple-style)
+    // ==========================================
+    const SVG_ICONS = {
+        check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+        close: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+        refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>',
+        chevronDown: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+        chevronUp: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>',
+        arrowRight: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+        wifi: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+        alertTriangle: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    };
+
+    // ==========================================
     // Display Mode Manager (Day/Night)
     // ==========================================
     const DisplayModeManager = {
@@ -296,7 +310,7 @@
             this.container.setAttribute('aria-live', 'polite');
             this.container.innerHTML = `
                 <button class="sync-status-button" onclick="SyncStatusManager.togglePanel()" aria-expanded="false">
-                    <span class="sync-icon">↻</span>
+                    <span class="sync-icon">${SVG_ICONS.refresh}</span>
                     <span class="sync-text">Checking...</span>
                 </button>
                 <div class="sync-panel" id="syncPanel" hidden>
@@ -396,11 +410,11 @@
             
             // Update icon and text
             const configs = {
-                synced: { icon: '✓', text: this.formatLastSync(lastSync), class: 'synced' },
-                syncing: { icon: '↻', text: 'Syncing...', class: 'syncing' },
-                offline: { icon: '⚠', text: pending > 0 ? `${pending} pending` : 'Offline', class: 'offline' },
-                error: { icon: '✕', text: 'Sync error', class: 'error' },
-                unknown: { icon: '?', text: 'Checking...', class: 'unknown' }
+                synced: { icon: SVG_ICONS.check, text: this.formatLastSync(lastSync), class: 'synced' },
+                syncing: { icon: SVG_ICONS.refresh, text: 'Syncing...', class: 'syncing' },
+                offline: { icon: SVG_ICONS.alertTriangle, text: pending > 0 ? `${pending} pending` : 'Offline', class: 'offline' },
+                error: { icon: SVG_ICONS.close, text: 'Sync error', class: 'error' },
+                unknown: { icon: SVG_ICONS.refresh, text: 'Checking...', class: 'unknown' }
             };
             
             const config = configs[state] || configs.unknown;
@@ -543,7 +557,7 @@
                 <span class="demo-label">Demo Mode</span>
                 <span class="demo-text">This is a preview — on a real MuleCube, services run locally</span>
                 <span class="demo-browser-hint">Best experienced in Chrome/Brave</span>
-                <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube →</a>
+                <a href="https://mulecube.com/products/" class="demo-cta">Get Your MuleCube <span class="cta-arrow">${SVG_ICONS.arrowRight}</span></a>
             `;
             document.body.insertBefore(banner, document.body.firstChild);
         }
@@ -1289,7 +1303,7 @@
                 // Add toggle indicator
                 const indicator = document.createElement('span');
                 indicator.className = 'category-toggle-indicator';
-                indicator.innerHTML = '▼';
+                indicator.innerHTML = SVG_ICONS.chevronDown;
                 title.appendChild(indicator);
                 
                 // Restore collapsed state
@@ -1570,9 +1584,9 @@
                                 <h3><span class="concept-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg></span> How MuleCube Works</h3>
                                 <div class="wizard-concept-diagram">
                                     <div class="concept-item"><span class="concept-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></span><span>Your Device</span></div>
-                                    <div class="concept-arrow">→ WiFi →</div>
+                                    <div class="concept-arrow"><span class="arrow-icon">${SVG_ICONS.wifi}</span></div>
                                     <div class="concept-item concept-mulecube"><span class="concept-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span><span>MuleCube</span></div>
-                                    <div class="concept-arrow">→</div>
+                                    <div class="concept-arrow"><span class="arrow-icon">${SVG_ICONS.arrowRight}</span></div>
                                     <div class="concept-item"><span class="concept-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg></span><span>30+ Services</span></div>
                                 </div>
                                 <p class="wizard-concept-text">
@@ -1582,10 +1596,10 @@
                             </div>
                             
                             <div class="wizard-features">
-                                <div class="wizard-feature"><span class="feature-check">✓</span> Works in remote locations</div>
-                                <div class="wizard-feature"><span class="feature-check">✓</span> Private by design</div>
-                                <div class="wizard-feature"><span class="feature-check">✓</span> No data leaves the device</div>
-                                <div class="wizard-feature"><span class="feature-check">✓</span> Available 24/7</div>
+                                <div class="wizard-feature"><span class="feature-check">${SVG_ICONS.check}</span> Works in remote locations</div>
+                                <div class="wizard-feature"><span class="feature-check">${SVG_ICONS.check}</span> Private by design</div>
+                                <div class="wizard-feature"><span class="feature-check">${SVG_ICONS.check}</span> No data leaves the device</div>
+                                <div class="wizard-feature"><span class="feature-check">${SVG_ICONS.check}</span> Available 24/7</div>
                             </div>
                         </div>
                     `
@@ -2026,7 +2040,7 @@
                 <h3 class="category-title">
                     <span class="category-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>
                     System
-                    <span class="category-toggle-indicator">▼</span>
+                    <span class="category-toggle-indicator">${SVG_ICONS.chevronDown}</span>
                 </h3>
                 <div class="service-grid" id="systemFunctionsGrid">
                     <div class="service-card system-card" onclick="OnboardingWizard.reset()">

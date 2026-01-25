@@ -1568,17 +1568,17 @@
                         <div class="card-body">
                             <div class="power-status-grid">
                                 <div class="power-indicator-card ${acPower.connected ? 'active' : ''}">
-                                    <div class="indicator-icon">${acPower.connected ? '⚡' : '○'}</div>
+                                    <div class="indicator-icon">${acPower.connected ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'}</div>
                                     <div class="indicator-label">AC Power</div>
                                     <div class="indicator-status">${acPower.connected ? 'Connected' : 'Disconnected'}</div>
                                 </div>
                                 <div class="power-indicator-card ${charging.active ? 'active' : ''}">
-                                    <div class="indicator-icon">${charging.active ? '🔋' : charging.status === 'full' ? '✓' : '○'}</div>
+                                    <div class="indicator-icon">${charging.active ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" y1="11" x2="22" y2="13"/><line x1="6" y1="11" x2="6" y2="13"/><line x1="10" y1="11" x2="10" y2="13"/><line x1="14" y1="11" x2="14" y2="13"/></svg>' : charging.status === 'full' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'}</div>
                                     <div class="indicator-label">Charging</div>
                                     <div class="indicator-status">${charging.active ? 'Active' : charging.status === 'full' ? 'Full' : 'Inactive'}</div>
                                 </div>
                                 <div class="power-indicator-card">
-                                    <div class="indicator-icon">🔌</div>
+                                    <div class="indicator-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg></div>
                                     <div class="indicator-label">UPS Model</div>
                                     <div class="indicator-status">${powerData.ups_model || 'X1202'}</div>
                                 </div>

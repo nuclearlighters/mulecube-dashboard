@@ -1,0 +1,289 @@
+/**
+ * MuleCube Favorites Manager Styles
+ * Pinned services section and star buttons
+ */
+
+/* ============================================
+   Favorites Section
+   ============================================ */
+
+.favorites-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: 16px;
+}
+
+.favorites-section.empty {
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .favorites-section,
+[data-display-mode="day"] .favorites-section {
+    background: rgba(34, 197, 94, 0.05);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+[data-theme="light"] .favorites-section.empty,
+[data-display-mode="day"] .favorites-section.empty {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Section Title */
+.favorites-section .category-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #f8fafc;
+    margin: 0 0 4px 0;
+}
+
+[data-theme="light"] .favorites-section .category-title,
+[data-display-mode="day"] .favorites-section .category-title {
+    color: #0f172a;
+}
+
+.favorites-icon {
+    display: flex;
+    color: #22c55e;
+}
+
+.favorites-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Subtitle */
+.favorites-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+}
+
+/* ============================================
+   Favorites Grid
+   ============================================ */
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+@media (max-width: 640px) {
+    .favorites-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 380px) {
+    .favorites-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   Favorite Card (cloned service card)
+   ============================================ */
+
+.favorite-card {
+    position: relative;
+}
+
+.favorite-card .drag-handle {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: #64748b;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.favorite-card:hover .drag-handle {
+    opacity: 1;
+}
+
+.favorite-card.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+
+.favorite-card.drag-over {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+
+.favorites-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    text-align: center;
+    color: #64748b;
+}
+
+.favorites-empty .empty-icon {
+    display: flex;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.favorites-empty .empty-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.favorites-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ============================================
+   Favorite Button (on service cards)
+   ============================================ */
+
+.favorite-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #94a3b8;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.service-card:hover .favorite-btn,
+.service-card:focus-within .favorite-btn,
+.favorite-btn.favorited {
+    opacity: 1;
+}
+
+.favorite-btn:hover {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.favorite-btn.favorited {
+    color: #fbbf24;
+}
+
+.favorite-btn:active {
+    transform: scale(0.95);
+}
+
+/* Light theme */
+[data-theme="light"] .favorite-btn,
+[data-display-mode="day"] .favorite-btn {
+    background: rgba(255, 255, 255, 0.8);
+    color: #94a3b8;
+}
+
+[data-theme="light"] .favorite-btn:hover,
+[data-display-mode="day"] .favorite-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Touch devices - always show */
+@media (hover: none) {
+    .favorite-btn {
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   Toast Notification
+   ============================================ */
+
+.favorites-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 24px;
+    background: #1e293b;
+    color: #f8fafc;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.favorites-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+[data-theme="light"] .favorites-toast,
+[data-display-mode="day"] .favorites-toast {
+    background: #0f172a;
+}
+
+/* Safe area on mobile */
+@supports (bottom: env(safe-area-inset-bottom)) {
+    @media (max-width: 768px) {
+        .favorites-toast {
+            bottom: calc(100px + env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* ============================================
+   Focus States
+   ============================================ */
+
+.favorite-btn:focus {
+    outline: none;
+}
+
+.favorite-btn:focus-visible {
+    outline: 2px solid #22c55e;
+    outline-offset: 2px;
+    opacity: 1;
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .favorite-btn,
+    .favorite-card,
+    .favorites-toast {
+        transition: none;
+    }
+    
+    .favorite-btn:active,
+    .favorite-btn:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,289 @@
+/**
+ * MuleCube Plain English Errors Styles
+ * Styling for user-friendly error messages
+ */
+
+/* ============================================
+   Base Error Display
+   ============================================ */
+
+.plain-error {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.plain-error.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.plain-error.info {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.plain-error.success {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+/* ============================================
+   Error Header
+   ============================================ */
+
+.error-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.error-icon {
+    display: flex;
+    flex-shrink: 0;
+    color: #ef4444;
+}
+
+.plain-error.warning .error-icon {
+    color: #f59e0b;
+}
+
+.plain-error.info .error-icon {
+    color: #3b82f6;
+}
+
+.plain-error.success .error-icon {
+    color: #22c55e;
+}
+
+.error-message {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+[data-theme="light"] .error-message,
+[data-display-mode="day"] .error-message {
+    color: #0f172a;
+}
+
+/* ============================================
+   Error Suggestion
+   ============================================ */
+
+.error-suggestion {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+    padding-left: 28px;
+}
+
+/* ============================================
+   Technical Details (Collapsible)
+   ============================================ */
+
+.error-technical {
+    margin-top: 12px;
+    padding-left: 28px;
+}
+
+.error-technical summary {
+    font-size: 12px;
+    color: #64748b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.error-technical summary:hover {
+    color: #94a3b8;
+}
+
+.error-technical code {
+    display: block;
+    margin-top: 8px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #94a3b8;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+[data-theme="light"] .error-technical code,
+[data-display-mode="day"] .error-technical code {
+    background: rgba(0, 0, 0, 0.05);
+    color: #64748b;
+}
+
+/* ============================================
+   Compact Error Display
+   ============================================ */
+
+.plain-error.compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+}
+
+.plain-error.compact .error-message {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ============================================
+   Error Toast
+   ============================================ */
+
+.plain-error-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    max-width: 400px;
+    background: #1e293b;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.plain-error-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+[data-theme="light"] .plain-error-toast,
+[data-display-mode="day"] .plain-error-toast {
+    background: #ffffff;
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.toast-icon {
+    display: flex;
+    flex-shrink: 0;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+.toast-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toast-message {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+[data-theme="light"] .toast-message,
+[data-display-mode="day"] .toast-message {
+    color: #0f172a;
+}
+
+.toast-suggestion {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.toast-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+}
+
+[data-theme="light"] .toast-close:hover,
+[data-display-mode="day"] .toast-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #0f172a;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .plain-error-toast {
+        left: 16px;
+        right: 16px;
+        transform: translateX(0) translateY(20px);
+        max-width: none;
+    }
+    
+    .plain-error-toast.visible {
+        transform: translateX(0) translateY(0);
+    }
+}
+
+/* Safe area on mobile */
+@supports (bottom: env(safe-area-inset-bottom)) {
+    @media (max-width: 768px) {
+        .plain-error-toast {
+            bottom: calc(24px + env(safe-area-inset-bottom));
+        }
+    }
+}
+
+/* ============================================
+   Inline Error Enhancement
+   ============================================ */
+
+.error[data-enhanced],
+.error-message[data-enhanced] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.error[data-enhanced] .error-icon,
+.error-message[data-enhanced] .error-icon {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+}
+
+.error[data-enhanced] .error-icon svg,
+.error-message[data-enhanced] .error-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .plain-error-toast {
+        transition: opacity 0.2s ease;
+    }
+    
+    .plain-error-toast.visible {
+        transform: translateX(-50%) translateY(0);
+    }
+}

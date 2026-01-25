@@ -1,0 +1,350 @@
+/**
+ * MuleCube Health History Styles
+ * GitHub-style uptime visualization
+ */
+
+/* ============================================
+   Health Bar (Inline in Service Cards)
+   ============================================ */
+
+.health-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .health-bar,
+[data-display-mode="day"] .health-bar {
+    border-top-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Segments container */
+.health-segments {
+    display: flex;
+    flex: 1;
+    height: 6px;
+    gap: 1px;
+    border-radius: 3px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Individual segment */
+.health-segment {
+    flex: 1;
+    min-width: 2px;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.health-segment:hover {
+    transform: scaleY(1.5);
+    filter: brightness(1.2);
+    z-index: 1;
+}
+
+/* Status colors */
+.health-segment.status-online {
+    background: #22c55e;
+}
+
+.health-segment.status-offline {
+    background: #ef4444;
+}
+
+.health-segment.status-degraded {
+    background: #f59e0b;
+}
+
+.health-segment.status-unknown {
+    background: #64748b;
+}
+
+/* Uptime percentage */
+.health-uptime {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    min-width: 36px;
+    text-align: right;
+}
+
+.health-uptime.excellent {
+    color: #22c55e;
+}
+
+.health-uptime.good {
+    color: #f59e0b;
+}
+
+.health-uptime.poor {
+    color: #ef4444;
+}
+
+/* ============================================
+   Health Detail Modal
+   ============================================ */
+
+.health-detail-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.health-detail-modal {
+    width: 100%;
+    max-width: 400px;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 20px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+[data-theme="light"] .health-detail-modal,
+[data-display-mode="day"] .health-detail-modal {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Header */
+.health-detail-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.health-detail-modal h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #f8fafc;
+    margin: 0;
+}
+
+[data-theme="light"] .health-detail-modal h3,
+[data-display-mode="day"] .health-detail-modal h3 {
+    color: #0f172a;
+}
+
+.health-detail-modal .modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #94a3b8;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.health-detail-modal .modal-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+}
+
+[data-theme="light"] .health-detail-modal .modal-close,
+[data-display-mode="day"] .health-detail-modal .modal-close {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .health-detail-modal .modal-close:hover,
+[data-display-mode="day"] .health-detail-modal .modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}
+
+/* ============================================
+   Health Stats Grid
+   ============================================ */
+
+.health-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.health-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #f8fafc;
+    line-height: 1;
+}
+
+[data-theme="light"] .stat-value,
+[data-display-mode="day"] .stat-value {
+    color: #0f172a;
+}
+
+.stat-value.excellent {
+    color: #22c55e;
+}
+
+.stat-value.good {
+    color: #f59e0b;
+}
+
+.stat-value.poor {
+    color: #ef4444;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* ============================================
+   Health Timeline (Large Bar)
+   ============================================ */
+
+.health-timeline {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+[data-theme="light"] .health-timeline,
+[data-display-mode="day"] .health-timeline {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.health-timeline h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin: 0 0 12px 0;
+}
+
+.health-bar-large {
+    display: flex;
+    height: 32px;
+    gap: 2px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.health-segment-large {
+    flex: 1;
+    min-width: 4px;
+    border-radius: 2px;
+    transition: transform 0.2s ease;
+    cursor: help;
+}
+
+.health-segment-large:hover {
+    transform: scaleY(1.1);
+}
+
+/* Timeline labels */
+.timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* ============================================
+   Health Note
+   ============================================ */
+
+.health-note {
+    font-size: 12px;
+    color: #64748b;
+    margin: 16px 0 0;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    text-align: center;
+}
+
+[data-theme="light"] .health-note,
+[data-display-mode="day"] .health-note {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* ============================================
+   Tooltips (native)
+   ============================================ */
+
+.health-segment[title],
+.health-segment-large[title] {
+    position: relative;
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 480px) {
+    .health-stats {
+        gap: 8px;
+    }
+    
+    .stat-value {
+        font-size: 22px;
+    }
+    
+    .health-bar-large {
+        height: 24px;
+    }
+    
+    .health-uptime {
+        display: none;
+    }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .health-detail-modal-overlay,
+    .health-detail-modal,
+    .health-segment,
+    .health-segment-large {
+        animation: none;
+        transition: none;
+    }
+}

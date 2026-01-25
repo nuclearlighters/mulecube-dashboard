@@ -33,10 +33,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
-    <!-- CSS -->
+    <!-- Core CSS -->
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/docs.css">
     <link rel="stylesheet" href="/css/system-management.css">
+    
+    <!-- UX Enhancement CSS -->
+    <link rel="stylesheet" href="/css/skeleton-loaders.css">
+    <link rel="stylesheet" href="/css/plain-english-errors.css">
+    <link rel="stylesheet" href="/css/health-history.css">
+    <link rel="stylesheet" href="/css/favorites-manager.css">
+    <link rel="stylesheet" href="/css/tour-guide.css">
+    <link rel="stylesheet" href="/css/mobile-navigation.css">
     
     <!-- Restore display mode from localStorage before render to prevent flash -->
     <script>
@@ -55,9 +63,18 @@
     
     {{- partial "footer.html" . -}}
     
+    <!-- Core JavaScript -->
     <script src="/js/dashboard.js"></script>
-<script src="/js/service-manager-api.js"></script>
-<script src="/js/service-manager-modal.js"></script>
-<script src="/js/system-management.js"></script>
+    <script src="/js/service-manager-api.js"></script>
+    <script src="/js/service-manager-modal.js"></script>
+    <script src="/js/system-management.js"></script>
+    
+    <!-- UX Enhancement JavaScript (load order matters) -->
+    <script src="/js/skeleton-loaders.js"></script>
+    <script src="/js/plain-english-errors.js"></script>
+    <script src="/js/health-history.js"></script>
+    <script src="/js/favorites-manager.js"></script>
+    <script src="/js/tour-guide.js"></script>
+    <script src="/js/mobile-navigation.js"></script>
 </body>
 </html>

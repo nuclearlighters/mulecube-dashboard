@@ -194,7 +194,7 @@ const ServiceManagerAPI = {
             section.style.display = this.isExpanded ? 'block' : 'none';
         }
         if (hint) {
-            hint.textContent = this.isExpanded ? '▲' : '▼';
+            hint.innerHTML = this.isExpanded ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
         }
         if (statusBanner) {
             statusBanner.classList.toggle('expanded', this.isExpanded);
@@ -348,7 +348,7 @@ const ServiceManagerAPI = {
             
             if (toggleHint) {
                 toggleHint.style.display = 'inline';
-                toggleHint.textContent = this.isExpanded ? '▲' : '▼';
+                toggleHint.innerHTML = this.isExpanded ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
             }
         } else {
             if (toggleHint) toggleHint.style.display = 'none';
@@ -845,9 +845,11 @@ const ServiceManagerAPI = {
         const existing = document.querySelector('.service-manager-toast');
         if (existing) existing.remove();
         
+        const closeIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        
         const toast = document.createElement('div');
         toast.className = `service-manager-toast ${type}`;
-        toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">✕</button>`;
+        toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" aria-label="Dismiss">${closeIcon}</button>`;
         document.body.appendChild(toast);
         
         setTimeout(() => toast.parentElement && toast.remove(), 4000);
