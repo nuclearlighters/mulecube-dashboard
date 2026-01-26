@@ -240,20 +240,7 @@
                 clone.classList.add('favorite-card');
                 clone.setAttribute('data-favorite-index', index);
                 
-                // Fix status LED - force green unless service is actually offline
-                const clonedStatus = clone.querySelector('.service-status');
-                if (clonedStatus) {
-                    // Remove ALL status modifier classes - favorites default to green (healthy)
-                    clonedStatus.classList.remove('checking', 'offline', 'online', 'loading', 'warning');
-                    clonedStatus.style.animation = 'none';
-                    clonedStatus.style.background = '';  // Let CSS handle it (green by default)
-                    
-                    // Only mark offline if original is explicitly offline (red)
-                    const originalStatus = originalCard.querySelector('.service-status');
-                    if (originalStatus && originalStatus.classList.contains('offline')) {
-                        clonedStatus.classList.add('offline');
-                    }
-                }
+                // Status LED will be synced by MutationObserver - no modification needed here
                 
                 // Re-attach event listener to cloned favorite button (listeners don't clone)
                 const clonedBtn = clone.querySelector('.favorite-btn');
@@ -277,6 +264,9 @@
                 
                 grid.appendChild(clone);
             });
+            
+            // Setup observer to sync status from original cards to favorites
+            this.setupStatusSync();
         },
         
         setupDragEvents(card) {
@@ -327,6 +317,63 @@
             
             this.saveFavorites();
             this.render();
+        },
+        
+        setupStatusSync() {
+            // Watch for status changes on original cards and sync to favorites
+            // This handles the case where favorites render before status checks complete
+            
+            if (this.statusObserver) {
+                this.statusObserver.disconnect();
+            }
+            
+            this.statusObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const statusDot = mutation.target;
+                        const card = statusDot.closest('.service-card:not(.favorite-card)');
+                        if (!card) return;
+                        
+                        const serviceId = card.dataset.service;
+                        if (!serviceId) return;
+                        
+                        // Find corresponding favorite card and sync status
+                        const favoriteCard = document.querySelector(`.favorite-card[data-service="${serviceId}"]`);
+                        if (favoriteCard) {
+                            const favoriteStatus = favoriteCard.querySelector('.service-status');
+                            if (favoriteStatus) {
+                                // Copy the exact class list from original
+                                favoriteStatus.className = statusDot.className;
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Observe all status dots in original (non-favorite) cards
+            document.querySelectorAll('.service-card:not(.favorite-card) .service-status').forEach(statusDot => {
+                this.statusObserver.observe(statusDot, { attributes: true, attributeFilter: ['class'] });
+            });
+            
+            // Also do an immediate sync in case status already updated
+            this.syncAllStatuses();
+        },
+        
+        syncAllStatuses() {
+            // Immediate sync of all favorite statuses with their originals
+            this.favorites.forEach(serviceId => {
+                const originalCard = document.querySelector(`.service-card[data-service="${serviceId}"]:not(.favorite-card)`);
+                const favoriteCard = document.querySelector(`.favorite-card[data-service="${serviceId}"]`);
+                
+                if (originalCard && favoriteCard) {
+                    const originalStatus = originalCard.querySelector('.service-status');
+                    const favoriteStatus = favoriteCard.querySelector('.service-status');
+                    
+                    if (originalStatus && favoriteStatus) {
+                        favoriteStatus.className = originalStatus.className;
+                    }
+                }
+            });
         },
         
         add(serviceId) {
