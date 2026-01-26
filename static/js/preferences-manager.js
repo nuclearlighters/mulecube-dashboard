@@ -5,8 +5,8 @@
  */
 
 const PreferencesManager = {
-    // API endpoint
-    apiUrl: '/api/preferences',
+    // API endpoint - points to MuleCube service manager
+    apiUrl: 'http://servicemanager.mulecube.net/api/preferences',
     
     // Cache for current preferences
     cache: null,
