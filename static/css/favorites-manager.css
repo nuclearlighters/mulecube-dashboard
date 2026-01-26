@@ -106,6 +106,21 @@
     position: relative;
 }
 
+/* Ensure favorite card status LED matches original - reset checking state */
+.favorite-card .service-status {
+    background: var(--color-primary, #22c55e);
+    animation: none;
+}
+
+.favorite-card .service-status.offline {
+    background: var(--color-danger, #ef4444);
+}
+
+.favorite-card .service-status.checking {
+    background: var(--color-warning, #f59e0b);
+    animation: pulse 1s infinite;
+}
+
 .favorite-card .drag-handle {
     position: absolute;
     top: 8px;
