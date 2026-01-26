@@ -236,17 +236,11 @@
                 target = document.body;
             }
             
-            // Update highlight
-            this.highlightElement(target);
-            
-            // Update tooltip
+            // Update tooltip content first
             this.tooltip.querySelector('.tour-icon').innerHTML = step.icon || ICONS.box;
             this.tooltip.querySelector('.tour-title').textContent = step.title;
             this.tooltip.querySelector('.tour-content').textContent = step.content;
             this.tooltip.querySelector('.tour-progress').textContent = `${index + 1} of ${this.steps.length}`;
-            
-            // Position tooltip
-            this.positionTooltip(target, step.position || 'bottom');
             
             // Update navigation
             const prevBtn = this.tooltip.querySelector('.tour-prev');
@@ -255,8 +249,14 @@
             prevBtn.style.display = index === 0 ? 'none' : '';
             nextBtn.textContent = index === this.steps.length - 1 ? 'Finish' : 'Next';
             
-            // Scroll target into view
+            // Scroll target into view first
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Wait for scroll to complete, then position highlight and tooltip
+            setTimeout(() => {
+                this.highlightElement(target);
+                this.positionTooltip(target, step.position || 'bottom');
+            }, 400);
         },
         
         highlightElement(target) {
@@ -264,8 +264,10 @@
             const rect = target.getBoundingClientRect();
             
             const padding = 8;
+            // Use viewport-relative positioning (getBoundingClientRect gives viewport coords)
+            // Then add scrollY/scrollX to get document coords
             highlight.style.top = `${rect.top + window.scrollY - padding}px`;
-            highlight.style.left = `${rect.left - padding}px`;
+            highlight.style.left = `${rect.left + window.scrollX - padding}px`;
             highlight.style.width = `${rect.width + padding * 2}px`;
             highlight.style.height = `${rect.height + padding * 2}px`;
         },
