@@ -63,10 +63,10 @@
                     icon: ICONS.hand
                 },
                 {
-                    target: '.service-category:first-of-type .category-title',
+                    target: '.service-category .category-title',
                     title: 'Organized by Category',
                     content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
-                    position: 'bottom',
+                    position: 'right',
                     icon: ICONS.folder
                 },
                 {
