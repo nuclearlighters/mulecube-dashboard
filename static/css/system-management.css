@@ -2051,6 +2051,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    line-height: 1.4;
 }
 
 .service-card-mini .status-dot {
