@@ -1934,6 +1934,13 @@
                     }
                 }, 2000);
             }
+            
+            // Launch tour guide after wizard completion (short delay for UI to settle)
+            setTimeout(() => {
+                if (typeof TourGuide !== 'undefined' && TourGuide.start) {
+                    TourGuide.start('dashboard');
+                }
+            }, isDemo ? 500 : 3000);
         },
         
         /**
