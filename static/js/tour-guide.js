@@ -35,10 +35,10 @@
         tours: {
             dashboard: [
                 {
-                    target: '.navbar .logo, .logo',
+                    target: 'a.logo, .site-header .logo',
                     title: 'Welcome to MuleCube',
                     content: 'This is your offline command center. Everything runs locally on this device - no internet needed.',
-                    position: 'bottom',
+                    position: 'right',
                     icon: ICONS.box
                 },
                 {
@@ -63,10 +63,10 @@
                     icon: ICONS.hand
                 },
                 {
-                    target: '#serviceCategories',
+                    target: '.service-category:first-of-type .category-title',
                     title: 'Organized by Category',
                     content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
-                    position: 'top',
+                    position: 'bottom',
                     icon: ICONS.folder
                 },
                 {
@@ -105,10 +105,10 @@
                     icon: ICONS.settings
                 },
                 {
-                    target: '.nav-links a[href*="doc"], .footer-links a[href*="doc"], a[href="/docs/"]',
+                    target: '.nav-links a[href*="Docs"], .nav-links a[href*="docs"]',
                     title: 'Learn More',
                     content: 'Visit the documentation for detailed guides on services, troubleshooting, and getting the most from MuleCube.',
-                    position: 'top',
+                    position: 'left',
                     icon: ICONS.book
                 }
             ],
