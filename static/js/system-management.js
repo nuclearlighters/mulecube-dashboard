@@ -902,12 +902,16 @@
                 <div class="service-card-mini ${statusClass} ${isSystem ? 'system' : ''}" data-service="${service.name}">
                     <div class="service-info">
                         <span class="service-name">${displayName}</span>
-                        <span class="service-status">${statusText}</span>
+                        <span class="service-status">
+                            <span class="status-dot"></span>
+                            ${statusText}
+                        </span>
                     </div>
                     ${!isSystem ? `
-                        <button class="service-toggle-btn" onclick="SystemManagementPanel.toggleService('${service.name}', ${!isRunning})" title="${isRunning ? 'Stop' : 'Start'} service">
-                            ${isRunning ? ICONS.stop : ICONS.play}
-                        </button>
+                        <label class="service-toggle" title="${isRunning ? 'Disable' : 'Enable'} service">
+                            <input type="checkbox" ${isRunning ? 'checked' : ''} onchange="SystemManagementPanel.toggleService('${service.name}', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
                     ` : `
                         <span class="system-badge">${ICONS.lock}</span>
                     `}
