@@ -165,7 +165,7 @@
         },
         
         init() {
-            console.log('[TourGuide] Ready. Call TourGuide.start() to begin.');
+            // Tour guide initialized
         },
         
         start(tourName = 'dashboard') {
@@ -244,15 +244,11 @@
             
             for (const selector of selectors) {
                 target = document.querySelector(selector);
-                if (target) {
-                    console.log(`[TourGuide] Step ${index + 1}: Found "${selector}"`);
-                    break;
-                }
+                if (target) break;
             }
             
             // If optional and not found, skip
             if (!target && step.optional) {
-                console.log(`[TourGuide] Step ${index + 1}: Optional step skipped (no element found)`);
                 if (index < this.steps.length - 1) {
                     this.showStep(index + 1);
                 } else {
@@ -263,12 +259,8 @@
             
             // Fallback to body if nothing found
             if (!target) {
-                console.warn(`[TourGuide] Step ${index + 1}: Target not found for any selector:`, step.target);
                 target = document.body;
             }
-            
-            // Log the element we're highlighting
-            console.log(`[TourGuide] Step ${index + 1}: Highlighting`, target);
             
             // Update tooltip content first
             this.tooltip.querySelector('.tour-icon').innerHTML = step.icon || ICONS.box;
