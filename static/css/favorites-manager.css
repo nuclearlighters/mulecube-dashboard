@@ -178,37 +178,39 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     background: transparent;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    color: #64748b;
-    opacity: 0;
+    color: #6b7280;
+    /* Always visible - no hiding */
+    opacity: 0.6;
     transition: all 0.15s ease;
     z-index: 10;
 }
 
 .favorite-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
 }
 
 .service-card:hover .favorite-btn,
-.service-card:focus-within .favorite-btn,
+.service-card:focus-within .favorite-btn {
+    opacity: 1;
+}
+
 .favorite-btn.favorited {
     opacity: 1;
+    color: #fbbf24;
 }
 
 .favorite-btn:hover {
     color: #fbbf24;
     transform: translateY(-50%) scale(1.15);
-}
-
-.favorite-btn.favorited {
-    color: #fbbf24;
+    opacity: 1;
 }
 
 .favorite-btn:active {
@@ -218,7 +220,7 @@
 /* Light theme */
 [data-theme="light"] .favorite-btn,
 [data-display-mode="day"] .favorite-btn {
-    color: #94a3b8;
+    color: #9ca3af;
 }
 
 [data-theme="light"] .favorite-btn:hover,
@@ -228,37 +230,17 @@
     color: #f59e0b;
 }
 
-/* Touch devices - always show button, larger touch target */
-@media (hover: none), (pointer: coarse) {
-    .service-card .favorite-btn,
-    .favorite-card .favorite-btn {
-        opacity: 1 !important;
-        visibility: visible !important;
-        width: 36px;
-        height: 36px;
-        /* Ensure touch target is large enough (44px recommended) */
-        min-width: 44px;
-        min-height: 44px;
-        margin: -10px;  /* Expand touch area without visual change */
-        color: #64748b;  /* Visible gray color */
-    }
-    
-    .service-card .favorite-btn.favorited,
-    .favorite-card .favorite-btn.favorited {
-        color: #fbbf24;  /* Gold when favorited */
+/* Mobile/touch - larger touch target */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+    .favorite-btn {
+        width: 32px;
+        height: 32px;
+        opacity: 0.7;
     }
     
     .favorite-btn svg {
         width: 18px;
         height: 18px;
-    }
-}
-
-/* Force visibility on all mobile/tablet */
-@media (max-width: 1024px) {
-    .favorite-btn {
-        opacity: 1 !important;
-        visibility: visible !important;
     }
 }
 
