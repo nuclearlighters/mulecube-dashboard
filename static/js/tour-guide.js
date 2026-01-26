@@ -35,59 +35,58 @@
         tours: {
             dashboard: [
                 {
-                    target: '.status-banner, #statusBanner',
+                    target: '.hero-content, .search-wrapper',
                     title: 'Welcome to MuleCube',
                     content: 'This is your offline command center. Everything runs locally on this device - no internet needed.',
                     position: 'bottom',
                     icon: ICONS.box
                 },
                 {
-                    target: '#serviceSearch, .search-input',
+                    target: '#serviceSearch, .search-input, .search-wrapper input',
                     title: 'Find Services Fast',
                     content: 'Search through 60+ services instantly. Try typing "wiki" or "maps" to find what you need.',
                     position: 'bottom',
                     icon: ICONS.search
                 },
                 {
-                    target: '.start-here .service-card:first-child, .service-card:first-child',
+                    target: '.start-here-grid .service-card:first-child',
                     title: 'Service Cards',
                     content: 'Each card is a service you can use. Click to open it. The green dot means it is running.',
-                    position: 'right',
+                    position: 'bottom',
                     icon: ICONS.grid
                 },
                 {
-                    target: '.category-title:first-of-type, .service-category:first-child h3',
+                    target: '.service-category:first-of-type',
                     title: 'Organized by Category',
-                    content: 'Services are grouped by type: AI, Knowledge, Files, and more. Collapse categories you do not need.',
+                    content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
                     position: 'bottom',
                     icon: ICONS.folder
                 },
                 {
-                    target: '.service-card:first-child',
+                    target: '.start-here-grid .service-card:nth-child(2)',
                     title: 'Pro Tip: Long Press',
                     content: 'Long-press (hold) any service card to enable or disable it. Disabled services save battery and RAM.',
-                    position: 'top',
+                    position: 'bottom',
                     icon: ICONS.hand
                 },
                 {
-                    target: '.status-banner, #statusBanner',
+                    target: '.stats-bar, .stats-controls',
                     title: 'System Status',
-                    content: 'This bar shows how many services are running. Click it to see disabled services.',
+                    content: 'Monitor CPU, memory, temperature, and connections. Click items for more details.',
                     position: 'bottom',
                     icon: ICONS.status
                 },
                 {
-                    target: '#favoritesSection, .favorites-section, .start-here',
+                    target: '.favorites-section',
                     title: 'Your Favorites',
-                    content: 'Star services to pin them at the top for quick access. Drag to reorder your favorites.',
+                    content: 'Star services to pin them here for quick access. Drag to reorder your favorites.',
                     position: 'bottom',
-                    icon: ICONS.star,
-                    optional: true
+                    icon: ICONS.star
                 },
                 {
-                    target: '#advancedToggle, .advanced-toggle',
+                    target: '.admin-toggle-btn, #advancedToggle, [onclick*="toggleAdminTools"]',
                     title: 'Admin Tools',
-                    content: 'Click here to access system monitoring, container management, and admin tools.',
+                    content: 'Click "Show Admin Tools" below to access system monitoring, container management, and settings.',
                     position: 'top',
                     icon: ICONS.settings
                 }
