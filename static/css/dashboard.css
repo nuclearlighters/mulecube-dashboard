@@ -2909,33 +2909,56 @@ select:focus-visible {
 
 .disabled-services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-lg);
-    max-width: 900px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-sm);
+    max-width: 100%;
     margin: 0 auto;
 }
 
+@media (max-width: 1200px) {
+    .disabled-services-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .disabled-services-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .disabled-services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .disabled-services-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ==========================================
-   Disabled Service Card
+   Disabled Service Card - Compact style
    ========================================== */
 .disabled-service-card {
     position: relative;
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
     background: var(--color-bg-card);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--border-radius);
+    min-height: 56px;
     opacity: 0.85;
     transition: all 0.2s ease;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-user-drag: none;
-    -khtml-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
 }
 
 .disabled-service-card:hover {
@@ -2944,17 +2967,19 @@ select:focus-visible {
 }
 
 .disabled-service-card .service-icon {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    background: var(--color-icon-bg) !important;
+    border-radius: var(--border-radius);
 }
 
 .disabled-service-card .service-icon img {
-    width: 36px;
-    height: 36px;
+    width: 20px;
+    height: 20px;
     opacity: 0.6;
     filter: grayscale(40%);
 }
@@ -2965,25 +2990,27 @@ select:focus-visible {
 }
 
 .disabled-service-card .service-info h3 {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 2px 0;
 }
 
 .disabled-service-card .service-info p {
-    font-size: 0.85rem;
+    font-size: 0.65rem;
     color: var(--color-text-muted);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 140px;
 }
 
 .disabled-service-card .service-status,
 .disabled-service-card .service-status.disabled {
     position: absolute;
-    top: 10px;
+    top: 50%;
     right: 10px;
+    transform: translateY(-50%);
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -2992,9 +3019,9 @@ select:focus-visible {
 
 /* Long-press hint - green colored, below description */
 .long-press-hint {
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     color: var(--color-primary);
-    margin-top: 0.25rem;
+    margin-top: 2px;
     opacity: 0.8;
 }
 
@@ -3206,7 +3233,7 @@ select:focus-visible {
    ========================================== */
 @media (max-width: 768px) {
     .disabled-services-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         padding: 0 var(--space-sm);
     }
     
@@ -3226,7 +3253,7 @@ select:focus-visible {
     }
     
     .long-press-hint {
-        font-size: 0.65rem;
+        font-size: 0.55rem;
     }
 }
 /**
