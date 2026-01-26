@@ -42,49 +42,49 @@
                     icon: ICONS.box
                 },
                 {
-                    target: '#serviceSearch, .search-input, .search-wrapper input',
+                    target: '#serviceSearch, .search-input',
                     title: 'Find Services Fast',
                     content: 'Search through 60+ services instantly. Try typing "wiki" or "maps" to find what you need.',
                     position: 'bottom',
                     icon: ICONS.search
                 },
                 {
-                    target: '.start-here-grid .service-card:first-child',
+                    target: '.start-here .service-card[data-service="kiwix"]',
                     title: 'Service Cards',
                     content: 'Each card is a service you can use. Click to open it. The green dot means it is running.',
                     position: 'bottom',
                     icon: ICONS.grid
                 },
                 {
-                    target: '.service-category:first-of-type',
+                    target: '#serviceCategories > .service-category:first-child',
                     title: 'Organized by Category',
                     content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
-                    position: 'bottom',
+                    position: 'top',
                     icon: ICONS.folder
                 },
                 {
-                    target: '.start-here-grid .service-card:nth-child(2)',
+                    target: '.start-here .service-card[data-service="tileserver-gl"]',
                     title: 'Pro Tip: Long Press',
                     content: 'Long-press (hold) any service card to enable or disable it. Disabled services save battery and RAM.',
                     position: 'bottom',
                     icon: ICONS.hand
                 },
                 {
-                    target: '.stats-bar, .stats-controls',
+                    target: '.stats-panel',
                     title: 'System Status',
                     content: 'Monitor CPU, memory, temperature, and connections. Click items for more details.',
                     position: 'bottom',
                     icon: ICONS.status
                 },
                 {
-                    target: '.favorites-section',
+                    target: '#favoritesSection',
                     title: 'Your Favorites',
                     content: 'Star services to pin them here for quick access. Drag to reorder your favorites.',
                     position: 'bottom',
                     icon: ICONS.star
                 },
                 {
-                    target: '.admin-toggle-btn, #advancedToggle, [onclick*="toggleAdminTools"]',
+                    target: '#advancedToggle',
                     title: 'Admin Tools',
                     content: 'Click "Show Admin Tools" below to access system monitoring, container management, and settings.',
                     position: 'top',
