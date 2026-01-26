@@ -56,18 +56,18 @@
                     icon: ICONS.grid
                 },
                 {
+                    target: '.start-here .service-card[data-service="kiwix"]',
+                    title: 'Pro Tip: Long Press',
+                    content: 'Long-press (hold) any service card to enable or disable it. Disabled services save battery and RAM.',
+                    position: 'right',
+                    icon: ICONS.hand
+                },
+                {
                     target: '#serviceCategories',
                     title: 'Organized by Category',
                     content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
                     position: 'top',
                     icon: ICONS.folder
-                },
-                {
-                    target: '.start-here',
-                    title: 'Pro Tip: Long Press',
-                    content: 'Long-press (hold) any service card to enable or disable it. Disabled services save battery and RAM.',
-                    position: 'bottom',
-                    icon: ICONS.hand
                 },
                 {
                     target: '.stats-panel',
@@ -84,11 +84,32 @@
                     icon: ICONS.star
                 },
                 {
+                    target: '#themeToggle, .theme-toggle',
+                    title: 'Day/Night Mode',
+                    content: 'Toggle between light and dark themes for comfortable viewing in any environment.',
+                    position: 'left',
+                    icon: ICONS.settings
+                },
+                {
+                    target: '#systemManagementBtn, .system-btn',
+                    title: 'System Management',
+                    content: 'Click here to open the System Management panel with detailed hardware info, network settings, logs, and more.',
+                    position: 'bottom',
+                    icon: ICONS.settings
+                },
+                {
                     target: '#advancedToggle',
                     title: 'Admin Tools',
                     content: 'Click "Show Admin Tools" below to access system monitoring, container management, and settings.',
                     position: 'top',
                     icon: ICONS.settings
+                },
+                {
+                    target: '.nav-links a[href*="doc"], .footer-links a[href*="doc"], a[href="/docs/"]',
+                    title: 'Learn More',
+                    content: 'Visit the documentation for detailed guides on services, troubleshooting, and getting the most from MuleCube.',
+                    position: 'top',
+                    icon: ICONS.book
                 }
             ],
             
