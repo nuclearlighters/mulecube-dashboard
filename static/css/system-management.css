@@ -2050,7 +2050,7 @@
     color: var(--color-text-muted);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .service-card-mini .status-dot {
@@ -2058,6 +2058,7 @@
     height: 8px;
     border-radius: 50%;
     background: var(--color-text-muted);
+    flex-shrink: 0;
 }
 
 .service-card-mini.running .status-dot {
