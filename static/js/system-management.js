@@ -828,87 +828,83 @@
         // Services Tab
         // ==========================================
         async loadServicesTab(container) {
-            // Delegate to ServiceManagerModal's content rendering
-            if (typeof ServiceManagerModal !== 'undefined') {
-                // Fetch services data
-                let services = [];
-                if (IS_DEMO) {
-                    services = ServiceManagerModal.generateDemoServices ? ServiceManagerModal.generateDemoServices() : [];
-                } else {
-                    try {
-                        const response = await fetch(`${API_BASE}/api/services`);
-                        if (response.ok) {
-                            services = await response.json();
-                        }
-                    } catch (e) {
-                        console.warn('Failed to fetch services:', e);
-                    }
+            // Fetch services data
+            let services = [];
+            if (IS_DEMO) {
+                // In demo mode, try to get from ServiceManagerModal or generate mock data
+                if (typeof ServiceManagerModal !== 'undefined' && ServiceManagerModal.services) {
+                    services = ServiceManagerModal.services;
                 }
-                
-                // Group services by category
-                const userServices = services.filter(s => !this.isSystemService(s.name));
-                const systemServices = services.filter(s => this.isSystemService(s.name));
-                const running = services.filter(s => s.state === 'running').length;
-                const stopped = services.filter(s => s.state !== 'running').length;
-                
-                container.innerHTML = `
-                    <div class="tab-content services-tab">
-                        <div class="services-header">
-                            <div class="services-summary">
-                                <div class="summary-stat">
-                                    <span class="stat-value">${services.length}</span>
-                                    <span class="stat-label">Total Services</span>
-                                </div>
-                                <div class="summary-stat running">
-                                    <span class="stat-value">${running}</span>
-                                    <span class="stat-label">Running</span>
-                                </div>
-                                <div class="summary-stat stopped">
-                                    <span class="stat-value">${stopped}</span>
-                                    <span class="stat-label">Stopped</span>
-                                </div>
-                            </div>
-                            <div class="services-actions">
-                                <input type="text" id="servicesSearch" class="services-search" placeholder="Search services..." oninput="SystemManagementPanel.filterServices(this.value)">
-                                <button class="btn btn-secondary" onclick="SystemManagementPanel.loadTab('services')">${ICONS.refresh} Refresh</button>
-                            </div>
-                        </div>
-                        
-                        <div class="services-section">
-                            <h4 class="section-title">${ICONS.settings} User Services (${userServices.length})</h4>
-                            <div class="services-grid" id="userServicesGrid">
-                                ${userServices.map(s => this.renderServiceCard(s)).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="services-section system-services">
-                            <h4 class="section-title">${ICONS.system} System Services (${systemServices.length})</h4>
-                            <p class="section-hint">System services cannot be disabled</p>
-                            <div class="services-grid" id="systemServicesGrid">
-                                ${systemServices.map(s => this.renderServiceCard(s, true)).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
             } else {
-                container.innerHTML = `
-                    <div class="panel-error">
-                        ${ICONS.warning}
-                        <p>Service Manager not available</p>
-                    </div>
-                `;
+                try {
+                    const response = await fetch(`${API_BASE}/api/services`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // API returns { services: [...], categories: [...] }
+                        services = data.services || data || [];
+                    }
+                } catch (e) {
+                    console.warn('Failed to fetch services:', e);
+                }
             }
+            
+            // Group services by category
+            const userServices = services.filter(s => !this.isSystemService(s.name));
+            const systemServices = services.filter(s => this.isSystemService(s.name));
+            const running = services.filter(s => s.status === 'running').length;
+            const stopped = services.filter(s => s.status !== 'running').length;
+            
+            container.innerHTML = `
+                <div class="tab-content services-tab">
+                    <div class="services-header">
+                        <div class="services-summary">
+                            <div class="summary-stat">
+                                <span class="stat-value">${services.length}</span>
+                                <span class="stat-label">Total Services</span>
+                            </div>
+                            <div class="summary-stat running">
+                                <span class="stat-value">${running}</span>
+                                <span class="stat-label">Running</span>
+                            </div>
+                            <div class="summary-stat stopped">
+                                <span class="stat-value">${stopped}</span>
+                                <span class="stat-label">Stopped</span>
+                            </div>
+                        </div>
+                        <div class="services-actions">
+                            <input type="text" id="servicesSearch" class="services-search" placeholder="Search services..." oninput="SystemManagementPanel.filterServices(this.value)">
+                            <button class="btn btn-secondary" onclick="SystemManagementPanel.loadTab('services')">${ICONS.refresh} Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <div class="services-section">
+                        <h4 class="section-title">${ICONS.settings} User Services (${userServices.length})</h4>
+                        <div class="services-grid" id="userServicesGrid">
+                            ${userServices.length > 0 ? userServices.map(s => this.renderServiceCard(s)).join('') : '<p class="empty-hint">No user services found</p>'}
+                        </div>
+                    </div>
+                    
+                    <div class="services-section system-services">
+                        <h4 class="section-title">${ICONS.system} System Services (${systemServices.length})</h4>
+                        <p class="section-hint">System services cannot be disabled</p>
+                        <div class="services-grid" id="systemServicesGrid">
+                            ${systemServices.length > 0 ? systemServices.map(s => this.renderServiceCard(s, true)).join('') : '<p class="empty-hint">No system services found</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
         },
         
         renderServiceCard(service, isSystem = false) {
-            const isRunning = service.state === 'running';
+            const isRunning = service.status === 'running';
             const statusClass = isRunning ? 'running' : 'stopped';
             const statusText = isRunning ? 'Running' : 'Stopped';
+            const displayName = service.display_name || service.name;
             
             return `
                 <div class="service-card-mini ${statusClass} ${isSystem ? 'system' : ''}" data-service="${service.name}">
                     <div class="service-info">
-                        <span class="service-name">${service.name}</span>
+                        <span class="service-name">${displayName}</span>
                         <span class="service-status">${statusText}</span>
                     </div>
                     ${!isSystem ? `
