@@ -228,10 +228,21 @@
     color: #f59e0b;
 }
 
-/* Touch devices - always show favorited */
-@media (hover: none) {
-    .favorite-btn.favorited {
-        opacity: 1;
+/* Touch devices - always show button, larger touch target */
+@media (hover: none), (pointer: coarse) {
+    .favorite-btn {
+        opacity: 1 !important;
+        width: 36px;
+        height: 36px;
+        /* Ensure touch target is large enough (44px recommended) */
+        min-width: 44px;
+        min-height: 44px;
+        margin: -10px;  /* Expand touch area without visual change */
+    }
+    
+    .favorite-btn svg {
+        width: 18px;
+        height: 18px;
     }
 }
 

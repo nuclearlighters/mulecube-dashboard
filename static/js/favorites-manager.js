@@ -113,14 +113,32 @@
             button.setAttribute('aria-label', isFavorited ? 'Remove from favorites' : 'Add to favorites');
             button.innerHTML = isFavorited ? ICONS.starFilled : ICONS.starOutline;
             
-            // Use capture phase to ensure we catch the event first
-            button.addEventListener('click', (e) => {
+            // Handler function for both click and touch
+            const handleToggle = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
                 this.toggleFavorite(serviceId, button);
                 return false;
-            }, true);
+            };
+            
+            // Use capture phase to ensure we catch the event first
+            button.addEventListener('click', handleToggle, true);
+            
+            // Touch events for mobile - touchend triggers the action
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                // Small delay to ensure touch is processed
+                setTimeout(() => this.toggleFavorite(serviceId, button), 10);
+                return false;
+            }, { capture: true, passive: false });
+            
+            // Prevent touchstart from bubbling to card (prevents card navigation)
+            button.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            }, { capture: true, passive: true });
             
             // Also prevent mousedown from triggering card actions
             button.addEventListener('mousedown', (e) => {
