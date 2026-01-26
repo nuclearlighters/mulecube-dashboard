@@ -34,8 +34,13 @@
         
         loadFavorites() {
             try {
-                const stored = localStorage.getItem(this.STORAGE_KEY);
-                this.favorites = stored ? JSON.parse(stored) : [];
+                // Use PreferencesManager if available, fallback to localStorage
+                if (typeof PreferencesManager !== 'undefined' && PreferencesManager.cache) {
+                    this.favorites = PreferencesManager.getFavorites() || [];
+                } else {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    this.favorites = stored ? JSON.parse(stored) : [];
+                }
             } catch (e) {
                 console.warn('[FavoritesManager] Error loading favorites:', e);
                 this.favorites = [];
@@ -44,7 +49,12 @@
         
         saveFavorites() {
             try {
-                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.favorites));
+                // Use PreferencesManager if available, fallback to localStorage
+                if (typeof PreferencesManager !== 'undefined') {
+                    PreferencesManager.setFavorites(this.favorites);
+                } else {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.favorites));
+                }
             } catch (e) {
                 console.warn('[FavoritesManager] Error saving favorites:', e);
             }
