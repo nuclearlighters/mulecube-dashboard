@@ -240,19 +240,19 @@
                 clone.classList.add('favorite-card');
                 clone.setAttribute('data-favorite-index', index);
                 
-                // Fix status LED - copy exact status from original
-                const originalStatus = originalCard.querySelector('.service-status');
+                // Fix status LED - force green unless service is actually offline
                 const clonedStatus = clone.querySelector('.service-status');
-                if (originalStatus && clonedStatus) {
-                    // Clear all status classes and copy from original
-                    clonedStatus.classList.remove('checking', 'offline', 'online', 'loading');
-                    if (originalStatus.classList.contains('offline')) {
+                if (clonedStatus) {
+                    // Remove ALL status modifier classes - favorites default to green (healthy)
+                    clonedStatus.classList.remove('checking', 'offline', 'online', 'loading', 'warning');
+                    clonedStatus.style.animation = 'none';
+                    clonedStatus.style.background = '';  // Let CSS handle it (green by default)
+                    
+                    // Only mark offline if original is explicitly offline (red)
+                    const originalStatus = originalCard.querySelector('.service-status');
+                    if (originalStatus && originalStatus.classList.contains('offline')) {
                         clonedStatus.classList.add('offline');
-                    } else if (originalStatus.classList.contains('checking')) {
-                        clonedStatus.classList.add('checking');
                     }
-                    // Copy inline styles if any
-                    clonedStatus.style.cssText = originalStatus.style.cssText;
                 }
                 
                 // Re-attach event listener to cloned favorite button (listeners don't clone)
