@@ -2402,7 +2402,16 @@
     // ==========================================
     // Initialize
     // ==========================================
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Wait for PreferencesManager to load from API first (if available)
+        if (typeof PreferencesManager !== 'undefined') {
+            try {
+                await PreferencesManager.init();
+            } catch (e) {
+                console.warn('PreferencesManager init failed, using localStorage fallback:', e);
+            }
+        }
+        
         // Core functionality
         ModeManager.init();
         StatsManager.init();

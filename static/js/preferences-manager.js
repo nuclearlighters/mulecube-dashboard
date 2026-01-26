@@ -328,12 +328,5 @@ const PreferencesManager = {
     }
 };
 
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => PreferencesManager.init());
-} else {
-    PreferencesManager.init();
-}
-
-// Export for use in other modules
+// Export for use in other modules - initialization is handled by dashboard.js
 window.PreferencesManager = PreferencesManager;
