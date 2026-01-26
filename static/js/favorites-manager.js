@@ -461,11 +461,7 @@
     // Make globally accessible
     window.FavoritesManager = FavoritesManager;
 
-    // Initialize on DOM ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => FavoritesManager.init());
-    } else {
-        FavoritesManager.init();
-    }
+    // Initialization is handled by dashboard.js after PreferencesManager is ready
+    // Do NOT auto-initialize here
 
 })();

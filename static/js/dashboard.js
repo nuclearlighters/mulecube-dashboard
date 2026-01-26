@@ -2407,6 +2407,7 @@
         if (typeof PreferencesManager !== 'undefined') {
             try {
                 await PreferencesManager.init();
+                console.log('[Dashboard] PreferencesManager initialized, cache:', PreferencesManager.cache);
             } catch (e) {
                 console.warn('PreferencesManager init failed, using localStorage fallback:', e);
             }
@@ -2425,6 +2426,12 @@
         AdvancedToggle.init();
         CategoryToggle.init();
         HeroToggle.init();
+        
+        // Initialize FavoritesManager AFTER PreferencesManager is ready
+        if (typeof FavoritesManager !== 'undefined') {
+            FavoritesManager.init();
+            console.log('[Dashboard] FavoritesManager initialized with favorites:', FavoritesManager.favorites);
+        }
         
         // New features
         DisplayModeManager.init();
