@@ -837,12 +837,9 @@
                 }
             } else {
                 try {
-                    const response = await fetch(`${API_BASE}/api/services`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        // API returns { services: [...], categories: [...] }
-                        services = data.services || data || [];
-                    }
+                    const data = await apiCall('/api/services');
+                    // API returns { services: [...], categories: [...] }
+                    services = data.services || data || [];
                 } catch (e) {
                     console.warn('Failed to fetch services:', e);
                 }
@@ -946,13 +943,9 @@
         async toggleService(serviceName, enable) {
             try {
                 const action = enable ? 'enable' : 'disable';
-                const response = await fetch(`${API_BASE}/api/services/${serviceName}/${action}`, {
-                    method: 'POST'
-                });
-                if (response.ok) {
-                    // Refresh the services tab
-                    setTimeout(() => this.loadTab('services'), 500);
-                }
+                await apiCall(`/api/services/${serviceName}/${action}`, { method: 'POST' });
+                // Refresh the services tab
+                setTimeout(() => this.loadTab('services'), 500);
             } catch (e) {
                 console.error('Failed to toggle service:', e);
             }
