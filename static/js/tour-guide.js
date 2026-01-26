@@ -217,11 +217,21 @@
             const step = this.steps[index];
             this.currentStep = index;
             
-            // Find target element
-            let target = document.querySelector(step.target);
+            // Find target element - try each selector in the comma-separated list
+            let target = null;
+            const selectors = step.target.split(',').map(s => s.trim());
+            
+            for (const selector of selectors) {
+                target = document.querySelector(selector);
+                if (target) {
+                    console.log(`[TourGuide] Step ${index + 1}: Found "${selector}"`);
+                    break;
+                }
+            }
             
             // If optional and not found, skip
             if (!target && step.optional) {
+                console.log(`[TourGuide] Step ${index + 1}: Optional step skipped (no element found)`);
                 if (index < this.steps.length - 1) {
                     this.showStep(index + 1);
                 } else {
@@ -230,11 +240,14 @@
                 return;
             }
             
-            // Fallback to body
+            // Fallback to body if nothing found
             if (!target) {
-                console.warn('[TourGuide] Target not found:', step.target);
+                console.warn(`[TourGuide] Step ${index + 1}: Target not found for any selector:`, step.target);
                 target = document.body;
             }
+            
+            // Log the element we're highlighting
+            console.log(`[TourGuide] Step ${index + 1}: Highlighting`, target);
             
             // Update tooltip content first
             this.tooltip.querySelector('.tour-icon').innerHTML = step.icon || ICONS.box;

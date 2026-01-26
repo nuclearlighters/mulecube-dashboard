@@ -8,8 +8,12 @@
    ============================================ */
 
 .tour-overlay {
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100%;
+    height: max(100%, 100vh);
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
@@ -22,7 +26,7 @@
 
 /* Backdrop - very subtle darkening */
 .tour-backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
     /* No blur - keeps content readable */
