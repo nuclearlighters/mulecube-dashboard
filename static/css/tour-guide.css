@@ -20,13 +20,12 @@
     opacity: 1;
 }
 
-/* Backdrop */
+/* Backdrop - subtle darkening without blur */
 .tour-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    background: rgba(0, 0, 0, 0.5);
+    /* No blur - keeps content readable */
 }
 
 /* Highlight cutout */
@@ -34,9 +33,9 @@
     position: absolute;
     border-radius: 12px;
     box-shadow: 
-        0 0 0 9999px rgba(0, 0, 0, 0.75),
-        0 0 0 4px rgba(34, 197, 94, 0.5),
-        0 0 20px rgba(34, 197, 94, 0.3);
+        0 0 0 9999px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(34, 197, 94, 0.6),
+        0 0 20px rgba(34, 197, 94, 0.4);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     animation: tourPulse 2s ease-in-out infinite;
@@ -45,15 +44,15 @@
 @keyframes tourPulse {
     0%, 100% {
         box-shadow: 
-            0 0 0 9999px rgba(0, 0, 0, 0.75),
-            0 0 0 4px rgba(34, 197, 94, 0.5),
-            0 0 20px rgba(34, 197, 94, 0.3);
+            0 0 0 9999px rgba(0, 0, 0, 0.5),
+            0 0 0 4px rgba(34, 197, 94, 0.6),
+            0 0 20px rgba(34, 197, 94, 0.4);
     }
     50% {
         box-shadow: 
-            0 0 0 9999px rgba(0, 0, 0, 0.75),
-            0 0 0 6px rgba(34, 197, 94, 0.7),
-            0 0 30px rgba(34, 197, 94, 0.5);
+            0 0 0 9999px rgba(0, 0, 0, 0.5),
+            0 0 0 6px rgba(34, 197, 94, 0.8),
+            0 0 30px rgba(34, 197, 94, 0.6);
     }
 }
 

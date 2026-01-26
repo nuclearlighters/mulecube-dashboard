@@ -230,19 +230,35 @@
 
 /* Touch devices - always show button, larger touch target */
 @media (hover: none), (pointer: coarse) {
-    .favorite-btn {
+    .service-card .favorite-btn,
+    .favorite-card .favorite-btn {
         opacity: 1 !important;
+        visibility: visible !important;
         width: 36px;
         height: 36px;
         /* Ensure touch target is large enough (44px recommended) */
         min-width: 44px;
         min-height: 44px;
         margin: -10px;  /* Expand touch area without visual change */
+        color: #64748b;  /* Visible gray color */
+    }
+    
+    .service-card .favorite-btn.favorited,
+    .favorite-card .favorite-btn.favorited {
+        color: #fbbf24;  /* Gold when favorited */
     }
     
     .favorite-btn svg {
         width: 18px;
         height: 18px;
+    }
+}
+
+/* Force visibility on all mobile/tablet */
+@media (max-width: 1024px) {
+    .favorite-btn {
+        opacity: 1 !important;
+        visibility: visible !important;
     }
 }
 
