@@ -35,7 +35,7 @@
         tours: {
             dashboard: [
                 {
-                    target: '.hero-content, .search-wrapper',
+                    target: '.navbar .logo, .logo',
                     title: 'Welcome to MuleCube',
                     content: 'This is your offline command center. Everything runs locally on this device - no internet needed.',
                     position: 'bottom',
@@ -56,14 +56,14 @@
                     icon: ICONS.grid
                 },
                 {
-                    target: '#serviceCategories > .service-category:first-child',
+                    target: '#serviceCategories',
                     title: 'Organized by Category',
                     content: 'Services are grouped by type: AI, Knowledge, Files, and more. Click category headers to collapse them.',
                     position: 'top',
                     icon: ICONS.folder
                 },
                 {
-                    target: '.start-here .service-card[data-service="tileserver-gl"]',
+                    target: '.start-here',
                     title: 'Pro Tip: Long Press',
                     content: 'Long-press (hold) any service card to enable or disable it. Disabled services save battery and RAM.',
                     position: 'bottom',
