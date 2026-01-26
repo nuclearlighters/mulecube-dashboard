@@ -29,35 +29,70 @@
 <!-- System Stats Panel -->
 <div class="stats-panel">
     <div class="stats-container">
-        <div class="stats-group stats-info">
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
+        <!-- Simple Mode (default) -->
+        <div class="stats-mode stats-simple" id="statsSimple">
+            <div class="stats-simple-left">
+                <span class="system-health" id="systemHealth">
+                    <span class="health-indicator healthy"></span>
+                    <span class="health-text">All Systems Healthy</span>
+                </span>
+            </div>
+            <div class="stats-simple-right">
+                <span class="stat-item-simple" id="batterySimple" style="display: none;">
+                    <span class="battery-icon-simple">🔋</span>
+                    <span class="battery-value-simple" id="batteryValueSimple">--%</span>
+                </span>
+                <button class="mode-toggle-btn" id="modeToggleSimple" title="Switch to Advanced Mode">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                    Advanced
+                </button>
+            </div>
         </div>
 
-        <div class="stats-group stats-primary">
-            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
-            <span class="stat-item stat-clickable" data-tab="storage"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
-        </div>
-        
-        <div class="stats-group stats-network">
-            <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
-            <span class="stat-item stat-clickable" data-tab="network" id="ethStatus"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
-        </div>
-        
-        <div class="stats-group stats-hardware">
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
-            <span class="stat-item stat-clickable" data-tab="power" id="batteryContainer" style="display: none;">
-                <span id="batteryIcon"><img src="/images/icons/stat-battery.svg" alt="" class="stat-icon"></span> <span class="stat-val" id="batteryValue">--%</span>
-            </span>
-        </div>
-        
-	<div class="stats-group stats-controls" id="statsControlsGroup">
-	    <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
-	    <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
-	</div>        
+        <!-- Advanced Mode -->
+        <div class="stats-mode stats-advanced" id="statsAdvanced" style="display: none;">
+            <div class="stats-group stats-info">
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
+            </div>
 
+            <div class="stats-group stats-primary">
+                <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
+                <span class="stat-item stat-clickable" data-tab="storage"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
+            </div>
+            
+            <div class="stats-group stats-network">
+                <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
+                <span class="stat-item stat-clickable" data-tab="network" id="ethStatus"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
+            </div>
+            
+            <div class="stats-group stats-hardware">
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
+                <span class="stat-item stat-clickable" data-tab="power" id="batteryContainer" style="display: none;">
+                    <span id="batteryIcon"><img src="/images/icons/stat-battery.svg" alt="" class="stat-icon"></span> <span class="stat-val" id="batteryValue">--%</span>
+                </span>
+            </div>
+            
+            <div class="stats-group stats-controls" id="statsControlsGroup">
+                <button class="power-btn system-btn" id="systemBtn" title="System Management">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    System
+                </button>
+                <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
+                <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
+                <button class="mode-toggle-btn mode-toggle-advanced" id="modeToggleAdvanced" title="Switch to Simple Mode">
+                    Simple
+                </button>
+            </div>
+        </div>
     </div>
+</div>
+
+<!-- Nominal Status Display (shown in Advanced mode header) -->
+<div class="nominal-banner" id="nominalBanner" style="display: none;">
+    <span class="nominal-indicator"></span>
+    <span class="nominal-text">All Systems Nominal</span>
 </div>
 
 <!-- Power Control Confirmation Modal -->
@@ -85,6 +120,185 @@
     max-width: var(--container-max, 1200px);
     margin: 0 auto;
     padding: 0 var(--space-lg, 1.5rem);
+}
+
+/* Stats Mode Containers */
+.stats-mode {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* ==========================================
+   SIMPLE MODE STYLES
+   ========================================== */
+.stats-simple {
+    min-height: 32px;
+}
+
+.stats-simple-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stats-simple-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.system-health {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.health-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+    animation: pulse-green 2s ease-in-out infinite;
+}
+
+@keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+    50% { box-shadow: 0 0 16px rgba(34, 197, 94, 0.8); }
+}
+
+.health-indicator.warning {
+    background: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+    animation: pulse-orange 2s ease-in-out infinite;
+}
+
+@keyframes pulse-orange {
+    0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+    50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.8); }
+}
+
+.health-indicator.critical {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    animation: pulse-red 1s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+    50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.8); }
+}
+
+.health-text {
+    color: var(--color-text-primary, #e4e4e7);
+}
+
+.system-health.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.system-health.critical {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.stat-item-simple {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--color-bg-tertiary, #1a1a1c);
+    border: 1px solid var(--color-border, #27272a);
+    border-radius: 16px;
+    font-size: 0.8rem;
+}
+
+.battery-icon-simple {
+    font-size: 1rem;
+}
+
+.battery-value-simple {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--color-primary, #22c55e);
+    font-weight: 500;
+}
+
+.mode-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--color-border, #27272a);
+    border-radius: 6px;
+    color: var(--color-text-muted, #a1a1aa);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.mode-toggle-btn:hover {
+    border-color: var(--color-primary, #22c55e);
+    color: var(--color-primary, #22c55e);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.mode-toggle-btn svg {
+    opacity: 0.7;
+}
+
+.mode-toggle-advanced {
+    margin-left: 8px;
+}
+
+/* Nominal Banner (shown in advanced mode) */
+.nominal-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 0;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
+    font-size: 0.7rem;
+    color: var(--color-text-muted, #a1a1aa);
+}
+
+.nominal-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.nominal-text {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nominal-banner.warning {
+    background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.1), transparent);
+}
+
+.nominal-banner.warning .nominal-indicator {
+    background: #f59e0b;
+}
+
+/* ==========================================
+   ADVANCED MODE STYLES (existing)
+   ========================================== */
+.stats-advanced {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -332,14 +546,67 @@
 (function() {
     const rebootBtn = document.getElementById('rebootBtn');
     const shutdownBtn = document.getElementById('shutdownBtn');
+    const systemBtn = document.getElementById('systemBtn');
     const modal = document.getElementById('powerModal');
     const modalTitle = document.getElementById('powerModalTitle');
     const modalMessage = document.getElementById('powerModalMessage');
     const modalCancel = document.getElementById('powerModalCancel');
     const modalConfirm = document.getElementById('powerModalConfirm');
     
+    // Mode toggle elements
+    const statsSimple = document.getElementById('statsSimple');
+    const statsAdvanced = document.getElementById('statsAdvanced');
+    const nominalBanner = document.getElementById('nominalBanner');
+    const modeToggleSimple = document.getElementById('modeToggleSimple');
+    const modeToggleAdvanced = document.getElementById('modeToggleAdvanced');
+    
     let pendingAction = null;
     
+    // Stats mode management
+    function setStatsMode(mode) {
+        if (mode === 'advanced') {
+            if (statsSimple) statsSimple.style.display = 'none';
+            if (statsAdvanced) statsAdvanced.style.display = 'flex';
+            if (nominalBanner) nominalBanner.style.display = 'flex';
+        } else {
+            if (statsSimple) statsSimple.style.display = 'flex';
+            if (statsAdvanced) statsAdvanced.style.display = 'none';
+            if (nominalBanner) nominalBanner.style.display = 'none';
+        }
+        
+        // Save preference
+        if (typeof PreferencesManager !== 'undefined') {
+            PreferencesManager.set('statsMode', mode);
+        } else {
+            localStorage.setItem('mulecube_stats_mode', mode);
+        }
+    }
+    
+    function getStatsMode() {
+        if (typeof PreferencesManager !== 'undefined' && PreferencesManager.cache) {
+            return PreferencesManager.get('statsMode') || 'simple';
+        }
+        return localStorage.getItem('mulecube_stats_mode') || 'simple';
+    }
+    
+    // Initialize mode from saved preference
+    function initStatsMode() {
+        const savedMode = getStatsMode();
+        setStatsMode(savedMode);
+    }
+    
+    // Mode toggle click handlers
+    if (modeToggleSimple) {
+        modeToggleSimple.addEventListener('click', () => setStatsMode('advanced'));
+    }
+    if (modeToggleAdvanced) {
+        modeToggleAdvanced.addEventListener('click', () => setStatsMode('simple'));
+    }
+    
+    // Initialize after a brief delay to allow PreferencesManager to load
+    setTimeout(initStatsMode, 100);
+    
+    // Power modal functions
     function showModal(action, title, message, isReboot) {
         pendingAction = action;
         modalTitle.textContent = title;
@@ -354,7 +621,6 @@
     }
     
     function executeAction(action) {
-        // Navigate to reboot page - it will trigger the API call
         window.location.href = '/reboot.html?action=' + action + '&trigger=true';
     }
     
@@ -369,6 +635,14 @@
         shutdownBtn.addEventListener('click', () => {
             showModal('shutdown', '⏻ Shut Down MuleCube?', 
                 'System will power off in 1 minute. Physical access needed to restart!', false);
+        });
+    }
+    
+    if (systemBtn) {
+        systemBtn.addEventListener('click', () => {
+            if (typeof SystemManagementPanel !== 'undefined') {
+                SystemManagementPanel.open();
+            }
         });
     }
     
@@ -392,13 +666,23 @@
             const targetTab = item.dataset.tab;
             if (targetTab && typeof SystemManagementPanel !== 'undefined') {
                 SystemManagementPanel.open();
-                // Small delay to ensure panel is rendered before switching tab
                 setTimeout(() => {
                     SystemManagementPanel.loadTab(targetTab);
                 }, 50);
             }
         });
     });
+    
+    // Also make simple mode health status clickable
+    const systemHealth = document.getElementById('systemHealth');
+    if (systemHealth) {
+        systemHealth.style.cursor = 'pointer';
+        systemHealth.addEventListener('click', () => {
+            if (typeof SystemManagementPanel !== 'undefined') {
+                SystemManagementPanel.open();
+            }
+        });
+    }
 })();
 </script>
 

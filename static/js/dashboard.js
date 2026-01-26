@@ -680,9 +680,11 @@
     // ==========================================
     const StatsManager = {
         elements: {},
+        lastData: {},  // Store last fetched data for health calculation
         
         init() {
             this.elements = {
+                // Advanced mode elements
                 cpu: document.getElementById('cpuValue'),
                 memory: document.getElementById('memValue'),
                 disk: document.getElementById('diskValue'),
@@ -694,7 +696,17 @@
                 batteryContainer: document.getElementById('batteryContainer'),
                 batteryIcon: document.getElementById('batteryIcon'),
                 batteryValue: document.getElementById('batteryValue'),
-                batteryTime: document.getElementById('batteryTime')
+                batteryTime: document.getElementById('batteryTime'),
+                // Simple mode elements
+                systemHealth: document.getElementById('systemHealth'),
+                healthIndicator: document.querySelector('.health-indicator'),
+                healthText: document.querySelector('.health-text'),
+                batterySimple: document.getElementById('batterySimple'),
+                batteryValueSimple: document.getElementById('batteryValueSimple'),
+                // Nominal banner (advanced mode)
+                nominalBanner: document.getElementById('nominalBanner'),
+                nominalIndicator: document.querySelector('.nominal-indicator'),
+                nominalText: document.querySelector('.nominal-text')
             };
             
             if (ModeManager.isDemo) {
@@ -835,6 +847,10 @@
         },
         
         updateDisplay(data) {
+            // Store data for health calculation
+            this.lastData = data;
+            
+            // === ADVANCED MODE UPDATES ===
             if (this.elements.cpu) this.elements.cpu.textContent = `${data.cpu ?? '--'}%`;
             if (this.elements.memory) this.elements.memory.textContent = `${data.memory ?? '--'}%`;
             if (this.elements.disk) this.elements.disk.textContent = `${data.disk ?? '--'}%`;
@@ -852,7 +868,7 @@
                 }
             }
             
-            // Battery (only show when available)
+            // Battery (Advanced mode - only show when available)
             if (this.elements.batteryContainer && data.battery_available) {
                 this.elements.batteryContainer.style.display = 'flex';
                 if (this.elements.batteryIcon) this.elements.batteryIcon.innerHTML = '<img src="/images/icons/stat-battery.svg" class="stat-icon">';
@@ -863,6 +879,93 @@
                 if (this.elements.batteryTime) this.elements.batteryTime.textContent = data.battery_time ? `(${data.battery_time})` : '';
             } else if (this.elements.batteryContainer) {
                 this.elements.batteryContainer.style.display = 'none';
+            }
+            
+            // === SIMPLE MODE UPDATES ===
+            // Battery (Simple mode)
+            if (this.elements.batterySimple) {
+                if (data.battery_available) {
+                    this.elements.batterySimple.style.display = 'flex';
+                    if (this.elements.batteryValueSimple) {
+                        this.elements.batteryValueSimple.textContent = `${data.battery_percent}%`;
+                        this.elements.batteryValueSimple.style.color = data.battery_percent < 20 ? '#ef4444' : data.battery_percent < 50 ? '#f59e0b' : '#22c55e';
+                    }
+                } else {
+                    this.elements.batterySimple.style.display = 'none';
+                }
+            }
+            
+            // === HEALTH STATUS CALCULATION ===
+            this.updateHealthStatus(data);
+        },
+        
+        updateHealthStatus(data) {
+            // Calculate overall system health
+            let healthLevel = 'healthy';  // healthy, warning, critical
+            let healthMessage = 'All Systems Healthy';
+            let issues = [];
+            
+            // Check temperature
+            if (data.temperature > 80) {
+                healthLevel = 'critical';
+                issues.push('CPU overheating');
+            } else if (data.temperature > 70) {
+                if (healthLevel !== 'critical') healthLevel = 'warning';
+                issues.push('CPU running warm');
+            }
+            
+            // Check memory
+            if (data.memory > 95) {
+                healthLevel = 'critical';
+                issues.push('Memory critical');
+            } else if (data.memory > 85) {
+                if (healthLevel !== 'critical') healthLevel = 'warning';
+                issues.push('Memory high');
+            }
+            
+            // Check disk
+            if (data.disk > 95) {
+                healthLevel = 'critical';
+                issues.push('Disk nearly full');
+            } else if (data.disk > 90) {
+                if (healthLevel !== 'critical') healthLevel = 'warning';
+                issues.push('Disk space low');
+            }
+            
+            // Check battery
+            if (data.battery_available && data.battery_percent < 10) {
+                healthLevel = 'critical';
+                issues.push('Battery critical');
+            } else if (data.battery_available && data.battery_percent < 20) {
+                if (healthLevel !== 'critical') healthLevel = 'warning';
+                issues.push('Battery low');
+            }
+            
+            // Build health message
+            if (issues.length > 0) {
+                healthMessage = issues.length === 1 ? issues[0] : `${issues.length} issues detected`;
+            }
+            
+            // Update Simple mode health display
+            if (this.elements.systemHealth) {
+                this.elements.systemHealth.className = 'system-health ' + healthLevel;
+            }
+            if (this.elements.healthIndicator) {
+                this.elements.healthIndicator.className = 'health-indicator ' + healthLevel;
+            }
+            if (this.elements.healthText) {
+                this.elements.healthText.textContent = healthMessage;
+            }
+            
+            // Update Nominal banner (Advanced mode)
+            if (this.elements.nominalBanner) {
+                this.elements.nominalBanner.className = 'nominal-banner ' + (healthLevel !== 'healthy' ? healthLevel : '');
+            }
+            if (this.elements.nominalIndicator) {
+                this.elements.nominalIndicator.style.background = healthLevel === 'critical' ? '#ef4444' : healthLevel === 'warning' ? '#f59e0b' : '#22c55e';
+            }
+            if (this.elements.nominalText) {
+                this.elements.nominalText.textContent = healthLevel === 'healthy' ? 'All Systems Nominal' : healthMessage.toUpperCase();
             }
         },
         

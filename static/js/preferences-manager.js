@@ -22,7 +22,8 @@ const PreferencesManager = {
         recentServices: [],
         theme: 'dark',
         collapsedCategories: [],
-        adminExpanded: false
+        adminExpanded: false,
+        statsMode: 'simple'  // 'simple' or 'advanced'
     },
     
     /**
@@ -314,6 +315,23 @@ const PreferencesManager = {
     setAdminExpanded(expanded) {
         if (this.cache) {
             this.cache.adminExpanded = expanded;
+            this.save();
+        }
+    },
+    
+    /**
+     * Generic get for any preference key
+     */
+    get(key) {
+        return this.cache?.[key] ?? this.defaults[key] ?? null;
+    },
+    
+    /**
+     * Generic set for any preference key
+     */
+    set(key, value) {
+        if (this.cache) {
+            this.cache[key] = value;
             this.save();
         }
     },
