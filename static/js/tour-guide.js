@@ -105,10 +105,10 @@
                     icon: ICONS.settings
                 },
                 {
-                    target: '.nav-links a[href*="Docs"], .nav-links a[href*="docs"]',
+                    target: '.nav-links li a[href*="/docs"]',
                     title: 'Learn More',
                     content: 'Visit the documentation for detailed guides on services, troubleshooting, and getting the most from MuleCube.',
-                    position: 'left',
+                    position: 'bottom',
                     icon: ICONS.book
                 }
             ],
