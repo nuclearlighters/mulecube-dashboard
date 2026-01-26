@@ -290,11 +290,11 @@
 .stats-advanced {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
     width: 100%;
     overflow-x: auto;
-    padding: 0;
+    overflow-y: visible;
+    padding: 4px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -316,20 +316,28 @@
     opacity: 0.6;
 }
 
+/* Light mode fixes for system health badge */
+[data-theme="light"] .system-health {
+    color: #166534;
+}
+
+[data-theme="light"] .system-health .health-text {
+    color: #166534;
+}
+
 .stat-item {
     color: var(--color-text-muted, #a1a1aa);
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: 0.75rem;
+    gap: 4px;
+    font-size: 0.7rem;
     background: transparent;
     border: 1px solid var(--color-border, #27272a);
     border-radius: var(--border-radius, 6px);
-    padding: 5px 10px;
-    min-width: 90px;
-    height: 32px;
+    padding: 4px 8px;
+    height: 28px;
     box-sizing: border-box;
 }
 
@@ -379,15 +387,14 @@
     background: transparent;
     border: 1px solid var(--color-border, #27272a);
     border-radius: var(--border-radius, 6px);
-    padding: 5px 10px;
+    padding: 5px 8px;
     cursor: pointer;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 500;
     white-space: nowrap;
     transition: all 0.2s ease;
     color: var(--color-text-muted, #a1a1aa);
-    min-width: 90px;
-    height: 32px;
+    height: 28px;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
