@@ -599,6 +599,10 @@
         
         getRecent() {
             try {
+                // Use PreferencesManager if available
+                if (typeof PreferencesManager !== 'undefined' && PreferencesManager.cache) {
+                    return PreferencesManager.getRecentServices();
+                }
                 const data = localStorage.getItem(this.storageKey);
                 return data ? JSON.parse(data) : [];
             } catch {
@@ -607,6 +611,13 @@
         },
         
         trackUsage(serviceName) {
+            // Use PreferencesManager if available
+            if (typeof PreferencesManager !== 'undefined') {
+                PreferencesManager.addRecentService(serviceName);
+                this.render();
+                return;
+            }
+            
             let recent = this.getRecent();
             
             // Remove if already exists
@@ -1130,8 +1141,13 @@
         init() {
             this.toggle = document.getElementById('themeToggle');
             
-            // Load saved theme or use system preference
-            const saved = localStorage.getItem('theme');
+            // Load saved theme - use PreferencesManager if available, fallback to localStorage
+            let saved;
+            if (typeof PreferencesManager !== 'undefined' && PreferencesManager.cache) {
+                saved = PreferencesManager.getTheme();
+            } else {
+                saved = localStorage.getItem('theme');
+            }
             const system = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
             const theme = saved || system;
             
@@ -1147,7 +1163,13 @@
             const current = document.documentElement.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
+            
+            // Save theme - use PreferencesManager if available
+            if (typeof PreferencesManager !== 'undefined') {
+                PreferencesManager.setTheme(next);
+            } else {
+                localStorage.setItem('theme', next);
+            }
             this.updateIcon(next);
         },
         
@@ -1323,6 +1345,10 @@
         
         getCollapsed() {
             try {
+                // Use PreferencesManager if available
+                if (typeof PreferencesManager !== 'undefined' && PreferencesManager.cache) {
+                    return PreferencesManager.getCollapsedCategories();
+                }
                 const data = localStorage.getItem(this.storageKey);
                 return data ? JSON.parse(data) : [];
             } catch {
@@ -1331,6 +1357,16 @@
         },
         
         saveState(categoryName, isCollapsed) {
+            // Use PreferencesManager if available
+            if (typeof PreferencesManager !== 'undefined') {
+                if (isCollapsed && !PreferencesManager.isCategoryCollapsed(categoryName)) {
+                    PreferencesManager.toggleCategoryCollapsed(categoryName);
+                } else if (!isCollapsed && PreferencesManager.isCategoryCollapsed(categoryName)) {
+                    PreferencesManager.toggleCategoryCollapsed(categoryName);
+                }
+                return;
+            }
+            
             let collapsed = this.getCollapsed();
             if (isCollapsed && !collapsed.includes(categoryName)) {
                 collapsed.push(categoryName);
@@ -1498,9 +1534,20 @@
         customServices: [], // For advanced setup customization
         isApplying: false,
         
-        init() {
-            // Check if wizard should show
-            const completed = localStorage.getItem(CONFIG.wizardStorageKey);
+        async init() {
+            // Check if wizard should show - use PreferencesManager if available
+            let completed = false;
+            
+            if (typeof PreferencesManager !== 'undefined') {
+                // Wait for PreferencesManager to initialize if needed
+                if (!PreferencesManager.cache) {
+                    await PreferencesManager.init();
+                }
+                completed = PreferencesManager.isSetupComplete();
+            } else {
+                completed = localStorage.getItem(CONFIG.wizardStorageKey) === 'true';
+            }
+            
             if (!completed) {
                 // Small delay to let page render first
                 setTimeout(() => this.show(), 500);
@@ -1901,8 +1948,12 @@
         },
         
         complete() {
-            // Save completion state
-            localStorage.setItem(CONFIG.wizardStorageKey, 'true');
+            // Save completion state - use PreferencesManager if available
+            if (typeof PreferencesManager !== 'undefined') {
+                PreferencesManager.setSetupComplete(true);
+            } else {
+                localStorage.setItem(CONFIG.wizardStorageKey, 'true');
+            }
             localStorage.setItem(CONFIG.profileStorageKey, this.selectedProfile || 'general');
             
             // Apply profile services (if not demo mode)
@@ -2007,7 +2058,12 @@
         },
         
         reset() {
-            localStorage.removeItem(CONFIG.wizardStorageKey);
+            // Reset completion state - use PreferencesManager if available
+            if (typeof PreferencesManager !== 'undefined') {
+                PreferencesManager.setSetupComplete(false);
+            } else {
+                localStorage.removeItem(CONFIG.wizardStorageKey);
+            }
             localStorage.removeItem(CONFIG.profileStorageKey);
             this.selectedProfile = null;
             this.setupType = 'quick';

@@ -382,7 +382,12 @@
             this.isActive = false;
             
             if (!skipped) {
-                localStorage.setItem(this.STORAGE_KEY, 'true');
+                // Use PreferencesManager if available, fallback to localStorage
+                if (typeof PreferencesManager !== 'undefined') {
+                    PreferencesManager.setTourComplete(true);
+                } else {
+                    localStorage.setItem(this.STORAGE_KEY, 'true');
+                }
             }
             
             if (this.overlay) this.overlay.classList.remove('visible');
@@ -411,11 +416,20 @@
         },
         
         isComplete() {
+            // Use PreferencesManager if available, fallback to localStorage
+            if (typeof PreferencesManager !== 'undefined') {
+                return PreferencesManager.isTourComplete();
+            }
             return localStorage.getItem(this.STORAGE_KEY) === 'true';
         },
         
         reset() {
-            localStorage.removeItem(this.STORAGE_KEY);
+            // Use PreferencesManager if available, fallback to localStorage
+            if (typeof PreferencesManager !== 'undefined') {
+                PreferencesManager.setTourComplete(false);
+            } else {
+                localStorage.removeItem(this.STORAGE_KEY);
+            }
         }
     };
 
