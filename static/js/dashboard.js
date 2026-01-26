@@ -2114,7 +2114,7 @@
                         </div>
                     </div>
                     
-                    <div class="service-card system-card" onclick="SystemFunctions.showServicesDialog()">
+                    <div class="service-card system-card" onclick="SystemManagementPanel.open(); setTimeout(() => SystemManagementPanel.switchTab('services'), 100);">
                         <div class="service-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h8"/><path d="M4 18h8"/><path d="M4 6h8"/><path d="m14 6 2 2 4-4"/><path d="m14 12 2 2 4-4"/><path d="m14 18 2 2 4-4"/></svg></div>
                         <div class="service-info">
                             <div class="service-name">Manage Services</div>

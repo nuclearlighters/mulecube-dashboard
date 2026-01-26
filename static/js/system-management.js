@@ -281,7 +281,10 @@
         download: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
         upload: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
         terminal: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
-        settings: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>'
+        settings: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+        play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+        stop: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>',
+        lock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
     };
 
     // ==========================================
@@ -401,6 +404,7 @@
                     
                     <div class="system-panel-tabs">
                         <button class="tab-btn active" data-tab="overview">${ICONS.system} Overview</button>
+                        <button class="tab-btn" data-tab="services">${ICONS.settings} Services</button>
                         <button class="tab-btn" data-tab="network">${ICONS.network} Network</button>
                         <button class="tab-btn" data-tab="storage">${ICONS.storage} Storage</button>
                         <button class="tab-btn" data-tab="processes">${ICONS.process} Processes</button>
@@ -500,6 +504,9 @@
                 switch (tabName) {
                     case 'overview':
                         await this.loadOverviewTab(body);
+                        break;
+                    case 'services':
+                        await this.loadServicesTab(body);
                         break;
                     case 'network':
                         await this.loadNetworkTab(body);
@@ -815,6 +822,144 @@
         
         async executeShutdown() {
             window.location.href = '/reboot.html?action=shutdown&trigger=true';
+        },
+
+        // ==========================================
+        // Services Tab
+        // ==========================================
+        async loadServicesTab(container) {
+            // Delegate to ServiceManagerModal's content rendering
+            if (typeof ServiceManagerModal !== 'undefined') {
+                // Fetch services data
+                let services = [];
+                if (IS_DEMO) {
+                    services = ServiceManagerModal.generateDemoServices ? ServiceManagerModal.generateDemoServices() : [];
+                } else {
+                    try {
+                        const response = await fetch(`${API_BASE}/api/services`);
+                        if (response.ok) {
+                            services = await response.json();
+                        }
+                    } catch (e) {
+                        console.warn('Failed to fetch services:', e);
+                    }
+                }
+                
+                // Group services by category
+                const userServices = services.filter(s => !this.isSystemService(s.name));
+                const systemServices = services.filter(s => this.isSystemService(s.name));
+                const running = services.filter(s => s.state === 'running').length;
+                const stopped = services.filter(s => s.state !== 'running').length;
+                
+                container.innerHTML = `
+                    <div class="tab-content services-tab">
+                        <div class="services-header">
+                            <div class="services-summary">
+                                <div class="summary-stat">
+                                    <span class="stat-value">${services.length}</span>
+                                    <span class="stat-label">Total Services</span>
+                                </div>
+                                <div class="summary-stat running">
+                                    <span class="stat-value">${running}</span>
+                                    <span class="stat-label">Running</span>
+                                </div>
+                                <div class="summary-stat stopped">
+                                    <span class="stat-value">${stopped}</span>
+                                    <span class="stat-label">Stopped</span>
+                                </div>
+                            </div>
+                            <div class="services-actions">
+                                <input type="text" id="servicesSearch" class="services-search" placeholder="Search services..." oninput="SystemManagementPanel.filterServices(this.value)">
+                                <button class="btn btn-secondary" onclick="SystemManagementPanel.loadTab('services')">${ICONS.refresh} Refresh</button>
+                            </div>
+                        </div>
+                        
+                        <div class="services-section">
+                            <h4 class="section-title">${ICONS.settings} User Services (${userServices.length})</h4>
+                            <div class="services-grid" id="userServicesGrid">
+                                ${userServices.map(s => this.renderServiceCard(s)).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="services-section system-services">
+                            <h4 class="section-title">${ICONS.system} System Services (${systemServices.length})</h4>
+                            <p class="section-hint">System services cannot be disabled</p>
+                            <div class="services-grid" id="systemServicesGrid">
+                                ${systemServices.map(s => this.renderServiceCard(s, true)).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="panel-error">
+                        ${ICONS.warning}
+                        <p>Service Manager not available</p>
+                    </div>
+                `;
+            }
+        },
+        
+        renderServiceCard(service, isSystem = false) {
+            const isRunning = service.state === 'running';
+            const statusClass = isRunning ? 'running' : 'stopped';
+            const statusText = isRunning ? 'Running' : 'Stopped';
+            
+            return `
+                <div class="service-card-mini ${statusClass} ${isSystem ? 'system' : ''}" data-service="${service.name}">
+                    <div class="service-info">
+                        <span class="service-name">${service.name}</span>
+                        <span class="service-status">${statusText}</span>
+                    </div>
+                    ${!isSystem ? `
+                        <button class="service-toggle-btn" onclick="SystemManagementPanel.toggleService('${service.name}', ${!isRunning})" title="${isRunning ? 'Stop' : 'Start'} service">
+                            ${isRunning ? ICONS.stop : ICONS.play}
+                        </button>
+                    ` : `
+                        <span class="system-badge">${ICONS.lock}</span>
+                    `}
+                </div>
+            `;
+        },
+        
+        isSystemService(name) {
+            if (!name) return false;
+            const systemServices = [
+                'mulecube-service-manager', 'mulecube-hw-monitor', 'mulecube-reset',
+                'mulecube-terminal', 'mulecube-terminal-ro', 'mulecube-status',
+                'mulecube-diagnostics', 'mulecube-backup', 'mulecube-wifi-status',
+                'mulecube-watchdog', 'mulecube-usb-monitor', 'mulecube-nettools',
+                'mulecube-gpio', 'mulecube-dockge', 'mulecube-logs', 'mulecube-dashboard',
+                'mulecube-homarr', 'nginx-proxy', 'pihole', 'uptime-kuma',
+                'postgres', 'postgres-linkwarden', 'valkey', 'meilisearch',
+                'meilisearch-linkwarden', 'tika'
+            ];
+            return systemServices.includes(name) ||
+                   name.startsWith('mulecube-') ||
+                   name.startsWith('watchtower-');
+        },
+        
+        filterServices(query) {
+            const q = query.toLowerCase();
+            document.querySelectorAll('.services-tab .service-card-mini').forEach(card => {
+                const name = card.dataset.service.toLowerCase();
+                card.style.display = name.includes(q) ? '' : 'none';
+            });
+        },
+        
+        async toggleService(serviceName, enable) {
+            try {
+                const action = enable ? 'enable' : 'disable';
+                const response = await fetch(`${API_BASE}/api/services/${serviceName}/${action}`, {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    // Refresh the services tab
+                    setTimeout(() => this.loadTab('services'), 500);
+                }
+            } catch (e) {
+                console.error('Failed to toggle service:', e);
+            }
         },
 
         // ==========================================

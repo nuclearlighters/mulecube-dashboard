@@ -1897,3 +1897,218 @@
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
 }
+
+/* ==========================================
+   Services Tab Styles
+   ========================================== */
+
+.services-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.services-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.services-summary {
+    display: flex;
+    gap: 24px;
+}
+
+.summary-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.summary-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--color-text-primary);
+}
+
+.summary-stat .stat-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-stat.running .stat-value {
+    color: #22c55e;
+}
+
+.summary-stat.stopped .stat-value {
+    color: #f59e0b;
+}
+
+.services-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.services-search {
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    min-width: 200px;
+}
+
+.services-search:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.services-section {
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+}
+
+.services-section .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.services-section .section-hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+}
+
+.services-section.system-services {
+    opacity: 0.7;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+}
+
+.service-card-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--color-bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--color-border-light);
+    transition: all 0.2s ease;
+}
+
+.service-card-mini:hover {
+    border-color: var(--color-border);
+    background: var(--color-bg-tertiary);
+}
+
+.service-card-mini.system {
+    opacity: 0.6;
+}
+
+.service-card-mini .service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.service-card-mini .service-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-card-mini .service-status {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
+
+.service-card-mini.running .service-status {
+    color: #22c55e;
+}
+
+.service-card-mini.stopped .service-status {
+    color: #f59e0b;
+}
+
+.service-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    color: var(--color-text-muted);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-toggle-btn:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-accent);
+}
+
+.service-card-mini.running .service-toggle-btn:hover {
+    color: #ef4444;
+}
+
+.service-card-mini.stopped .service-toggle-btn:hover {
+    color: #22c55e;
+}
+
+.system-badge {
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .services-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .services-summary {
+        justify-content: center;
+    }
+    
+    .services-actions {
+        flex-direction: column;
+    }
+    
+    .services-search {
+        width: 100%;
+    }
+    
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+}
