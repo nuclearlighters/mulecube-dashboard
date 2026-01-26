@@ -351,35 +351,12 @@
         init() {
             this.injectPanelHTML();
             this.setupEventListeners();
-            this.addNavigationButton();
+            // Button is now in header.html, no need to inject dynamically
             console.log('SystemManagementPanel: Initialized');
         },
         
-        addNavigationButton() {
-            // Place "System" button in the stats control bar (next to reboot/shutdown)
-            const statsControls = document.getElementById('statsControlsGroup');
-            
-            const btn = document.createElement('button');
-            btn.className = 'power-btn system-btn';
-            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> System`;
-            btn.onclick = () => this.toggle();
-            btn.title = 'System Management (Ctrl+Shift+S)';
-            btn.id = 'systemManagementBtn';
-            
-            if (statsControls) {
-                // Insert at the beginning of the controls group (before Reboot)
-                statsControls.insertBefore(btn, statsControls.firstChild);
-                console.log('SystemManagementPanel: Button placed in stats controls bar');
-            } else {
-                // Fallback: try the status banner
-                const statusBanner = document.getElementById('statusBanner');
-                if (statusBanner) {
-                    btn.className = 'system-panel-trigger top-bar-btn';
-                    statusBanner.insertBefore(btn, statusBanner.firstChild);
-                    console.log('SystemManagementPanel: Button placed in status banner (fallback)');
-                }
-            }
-        },
+        // Button is now placed directly in header.html - no dynamic injection needed
+        // This prevents duplicate buttons
         
         injectPanelHTML() {
             const panel = document.createElement('div');
