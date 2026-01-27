@@ -73,6 +73,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 Simple
             </button>
+            <span class="stats-spacer" aria-hidden="true"></span>
         </div>
     </div>
 </div>
@@ -301,12 +302,6 @@
     -ms-overflow-style: none;
 }
 
-.stats-advanced::after {
-    content: '';
-    flex-shrink: 0;
-    width: 24px;
-}
-
 .stats-advanced::-webkit-scrollbar {
     display: none;
 }
@@ -314,6 +309,18 @@
 .stats-advanced .stat-item,
 .stats-advanced .power-btn,
 .stats-advanced .mode-toggle-btn {
+    flex-shrink: 0;
+}
+
+/* Ensure last button has space and isn't clipped */
+.stats-advanced .mode-toggle-btn:last-child {
+    margin-right: 1.5rem;
+}
+
+/* Spacer element to prevent button clipping */
+.stats-spacer {
+    display: inline-block;
+    width: 2rem;
     flex-shrink: 0;
 }
 
