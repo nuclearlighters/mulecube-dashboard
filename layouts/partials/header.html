@@ -50,30 +50,34 @@
         </div>
 
         <!-- Advanced Mode -->
+        <!-- Advanced Mode - Two Row Layout -->
         <div class="stats-mode stats-advanced" id="statsAdvanced" style="display: none;">
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
-            <span class="stat-item stat-clickable" data-tab="storage"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
-            <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
-            <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
-            <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
-            <span class="stat-item stat-clickable" data-tab="power" id="batteryContainer" style="display: none;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon-svg"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="10" x2="23" y2="14"/><rect x="3" y="8" width="12" height="8" fill="currentColor" opacity="0.3"/></svg>
-                <span class="stat-val" id="batteryValue">--%</span>
-            </span>
-            <button class="power-btn system-btn" id="systemBtn" title="System Management">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                System
-            </button>
-            <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
-            <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
-            <button class="mode-toggle-btn" id="modeToggleAdvanced" title="Switch to Simple Mode">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Simple
-            </button>
-            <span class="stats-spacer" aria-hidden="true"></span>
+            <div class="stats-row-top">
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-hostname.svg" alt="" class="stat-icon"> <span id="hostname">mulecube</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-uptime.svg" alt="" class="stat-icon"> <span id="uptime">--</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">CPU</span> <span class="stat-val" id="cpuValue">--%</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><span class="stat-label">MEM</span> <span class="stat-val" id="memValue">--%</span></span>
+                <span class="stat-item stat-clickable" data-tab="storage"><span class="stat-label">DISK</span> <span class="stat-val" id="diskValue">--%</span></span>
+                <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">AP</span> <span class="stat-val" id="wifiValue">--</span></span>
+                <span class="stat-item stat-clickable" data-tab="network"><span class="stat-label">ETH</span> <span class="stat-val" id="ethValue">--</span></span>
+                <span class="stat-item stat-clickable" data-tab="overview"><img src="/images/icons/stat-temp.svg" alt="" class="stat-icon"> <span class="stat-val" id="tempValue">--°C</span></span>
+                <span class="stat-item stat-clickable" data-tab="power" id="batteryContainer" style="display: none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon-svg"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="10" x2="23" y2="14"/><rect x="3" y="8" width="12" height="8" fill="currentColor" opacity="0.3"/></svg>
+                    <span class="stat-val" id="batteryValue">--%</span>
+                </span>
+            </div>
+            <div class="stats-row-bottom">
+                <button class="power-btn system-btn" id="systemBtn" title="System Management">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    System
+                </button>
+                <button class="power-btn reboot" id="rebootBtn" title="Reboot">↻ Reboot</button>
+                <button class="power-btn shutdown" id="shutdownBtn" title="Shutdown">⏻ Shutdown</button>
+                <button class="mode-toggle-btn" id="modeToggleAdvanced" title="Switch to Simple Mode">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Simple
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -288,37 +292,42 @@
 }
 
 /* ==========================================
-   ADVANCED MODE STYLES (existing)
+   ADVANCED MODE STYLES - Two Row Layout
    ========================================== */
 .stats-advanced {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.stats-row-top {
     display: flex;
     align-items: center;
     gap: 8px;
     overflow-x: auto;
-    overflow-y: visible;
-    padding: 4px 0;
+    padding: 2px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-.stats-advanced::-webkit-scrollbar {
+.stats-row-top::-webkit-scrollbar {
     display: none;
 }
 
-.stats-advanced .stat-item,
-.stats-advanced .power-btn,
-.stats-advanced .mode-toggle-btn,
-.stats-advanced .stats-spacer {
-    flex-shrink: 0;
+.stats-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-/* Spacer element to prevent button clipping */
-.stats-spacer {
-    display: block;
-    min-width: 48px;
-    width: 48px;
-    height: 1px;
+.stats-row-top .stat-item,
+.stats-row-bottom .power-btn,
+.stats-row-bottom .mode-toggle-btn {
+    flex-shrink: 0;
 }
 
 .stat-icon-svg {
