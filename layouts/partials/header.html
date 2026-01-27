@@ -102,12 +102,14 @@
     border-bottom: 1px solid var(--color-border, #27272a);
     padding: 10px 0;
     font-size: 0.8rem;
+    overflow: visible;
 }
 
 .stats-container {
     max-width: var(--container-max, 1200px);
     margin: 0 auto;
     padding: 0 var(--space-lg, 1.5rem);
+    overflow: visible;
 }
 
 /* Stats Mode Containers */
@@ -291,14 +293,18 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    width: calc(100% + 48px);
-    margin-right: -48px;
     overflow-x: auto;
     overflow-y: visible;
-    padding: 4px 48px 4px 0;
+    padding: 4px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+.stats-advanced::after {
+    content: '';
+    flex-shrink: 0;
+    width: 24px;
 }
 
 .stats-advanced::-webkit-scrollbar {
