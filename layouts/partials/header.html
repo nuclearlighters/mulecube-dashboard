@@ -308,20 +308,17 @@
 
 .stats-advanced .stat-item,
 .stats-advanced .power-btn,
-.stats-advanced .mode-toggle-btn {
+.stats-advanced .mode-toggle-btn,
+.stats-advanced .stats-spacer {
     flex-shrink: 0;
-}
-
-/* Ensure last button has space and isn't clipped */
-.stats-advanced .mode-toggle-btn:last-child {
-    margin-right: 1.5rem;
 }
 
 /* Spacer element to prevent button clipping */
 .stats-spacer {
-    display: inline-block;
-    width: 2rem;
-    flex-shrink: 0;
+    display: block;
+    min-width: 48px;
+    width: 48px;
+    height: 1px;
 }
 
 .stat-icon-svg {
