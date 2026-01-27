@@ -1,71 +1,104 @@
 {{ define "main" }}
-<section class="docs-hero">
-    <div class="container">
-        <h1>{{ .Title }}</h1>
-        <p class="lead">{{ .Description }}</p>
-    </div>
-</section>
-
-<section class="docs-content">
-    <div class="container">
-        <div class="docs-grid">
-            <!-- Sidebar Navigation -->
-            <nav class="docs-sidebar">
-                <h3>Documentation</h3>
+<div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+        <div class="docs-sidebar-inner">
+            <div class="docs-sidebar-header">
+                <h2>Guides</h2>
+            </div>
+            <nav class="docs-nav">
                 <ul>
                     {{ range (where .Site.RegularPages "Section" "docs").ByWeight }}
-                    <li class="{{ if eq $.RelPermalink .RelPermalink }}active{{ end }}">
-                        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                    <li>
+                        <a href="{{ .RelPermalink }}" class="{{ if eq $.RelPermalink .RelPermalink }}active{{ end }}">
+                            {{ .Title }}
+                        </a>
                     </li>
                     {{ end }}
                 </ul>
-                
-                <div class="docs-sidebar-footer">
-                    <a href="https://github.com/nuclearlighters/mulecube" target="_blank" rel="noopener">
-                        View on GitHub →
-                    </a>
-                </div>
             </nav>
-            
-            <!-- Main Content -->
-            <article class="docs-article">
-                <div class="docs-article-content">
-                    {{ .Content }}
-                </div>
-                
-                <footer class="docs-article-footer">
-                    <div class="docs-nav">
-                        {{ $pages := (where .Site.RegularPages "Section" "docs").ByWeight }}
-                        {{ $currentIndex := 0 }}
-                        {{ range $i, $p := $pages }}
-                            {{ if eq $.RelPermalink $p.RelPermalink }}
-                                {{ $currentIndex = $i }}
-                            {{ end }}
-                        {{ end }}
-                        
-                        {{ if gt $currentIndex 0 }}
-                            {{ $prev := index $pages (sub $currentIndex 1) }}
-                            <a href="{{ $prev.RelPermalink }}" class="docs-nav-prev">
-                                ← {{ $prev.Title }}
-                            </a>
-                        {{ end }}
-                        
-                        {{ if lt $currentIndex (sub (len $pages) 1) }}
-                            {{ $next := index $pages (add $currentIndex 1) }}
-                            <a href="{{ $next.RelPermalink }}" class="docs-nav-next">
-                                {{ $next.Title }} →
-                            </a>
-                        {{ end }}
-                    </div>
-                    
-                    <p class="docs-edit">
-                        <a href="https://github.com/nuclearlighters/mulecube/edit/main/docs/{{ .File.LogicalName }}" target="_blank" rel="noopener">
-                            Edit this page on GitHub
-                        </a>
-                    </p>
-                </footer>
-            </article>
+            <div class="docs-sidebar-footer">
+                <a href="https://github.com/nuclearlighters/mulecube" target="_blank" rel="noopener">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
         </div>
-    </div>
-</section>
+    </aside>
+
+    <!-- Mobile sidebar toggle -->
+    <button class="docs-mobile-toggle" id="docs-mobile-toggle" aria-label="Toggle navigation">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span>Menu</span>
+    </button>
+
+    <!-- Main Content -->
+    <main class="docs-main">
+        <article class="docs-article">
+            <header class="docs-header">
+                <h1>{{ .Title }}</h1>
+                {{ if .Description }}<p class="docs-lead">{{ .Description }}</p>{{ end }}
+            </header>
+
+            <div class="docs-body">
+                {{ .Content }}
+            </div>
+
+            <!-- Previous/Next Navigation -->
+            <footer class="docs-footer">
+                <nav class="docs-pagination">
+                    {{ $pages := (where .Site.RegularPages "Section" "docs").ByWeight }}
+                    {{ $currentIndex := 0 }}
+                    {{ range $i, $p := $pages }}
+                        {{ if eq $.RelPermalink $p.RelPermalink }}
+                            {{ $currentIndex = $i }}
+                        {{ end }}
+                    {{ end }}
+                    
+                    {{ if gt $currentIndex 0 }}
+                        {{ $prev := index $pages (sub $currentIndex 1) }}
+                        <a href="{{ $prev.RelPermalink }}" class="docs-pagination-link docs-pagination-prev">
+                            <span class="docs-pagination-label">Previous</span>
+                            <span class="docs-pagination-title">← {{ $prev.Title }}</span>
+                        </a>
+                    {{ else }}
+                        <span class="docs-pagination-spacer"></span>
+                    {{ end }}
+                    
+                    {{ if lt $currentIndex (sub (len $pages) 1) }}
+                        {{ $next := index $pages (add $currentIndex 1) }}
+                        <a href="{{ $next.RelPermalink }}" class="docs-pagination-link docs-pagination-next">
+                            <span class="docs-pagination-label">Next</span>
+                            <span class="docs-pagination-title">{{ $next.Title }} →</span>
+                        </a>
+                    {{ end }}
+                </nav>
+
+                <p class="docs-edit">
+                    <a href="https://github.com/nuclearlighters/mulecube/edit/main/docs/{{ .File.LogicalName }}" target="_blank" rel="noopener">
+                        Edit this page on GitHub
+                    </a>
+                </p>
+            </footer>
+        </article>
+    </main>
+</div>
+
+<script>
+(function() {
+    const toggle = document.getElementById('docs-mobile-toggle');
+    const sidebar = document.querySelector('.docs-sidebar');
+    
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            toggle.classList.toggle('active');
+        });
+    }
+})();
+</script>
 {{ end }}
