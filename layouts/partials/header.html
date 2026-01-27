@@ -294,10 +294,15 @@
     width: 100%;
     overflow-x: auto;
     overflow-y: visible;
-    padding: 4px 0;
+    padding: 4px 8px 4px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+/* Add padding to last item to ensure it's not cut off */
+.stats-advanced > *:last-child {
+    margin-right: 8px;
 }
 
 .stats-advanced::-webkit-scrollbar {
