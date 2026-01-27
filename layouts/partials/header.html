@@ -291,18 +291,14 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
+    width: calc(100% + 24px);
+    margin-right: -24px;
     overflow-x: auto;
     overflow-y: visible;
-    padding: 4px 8px 4px 0;
+    padding: 4px 24px 4px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
-}
-
-/* Add padding to last item to ensure it's not cut off */
-.stats-advanced > *:last-child {
-    margin-right: 8px;
 }
 
 .stats-advanced::-webkit-scrollbar {
